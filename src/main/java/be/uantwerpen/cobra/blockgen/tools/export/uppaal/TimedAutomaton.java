@@ -1,0 +1,654 @@
+package be.uantwerpen.cobra.blockgen.tools.export.uppaal;
+
+import be.uantwerpen.cobra.blockgen.models.blocks.*;
+import be.uantwerpen.cobra.blockgen.tools.export.uppaal.models.Link;
+import be.uantwerpen.cobra.blockgen.tools.export.uppaal.models.Node;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Vector;
+
+/**
+ * Created by Thomas on 25/04/2016.
+ */
+public class TimedAutomaton
+{
+    private String name;
+    private Vector<Node> nodes;
+    private Vector<Link> links;
+
+    public TimedAutomaton()
+    {
+        this.name = "AUTOMATON";
+        this.nodes = new Vector<Node>();
+        this.links = new Vector<Link>();
+    }
+
+    public int createAutomaton(Block model, int abstractionDepth) throws Exception
+    {
+        Vector<Node> endNodes = new Vector<Node>();
+
+        if(model.getClass() != MethodBlock.class)
+        {
+            throw new Exception("Top block needs to be from the class MethodBlock!");
+        }
+
+        //Set automaton name
+        this.name = ((MethodBlock)model).getMethodName();
+
+        //Set initial node
+        Node node = new Node();
+        node.setId(getNextFreeId());
+        node.setName(((MethodBlock) model).getMethodName());
+        node.setInitial(true);
+
+        if(abstractionDepth != 0)
+        {
+            node.setComments(model.getCodeSegment().toString());
+        }
+        else
+        {
+            node.setComments(model.getCodeString());
+        }
+
+        this.nodes.add(node);
+
+        if(abstractionDepth != 0)
+        {
+            Vector<Node> parentNodes = new Vector<Node>();
+
+            parentNodes.add(node);
+
+            endNodes = addNodesRecursive(model, parentNodes, abstractionDepth - 1);
+        }
+        else
+        {
+            endNodes.add(node);
+        }
+
+        //Add return node if no available
+        if(!(endNodes.lastElement().getComments().contains("return")))
+        {
+            Node exitNode = new Node();
+            exitNode.setId(getNextFreeId());
+            exitNode.setName("END");
+            exitNode.setComments("return;");
+
+            this.nodes.add(exitNode);
+
+            //Create links
+            for(Node lastNode : endNodes)
+            {
+                Link link = getEmptyTargetLink(lastNode);
+
+                //Set link target
+                link.setTargetNode(exitNode);
+
+                this.links.add(link);
+            }
+        }
+
+        this.prettifyLayout();
+
+        return 0;
+    }
+
+    private Vector<Node> addNodesRecursive(Block currentBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
+    {
+        int startRow = 0;
+        int endRow = 0;
+        int nextAbstractionLevel = leftAbstractionLevel - 1;
+        Vector<Node> lastNodes = new Vector<Node>(parentNodes);
+
+        for(Block block : currentBlock.getChildBlocks())
+        {
+            if(block instanceof IterationBlock)
+            {
+                lastNodes = createIterationNode((IterationBlock)block, lastNodes, leftAbstractionLevel);
+            }
+            else if(block instanceof SelectionBlock)
+            {
+                lastNodes = createSelectionNode((SelectionBlock)block, lastNodes, leftAbstractionLevel);
+            }
+            else
+            {
+                Node node = createBasicNode(block, leftAbstractionLevel);
+
+                this.nodes.add(node);
+
+                //Create link
+                for(Node lastNode : lastNodes)
+                {
+                    Link link = getEmptyTargetLink(lastNode);
+
+                    //Set link target
+                    link.setTargetNode(node);
+
+                    this.links.add(link);
+                }
+
+                //Set new last node
+                lastNodes.clear();
+                lastNodes.add(node);
+
+                if(block.getNumOfChildren() > 0 && leftAbstractionLevel != 0)
+                {
+                    lastNodes = addNodesRecursive(block, lastNodes, nextAbstractionLevel);
+                }
+            }
+        }
+
+        return lastNodes;
+    }
+
+    private Link getEmptyTargetLink(Node node)
+    {
+        Link link = null;
+        boolean found = false;
+        Iterator<Link> it = node.getLinks().iterator();
+
+        while(it.hasNext() && !found)
+        {
+            link = it.next();
+
+            if(link.getTargetNode() == null)
+            {
+                found = true;
+            }
+        }
+
+        if(found)
+        {
+            return link;
+        }
+        else
+        {
+            link = new Link();
+            node.addLink(link);
+
+            return link;
+        }
+    }
+
+    private Node createBasicNode(Block block, int leftAbstractionLevel)
+    {
+        Node node;
+        int startRow;
+        int endRow;
+
+        //Create node
+        node = new Node();
+        node.setId(getNextFreeId());
+
+        startRow = block.getStartRowNumber();
+
+        if(leftAbstractionLevel != 0)
+        {
+            endRow = block.getEndRowNumber();
+            node.setComments(block.getCodeSegment().toString());
+        }
+        else
+        {
+            endRow = block.getLeafs().lastElement().getEndRowNumber();
+            node.setComments(block.getCodeString());
+        }
+
+        if(startRow == endRow)
+        {
+            node.setName("r" + startRow);
+        }
+        else
+        {
+            node.setName("r" + startRow + "_r" + endRow);
+        }
+
+        return node;
+    }
+
+    private Vector<Node> createIterationNode(IterationBlock iterationBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
+    {
+        int nextAbstractionLevel = leftAbstractionLevel - 1;
+        Vector<Node> lastNodes = new Vector<Node>(parentNodes);
+
+        if(leftAbstractionLevel == 0)
+        {
+            Node node = createBasicNode(iterationBlock, leftAbstractionLevel);
+
+            this.nodes.add(node);
+
+            //Create link
+            for(Node lastNode : lastNodes)
+            {
+                Link link = getEmptyTargetLink(lastNode);
+
+                //Set link target
+                link.setTargetNode(node);
+
+                this.links.add(link);
+            }
+
+            //Set new last node
+            lastNodes.clear();
+            lastNodes.add(node);
+        }
+        else
+        {
+            if(iterationBlock.getCodeSegment().toString().startsWith("for"))
+            {
+                String initString = iterationBlock.getCodeSegment().toString();
+                initString = initString.split(";")[0];
+                initString = initString.split("\\(")[1];
+
+                //Create initialisation node
+                if(!initString.isEmpty())
+                {
+                    Node node = new Node();
+                    node.setId(getNextFreeId());
+                    node.setName("r" + iterationBlock.getStartRowNumber() + "_init");
+                    node.setComments(initString + ";");
+
+                    this.nodes.add(node);
+
+                    //Create link with last nodes
+                    for(Node lastNode : lastNodes)
+                    {
+                        Link link = getEmptyTargetLink(lastNode);
+
+                        //Set link target
+                        link.setTargetNode(node);
+
+                        this.links.add(link);
+                    }
+
+                    //Set new last node
+                    lastNodes.clear();
+                    lastNodes.add(node);
+                }
+            }
+
+            //Create iteration condition node
+            Node conditionNode = new Node();
+            String conditionString = iterationBlock.getCodeSegment().toString();
+
+            if(!iterationBlock.isDoWhileStatement())
+            {
+                if(iterationBlock.getCodeSegment().toString().startsWith("for"))
+                {
+                    conditionNode.setName("r" + iterationBlock.getStartRowNumber() + "_cond");
+                    conditionString = conditionString.split(";")[1];
+                    conditionString = "for( ; " + conditionString + " ; )";
+                }
+                else
+                {
+                    conditionNode.setName("r" + iterationBlock.getStartRowNumber());
+                }
+
+                conditionNode.setComments(conditionString);
+
+                //Create true statement links
+                Link trueStatementLink = new Link();
+                trueStatementLink.setGuard("true");
+
+                conditionNode.addLink(trueStatementLink);
+            }
+            else
+            {
+                conditionNode.setName("r" + iterationBlock.getStartRowNumber() + "_do");
+                conditionNode.setComments("do");
+            }
+
+            conditionNode.setId(getNextFreeId());
+
+            this.nodes.add(conditionNode);
+
+            //Create link with last nodes
+            for(Node lastNode : lastNodes)
+            {
+                Link link = getEmptyTargetLink(lastNode);
+
+                //Set link target
+                link.setTargetNode(conditionNode);
+
+                this.links.add(link);
+            }
+
+            //Set new last node
+            lastNodes.clear();
+            lastNodes.add(conditionNode);
+
+            Vector<Node> iterationInNodes = new Vector<Node>(lastNodes);
+
+            //Add iteration body
+            lastNodes = addNodesRecursive(iterationBlock, lastNodes, nextAbstractionLevel);
+
+            if(iterationBlock.getCodeSegment().toString().startsWith("for"))
+            {
+                String postString = iterationBlock.getCodeSegment().toString();
+                postString = postString.split(";")[2];
+                postString = postString.substring(0, postString.lastIndexOf(")"));
+
+                //Create post statement node
+                if(!postString.isEmpty())
+                {
+                    Node node = new Node();
+                    node.setId(getNextFreeId());
+                    node.setName("r" + iterationBlock.getStartRowNumber() + "_post");
+                    node.setComments(postString + ";");
+
+                    this.nodes.add(node);
+
+                    //Create link with last nodes
+                    for(Node lastNode : lastNodes)
+                    {
+                        Link link = getEmptyTargetLink(lastNode);
+
+                        //Set link target
+                        link.setTargetNode(node);
+
+                        this.links.add(link);
+                    }
+
+                    //Set new last node
+                    lastNodes.clear();
+                    lastNodes.add(node);
+                }
+            }
+
+            if(iterationBlock.isDoWhileStatement())
+            {
+                //Create iteration condition node at the end
+                Node conditionDoWhileNode = new Node();
+
+                conditionDoWhileNode.setName("r" + iterationBlock.getStartRowNumber());
+                conditionDoWhileNode.setId(getNextFreeId());
+                conditionDoWhileNode.setComments(conditionString);
+
+                this.nodes.add(conditionDoWhileNode);
+
+                //Create link with last nodes
+                for(Node lastNode : lastNodes)
+                {
+                    Link link = getEmptyTargetLink(lastNode);
+
+                    //Set link target
+                    link.setTargetNode(conditionDoWhileNode);
+
+                    this.links.add(link);
+                }
+
+                //Set new last node
+                lastNodes.clear();
+                lastNodes.add(conditionDoWhileNode);
+            }
+
+            //Create iteration loop links
+            for(Node lastNode : lastNodes)
+            {
+                //Get iteration start nodes
+                for(Node iterationInNode : iterationInNodes)
+                {
+                    Link link = getEmptyTargetLink(lastNode);
+
+                    //Set link target
+                    link.setTargetNode(iterationInNode);
+
+                    //Add iteration loop link to last nodes of loop
+                    lastNode.addLink(link);
+
+                    if(iterationBlock.isDoWhileStatement())
+                    {
+                        //Set link guard (True statement)
+                        link.setGuard("true");
+                    }
+
+                    this.links.add(link);
+                }
+            }
+
+            //Create iteration exit links
+            //Get guard condition false
+            if(!iterationBlock.isDoWhileStatement())
+            {
+                for(Node iterationInNode : iterationInNodes)
+                {
+                    Link link = getEmptyTargetLink(iterationInNode);
+
+                    //Set link guard (False statement)
+                    link.setGuard("false");
+
+                    //Add node to last node list
+                    lastNodes.clear();
+                    lastNodes.add(iterationInNode);
+                }
+            }
+            else
+            {
+                for(Node lastNode : lastNodes)
+                {
+                    Link link = getEmptyTargetLink(lastNode);
+
+                    //Set link guard (False statement)
+                    link.setGuard("false");
+                }
+            }
+        }
+
+        return lastNodes;
+    }
+
+    private Vector<Node> createSelectionNode(SelectionBlock selectionBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
+    {
+        int nextAbstractionLevel = leftAbstractionLevel - 1;
+        Vector<Node> lastNodes = new Vector<Node>();
+
+        if(leftAbstractionLevel == 0)
+        {
+            Node node = createBasicNode(selectionBlock, leftAbstractionLevel);
+
+            this.nodes.add(node);
+
+            //Create link
+            for(Node parentNode : parentNodes)
+            {
+                Link link = getEmptyTargetLink(parentNode);
+
+                //Set link target
+                link.setTargetNode(node);
+
+                this.links.add(link);
+            }
+
+            //Set new last nodes
+            lastNodes.add(node);
+        }
+        else
+        {
+            //Create selection condition node
+            Node selectionNode = new Node();
+            String selectionString = selectionBlock.getCodeSegment().toString();
+
+            selectionNode.setName("r" + selectionBlock.getStartRowNumber());
+            selectionNode.setId(getNextFreeId());
+            selectionNode.setComments(selectionString);
+
+            this.nodes.add(selectionNode);
+
+            //Create link with parent nodes
+            for(Node parentNode : parentNodes)
+            {
+                Link link = getEmptyTargetLink(parentNode);
+
+                //Set link target
+                link.setTargetNode(selectionNode);
+
+                this.links.add(link);
+            }
+
+            if(selectionBlock.getCodeSegment().toString().startsWith("if"))
+            {
+                //If-Else statement
+                boolean trueStatement = false;
+                boolean falseStatement = false;
+
+                for(Block caseBlock : selectionBlock.getChildBlocks())
+                {
+                    String guardString;
+
+                    if(caseBlock.getNumOfChildren() != 0)
+                    {
+                        if(((CaseBlock)caseBlock).getIfSelectionValue())
+                        {
+                            //True case
+                            trueStatement = true;
+                            guardString = "true";
+                        }
+                        else
+                        {
+                            //False case
+                            falseStatement = true;
+                            guardString = "false";
+                        }
+
+                        //Create link with selection statement node
+                        Link link = getEmptyTargetLink(selectionNode);
+
+                        //Set link guard
+                        link.setGuard(guardString);
+
+                        //Add selection branch body
+                        lastNodes.addAll(addNodesRecursive(caseBlock, new Vector<Node>(Collections.singleton(selectionNode)), nextAbstractionLevel));
+                    }
+                }
+
+                if(!trueStatement && falseStatement)                    //Close true case if not existing
+                {
+                    //Create link with selection statement node
+                    Link link = getEmptyTargetLink(selectionNode);
+
+                    //Set link guard
+                    link.setGuard("true");
+
+                    lastNodes.add(selectionNode);
+                }
+                else if(!falseStatement && trueStatement)               //Close false case if not existing
+                {
+                    //Create link with selection statement node
+                    Link link = getEmptyTargetLink(selectionNode);
+
+                    //Set link guard
+                    link.setGuard("false");
+
+                    lastNodes.add(selectionNode);
+                }
+                else if(!(trueStatement && falseStatement))            //None completed if-else statement or non-functional selection statement if();
+                {
+                    lastNodes.add(selectionNode);
+                }
+            }
+            else if(selectionBlock.getCodeSegment().toString().startsWith("switch"))
+            {
+                Vector<Node> previousCaseNodes = new Vector<Node>(Collections.singleton(selectionNode));
+                boolean firstCase = true;
+
+                //Switch-case statement
+                for(Block caseBlock : selectionBlock.getChildBlocks())
+                {
+                    Node caseNode = new Node();
+                    String caseString = caseBlock.getCodeSegment().toString();
+
+                    caseNode.setName("r" + caseBlock.getStartRowNumber());
+                    caseNode.setId(getNextFreeId());
+                    caseNode.setComments(caseString);
+
+                    this.nodes.add(caseNode);
+
+                    //Create link with previous case nodes
+                    for(Node previousCaseNode : previousCaseNodes)
+                    {
+                        Link link = getEmptyTargetLink(previousCaseNode);
+
+                        //Set link target
+                        link.setTargetNode(caseNode);
+
+                        if(!firstCase)
+                        {
+                            //Set guard (False)
+                            link.setGuard("false");
+                        }
+                        else
+                        {
+                            firstCase = false;
+                        }
+
+                        this.links.add(link);
+                    }
+
+                    //Create link for case body
+                    Link caseBodyLink = getEmptyTargetLink(caseNode);
+
+                    if(!caseString.startsWith("default:"))
+                    {
+                        //Set guard (True)
+                        caseBodyLink.setGuard("true");
+                    }
+
+                    lastNodes.addAll(addNodesRecursive(caseBlock, new Vector<Node>(Collections.singleton(caseNode)), nextAbstractionLevel));
+
+                    previousCaseNodes.clear();
+                    previousCaseNodes.add(caseNode);
+                }
+
+                //Check for empty switch (Pass through)
+                if(selectionBlock.getChildBlocks().isEmpty())
+                {
+                    lastNodes.add(selectionNode);
+                }
+
+                //To Do: Build check for cases without break statement!!
+            }
+        }
+
+        return lastNodes;
+    }
+
+    private int getNextFreeId()
+    {
+        if(this.nodes.isEmpty())
+        {
+            return 0;
+        }
+        else
+        {
+            return this.nodes.lastElement().getId() + 1;
+        }
+    }
+
+    public Vector<Node> getNodes()
+    {
+        return this.nodes;
+    }
+
+    public Vector<Link> getLinks()
+    {
+        return this.links;
+    }
+
+    public String getName()
+    {
+        return this.name;
+    }
+
+    private void prettifyLayout()
+    {
+        int locX = 0;
+        int locY = 0;
+
+        for(Node node : nodes)
+        {
+            node.setLocation(locX, locY);
+
+            locX = locX;
+            locY = locY + 64;
+        }
+    }
+}
