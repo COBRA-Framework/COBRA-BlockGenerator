@@ -16,12 +16,16 @@ public class TimedAutomaton
     private String name;
     private Vector<Node> nodes;
     private Vector<Link> links;
+    private Node endNode;
 
     public TimedAutomaton()
     {
         this.name = "AUTOMATON";
         this.nodes = new Vector<Node>();
         this.links = new Vector<Link>();
+        this.endNode = new Node();
+        this.endNode.setName("END");
+        this.endNode.setComments("");
     }
 
     public int createAutomaton(Block model, int abstractionDepth) throws Exception
@@ -66,23 +70,19 @@ public class TimedAutomaton
             endNodes.add(node);
         }
 
-        //Add return node if no available
-        if(!(endNodes.lastElement().getComments().contains("return")))
+        //Set id of end node
+        this.endNode.setId(getNextFreeId());
+
+        //Link to end if no return node is available
+        if(!endNodes.isEmpty())
         {
-            Node exitNode = new Node();
-            exitNode.setId(getNextFreeId());
-            exitNode.setName("END");
-            exitNode.setComments("return;");
-
-            this.nodes.add(exitNode);
-
             //Create links
             for(Node lastNode : endNodes)
             {
                 Link link = getEmptyTargetLink(lastNode);
 
                 //Set link target
-                link.setTargetNode(exitNode);
+                link.setTargetNode(this.endNode);
 
                 this.links.add(link);
             }
@@ -109,6 +109,10 @@ public class TimedAutomaton
             else if(block instanceof SelectionBlock)
             {
                 lastNodes = createSelectionNode((SelectionBlock)block, lastNodes, leftAbstractionLevel);
+            }
+            else if(block instanceof JumpBlock)
+            {
+                lastNodes = createJumpNode((JumpBlock)block, lastNodes, leftAbstractionLevel);
             }
             else
             {
@@ -611,6 +615,61 @@ public class TimedAutomaton
         return lastNodes;
     }
 
+    private Vector<Node> createJumpNode(JumpBlock jumpBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
+    {
+        int nextAbstractionLevel = leftAbstractionLevel - 1;
+        Vector<Node> lastNodes = new Vector<Node>();
+
+        //Create jump node
+        Node jumpNode = new Node();
+        String jumpString = jumpBlock.getCodeSegment().toString();
+
+        jumpNode.setName("r" + jumpBlock.getStartRowNumber());
+        jumpNode.setId(getNextFreeId());
+        jumpNode.setComments(jumpString);
+
+        this.nodes.add(jumpNode);
+
+        if(jumpNode.getComments().contains("return"))
+        {
+            //Return statement
+            //Create link with parent nodes
+            for(Node parentNode : parentNodes)
+            {
+                Link link = getEmptyTargetLink(parentNode);
+
+                //Set link target
+                link.setTargetNode(jumpNode);
+
+                this.links.add(link);
+            }
+
+            //Create link with exit node
+            Link link = getEmptyTargetLink(jumpNode);
+
+            //Set link target
+            link.setTargetNode(this.endNode);
+
+            this.links.add(link);
+        }
+        else if(jumpNode.getComments().contains("break"))
+        {
+            //Break statement
+        }
+        else if(jumpNode.getComments().contains("continue"))
+        {
+            //Continue statement
+        }
+        else if(jumpNode.getComments().contains("goto"))
+        {
+            //Go to statement
+            System.err.println("Goto statement block is not yet implemented!");
+            System.err.println("Results will not be correct!");
+        }
+
+        return lastNodes;
+    }
+
     private int getNextFreeId()
     {
         if(this.nodes.isEmpty())
@@ -638,6 +697,11 @@ public class TimedAutomaton
         return this.name;
     }
 
+    public Node getEndNode()
+    {
+        return this.endNode;
+    }
+
     private void prettifyLayout()
     {
         int locX = 0;
@@ -650,5 +714,7 @@ public class TimedAutomaton
             locX = locX;
             locY = locY + 64;
         }
+
+        this.endNode.setLocation(locX, locY);
     }
 }

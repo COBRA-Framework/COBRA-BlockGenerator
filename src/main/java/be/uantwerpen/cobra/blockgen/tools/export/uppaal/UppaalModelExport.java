@@ -176,6 +176,10 @@ public class UppaalModelExport implements ExportTool
                     buffWriter.write(nodeString);
                 }
 
+                //Write end node
+                String nodeString = "<location id=\"id" + system.getEndNode().getId() + "\" x=\"" + system.getEndNode().getLocX() + "\" y=\"" + system.getEndNode().getLocY() + "\"><name x=\"" + (system.getEndNode().getLocX() + 16) + "\" y=\"" + (system.getEndNode().getLocY() - 16) + "\">" + system.getEndNode().getName() + "</name><label kind=\"comments\">" + formatXMLString(system.getEndNode().getComments()) + "</label></location>" + eol;
+                buffWriter.write(nodeString);
+
                 //Set initial node
                 int i = 0;
                 boolean initialFound = false;

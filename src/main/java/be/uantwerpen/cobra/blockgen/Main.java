@@ -71,7 +71,7 @@ public class Main extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        primaryStage.setTitle("HPAFramework");
+        primaryStage.setTitle("COBRA Framework - Block Generator");
 
         StackPane layout = new StackPane();
 
