@@ -1,11 +1,10 @@
-package be.uantwerpen.cobra.blockgen.tools.export.blockbenchmarker;
+package be.uantwerpen.cobra.blockgen.tools.export.blockmodel.generators;
 
 import be.uantwerpen.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.cobra.blockgen.models.blocks.MethodBlock;
 import be.uantwerpen.cobra.blockgen.models.blocks.ProgramBlock;
-import be.uantwerpen.cobra.blockgen.tools.export.uppaal.TimedAutomaton;
+import be.uantwerpen.cobra.blockgen.tools.export.blockmodel.SourceGenerator;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.models.Node;
-import be.uantwerpen.cobra.blockgen.tools.interfaces.CodeParser;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -13,61 +12,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Created by Thomas on 09/05/2016.
+ * Created by Thomas on 27/09/2016.
  */
-public class BlockBenchmarkExport
+public class CSourceGenerator extends BasicSourceGenerator implements SourceGenerator
 {
-    public int generateSourceOfBlock(String fileLocation, Block codeBlock, CodeParser.Grammar grammar) throws Exception
-    {
-        int startRowNumber = codeBlock.getStartRowNumber();
-        int endRowNumber = codeBlock.getEndRowNumber();
-        String exportFile = fileLocation + "block_";
-
-        //Generate file name
-        if(startRowNumber != endRowNumber)
-        {
-            exportFile = exportFile.concat("r" + startRowNumber + "-" + endRowNumber);
-        }
-        else
-        {
-            exportFile = exportFile.concat("r" + startRowNumber);
-        }
-
-        switch(grammar)
-        {
-            case C:
-                exportFile = exportFile.concat(".c");
-                return writeCSourceFile(exportFile, codeBlock);
-            default:
-                throw new Exception("Exporting to:" + grammar.name() + " is not supported!");
-        }
-    }
-
-    public int generateSourceOfTimedAutomaton(String fileLocation, TimedAutomaton automaton, CodeParser.Grammar grammar) throws Exception
-    {
-        for(Node node : automaton.getNodes())
-        {
-            generateSourceOfNode(fileLocation + automaton.getName() + "_", node, grammar);
-        }
-
-        return 0;
-    }
-
-    public int generateSourceOfNode(String fileLocation, Node node, CodeParser.Grammar grammar) throws Exception
-    {
-        String exportFile = fileLocation + "node_" + node.getName();
-
-        switch(grammar)
-        {
-            case C:
-                exportFile = exportFile.concat(".c");
-                return writeCSourceFile(exportFile, node);
-            default:
-                throw new Exception("Exporting to:" + grammar.name() + " is not supported!");
-        }
-    }
-
-    private int writeCSourceFile(String exportFile, Block codeBlock) throws Exception
+    public int writeSourceFile(String exportFile, Block codeBlock) throws Exception
     {
         File file;
         FileWriter writer;
@@ -78,21 +27,8 @@ public class BlockBenchmarkExport
             throw new Exception("Program block export is not supported!");
         }
 
-        //Open file
-        try
-        {
-            file = new File(exportFile);
-
-            if(!file.exists())
-            {
-                file.createNewFile();
-            }
-        }
-        catch(IOException e)
-        {
-            //Could not create file
-            throw new IOException("Could not open file: " + exportFile + ".\n" + e.getMessage());
-        }
+        //Get file
+        file = openFile(exportFile);
 
         try
         {
@@ -101,7 +37,7 @@ public class BlockBenchmarkExport
             buffWriter = new BufferedWriter(writer);
 
             //Write file introduction
-            String fileHeader = "/* " + eol + eol + "\tCreated with COBRA-Framework Export Tool v0.1" + eol + "\tDeveloped by: Thomas Huybrechts - MOSAIC 2016" + eol + eol + "*/" + eol + eol;
+            String fileHeader = "/* " + eol + eol + getSourceHeader() + eol + eol + "*/" + eol + eol;
             buffWriter.write(fileHeader);
 
             //Write include section
@@ -181,27 +117,14 @@ public class BlockBenchmarkExport
         return 0;
     }
 
-    private int writeCSourceFile(String exportFile, Node node) throws Exception
+    public int writeSourceFile(String exportFile, Node node) throws Exception
     {
         File file;
         FileWriter writer;
         BufferedWriter buffWriter;
 
-        //Open file
-        try
-        {
-            file = new File(exportFile);
-
-            if(!file.exists())
-            {
-                file.createNewFile();
-            }
-        }
-        catch(IOException e)
-        {
-            //Could not create file
-            throw new IOException("Could not open file: " + exportFile + ".\n" + e.getMessage());
-        }
+        //Get file
+        file = openFile(exportFile);
 
         try
         {
@@ -210,7 +133,7 @@ public class BlockBenchmarkExport
             buffWriter = new BufferedWriter(writer);
 
             //Write file introduction
-            String fileHeader = "/* " + eol + eol + "\tCreated with COBRA-Framework Export Tool v0.1" + eol + "\tDeveloped by: Thomas Huybrechts - MOSAIC 2016" + eol + eol + "*/" + eol + eol;
+            String fileHeader = "/* " + eol + eol + getSourceHeader() + eol + eol + "*/" + eol + eol;
             buffWriter.write(fileHeader);
 
             //Write include section

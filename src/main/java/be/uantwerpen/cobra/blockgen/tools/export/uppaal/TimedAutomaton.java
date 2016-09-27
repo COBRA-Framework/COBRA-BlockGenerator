@@ -630,20 +630,20 @@ public class TimedAutomaton
 
         this.nodes.add(jumpNode);
 
+        //Create link with parent nodes
+        for(Node parentNode : parentNodes)
+        {
+            Link link = getEmptyTargetLink(parentNode);
+
+            //Set link target
+            link.setTargetNode(jumpNode);
+
+            this.links.add(link);
+        }
+
         if(jumpNode.getComments().contains("return"))
         {
             //Return statement
-            //Create link with parent nodes
-            for(Node parentNode : parentNodes)
-            {
-                Link link = getEmptyTargetLink(parentNode);
-
-                //Set link target
-                link.setTargetNode(jumpNode);
-
-                this.links.add(link);
-            }
-
             //Create link with exit node
             Link link = getEmptyTargetLink(jumpNode);
 
@@ -655,10 +655,18 @@ public class TimedAutomaton
         else if(jumpNode.getComments().contains("break"))
         {
             //Break statement
+            //Add node to last nodes list to connect loop exit
+            //lastNodes.add(jumpNode);
+            System.err.println("Break statement block is not yet implemented!");
+            System.err.println("Results will not be correct!");
         }
         else if(jumpNode.getComments().contains("continue"))
         {
             //Continue statement
+            //Add node to last nodes list to connect to next iteration evaluation
+            //lastNodes.add(jumpNode);
+            System.err.println("Continue statement block is not yet implemented!");
+            System.err.println("Results will not be correct!");
         }
         else if(jumpNode.getComments().contains("goto"))
         {

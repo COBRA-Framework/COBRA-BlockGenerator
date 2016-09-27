@@ -9,7 +9,7 @@ import be.uantwerpen.cobra.blockgen.models.blocks.ProgramBlock;
 import be.uantwerpen.cobra.blockgen.models.blocks.SelectionBlock;
 import be.uantwerpen.cobra.blockgen.tools.antlr.Antlr;
 import be.uantwerpen.cobra.blockgen.tools.export.ExportTool;
-import be.uantwerpen.cobra.blockgen.tools.export.blockbenchmarker.BlockBenchmarkExport;
+import be.uantwerpen.cobra.blockgen.tools.export.blockmodel.BlockModelExport;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.TimedAutomaton;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.UppaalModelExport;
 import be.uantwerpen.cobra.blockgen.tools.interfaces.CodeParser;
@@ -58,10 +58,12 @@ public class Main extends Application
 
         generateOUTPUT(args[0], args[1], abstractionDepth);
 
-        try {
+        try
+        {
             System.in.read();
         }
-        catch(IOException e) {
+        catch(IOException e)
+        {
             e.printStackTrace();
         }
 
@@ -216,7 +218,7 @@ public class Main extends Application
 
         ((UppaalModelExport)exportTool).exportToXML(automata, exportLocation + "uppaal.xml");
 
-        BlockBenchmarkExport benchmarkExport = new BlockBenchmarkExport();
+        BlockModelExport benchmarkExport = new BlockModelExport();
 
         //Generate UPPAAL C source files for benchmarking
         File uppaalCSourceFolder = new File(exportLocation + "UPPAAL_source/");
