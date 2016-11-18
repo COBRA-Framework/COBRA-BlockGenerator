@@ -48,7 +48,13 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
     @Override
     public void enterCompilationUnit(CParser.CompilationUnitContext ctx)
     {
-        System.out.println("*********[COMPILATION UNIT]*********");
+        //New compilation unit
+    }
+
+    @Override
+    public void exitCompilationUnit(CParser.CompilationUnitContext ctx)
+    {
+        //Exit compilation unit
     }
 
     @Override

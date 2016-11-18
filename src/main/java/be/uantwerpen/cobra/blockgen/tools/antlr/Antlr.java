@@ -13,14 +13,14 @@ import be.uantwerpen.cobra.blockgen.tools.antlr.interfaces.AntlrLexer;
 import be.uantwerpen.cobra.blockgen.tools.antlr.interfaces.AntlrListener;
 import be.uantwerpen.cobra.blockgen.tools.antlr.interfaces.AntlrParser;
 import be.uantwerpen.cobra.blockgen.tools.interfaces.CodeParser;
-import org.antlr.v4.runtime.ANTLRFileStream;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -33,6 +33,7 @@ public class Antlr implements CodeParser
         AntlrLexer lexer;
         AntlrParser parser;
         AntlrListener listener;
+        ParserErrorListener errorListener;
         CharStream fileStream;
         BlockFactory blockParser;
         CodeFile codeFile;
@@ -60,6 +61,8 @@ public class Antlr implements CodeParser
 
         //Get parser
         parser = getParser(grammar, lexer);
+        errorListener = new ParserErrorListener();
+        parser.addErrorListener(errorListener);
 
         //Get listener
         listener = getListener(grammar, blockParser);
@@ -68,6 +71,11 @@ public class Antlr implements CodeParser
         ParseTree tree = parser.getRootNode();
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(listener, tree);
+
+        if(errorListener.getNumberOfSyntaxErrors() > 0)
+        {
+            throw new Exception("Errors are detected in the syntax of the input file. Parsing will be terminated!\n" + errorListener.toString());
+        }
 
         return blockParser.getGeneratedBlocks();
     }
@@ -148,5 +156,49 @@ public class Antlr implements CodeParser
         }
 
         return listener;
+    }
+
+    private class ParserErrorListener extends BaseErrorListener
+    {
+        private final List<String> syntaxErrors;
+
+        public ParserErrorListener()
+        {
+            this.syntaxErrors = new ArrayList<String>();
+        }
+
+        public List<String> getSyntaxErrors()
+        {
+            return this.syntaxErrors;
+        }
+
+        public int getNumberOfSyntaxErrors()
+        {
+            return this.syntaxErrors.size();
+        }
+
+        @Override
+        public String toString()
+        {
+            String syntaxMessages = "";
+
+            if(!this.syntaxErrors.isEmpty())
+            {
+                for(String syntaxError : this.syntaxErrors)
+                {
+                    syntaxMessages = syntaxMessages.concat(syntaxError + "\n");
+                }
+
+                syntaxMessages = syntaxMessages.substring(0, syntaxMessages.length() - 1);
+            }
+
+            return syntaxMessages;
+        }
+
+        @Override
+        public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
+        {
+            this.syntaxErrors.add("Syntax error (line " + line + ":" + charPositionInLine + ") -> " + msg);
+        }
     }
 }

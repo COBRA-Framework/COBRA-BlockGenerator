@@ -1,5 +1,6 @@
 package be.uantwerpen.cobra.blockgen.tools.antlr.interfaces;
 
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 
@@ -9,4 +10,5 @@ import org.antlr.v4.runtime.RecognitionException;
 public interface AntlrParser
 {
     ParserRuleContext getRootNode() throws RecognitionException;
+    void addErrorListener(BaseErrorListener errorListener);
 }

@@ -19,7 +19,7 @@ import java.util.Collection;
 public class UppaalModelExport implements ExportTool
 {
     @Override
-    public int exportToXML(Block model, String exportFile, String[] args) throws IllegalArgumentException
+    public int exportToXML(Block model, String exportFile, String[] args) throws Exception
     {
         int abstractionDepth;
 
@@ -46,58 +46,37 @@ public class UppaalModelExport implements ExportTool
         return exportToXML(model, exportFile, abstractionDepth);
     }
 
-    public int exportToXML(Block model, String exportFile, int abstractionDepth)
+    public int exportToXML(Block model, String exportFile, int abstractionDepth) throws Exception
     {
         Collection<TimedAutomaton> uppaalModel = new ArrayList<TimedAutomaton>();
+        Block programBlock;
 
         if(model.getClass() == ProgramBlock.class)
         {
-            for(Block methodBlock : model.getChildBlocks())
-            {
-                try
-                {
-                    uppaalModel.add(createTimedAutomaton(methodBlock, abstractionDepth));
-                }
-                catch(Exception e)
-                {
-                    System.err.println("Failed to export model to XML!\n" + e.getMessage());
-                    e.printStackTrace();
-
-                    return -1;
-                }
-            }
+            programBlock = model;
         }
         else
         {
+            programBlock = new ProgramBlock("");
+            programBlock.addChildBlock(model);
+        }
+
+        for(Block methodBlock : programBlock.getChildBlocks())
+        {
             try
             {
-                uppaalModel.add(createTimedAutomaton(model, abstractionDepth));
+                uppaalModel.add(createTimedAutomaton(methodBlock, abstractionDepth));
             }
             catch(Exception e)
             {
-                System.err.println("Failed to export model to XML!\n" + e.getMessage());
-                e.printStackTrace();
-
-                return -1;
+                throw new Exception("Failed to export model to XML!\n" + e.getMessage());
             }
         }
 
-        try
-        {
-            writeXMLFile(exportFile, uppaalModel);
-        }
-        catch(Exception e)
-        {
-            System.err.println("Error occurred while exporting to XML!\n" + e.getMessage());
-            e.printStackTrace();
-
-            return -2;
-        }
-
-        return 0;
+        return exportToXML(uppaalModel, exportFile);
     }
 
-    public int exportToXML(Collection<TimedAutomaton> automata, String exportFile)
+    public int exportToXML(Collection<TimedAutomaton> automata, String exportFile) throws Exception
     {
         try
         {
@@ -105,10 +84,7 @@ public class UppaalModelExport implements ExportTool
         }
         catch(Exception e)
         {
-            System.err.println("Error occurred while exporting to XML!\n" + e.getMessage());
-            e.printStackTrace();
-
-            return -2;
+            throw new Exception("Error occurred while exporting to XML!\n" + e.getMessage());
         }
 
         return 0;

@@ -34,7 +34,7 @@ public class TimedAutomaton
 
         if(model.getClass() != MethodBlock.class)
         {
-            throw new Exception("Top block needs to be from the class MethodBlock!");
+            throw new Exception("Top block needs to be of class type MethodBlock!");
         }
 
         //Set automaton name

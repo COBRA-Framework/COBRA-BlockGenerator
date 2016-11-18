@@ -7,6 +7,7 @@ import be.uantwerpen.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.cobra.blockgen.models.blocks.MethodBlock;
 import be.uantwerpen.cobra.blockgen.models.blocks.ProgramBlock;
 import be.uantwerpen.cobra.blockgen.models.blocks.SelectionBlock;
+import be.uantwerpen.cobra.blockgen.services.TerminalService;
 import be.uantwerpen.cobra.blockgen.tools.antlr.Antlr;
 import be.uantwerpen.cobra.blockgen.tools.export.ExportTool;
 import be.uantwerpen.cobra.blockgen.tools.export.blockmodel.BlockModelExport;
@@ -14,10 +15,7 @@ import be.uantwerpen.cobra.blockgen.tools.export.uppaal.TimedAutomaton;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.UppaalModelExport;
 import be.uantwerpen.cobra.blockgen.tools.interfaces.CodeParser;
 import be.uantwerpen.cobra.blockgen.tools.jgraph.GraphTool;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
+import be.uantwerpen.cobra.blockgen.tools.terminal.Terminal;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,58 +26,145 @@ import java.util.Vector;
 /**
  * Created by Thomas on 18/03/2016.
  */
-public class Main extends Application
+public class Main
 {
+    private static TerminalService terminalService = new TerminalService();
+    private static boolean terminalMode = false;
+    private static String file = new String();
+    private static String outputFolder = new String();
+    private static int abstractionDepth = -1;
+
     public static void main(String[] args)
     {
-        int abstractionDepth = 0;
-        //Setup JavaFX
-        //launch(args);
+        checkArguments(args);
 
-        printBanner();
-
-        if(args.length < 3)
+        if(!terminalMode)
         {
-            System.out.println("Missing arguments!");
-            System.out.println("arg 1: Import file location\narg 2: Export file location\narg 3: Depth-level of abstraction");
-            System.exit(-1);
+            try
+            {
+                runBlockGenerator(file, outputFolder, abstractionDepth);
+            }
+            catch(Exception e)
+            {
+                Terminal.printTerminalError("Failed to generate block model!");
+                Terminal.printTerminalError(e.getMessage());
+                Terminal.printTerminalError("Block generation will be terminated!");
+                //e.printStackTrace();
+            }
         }
-
-        try
-        {
-            abstractionDepth = Integer.parseInt(args[2]);
-        }
-        catch(Exception e)
-        {
-            System.err.println("Arg 3: Depth-level of abstraction is not a valid number!");
-
-            System.exit(-1);
-        }
-
-        generateOUTPUT(args[0], args[1], abstractionDepth);
-
-        try
-        {
-            System.in.read();
-        }
-        catch(IOException e)
-        {
-            e.printStackTrace();
-        }
-
-        System.exit(0);
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception
+    private static void checkArguments(String[] args)
     {
-        primaryStage.setTitle("COBRA Framework - Block Generator");
+        if(args.length == 0)
+        {
+            Terminal.printTerminal("Use option '--help' to get a list of all known commands.");
 
-        StackPane layout = new StackPane();
+            System.exit(0);
+        }
+        else
+        {
+            int i = 0;
 
-        Scene scene = new Scene(layout, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+            while(i < args.length)
+            {
+                String arg = args[i].toLowerCase().trim();
+
+                if(arg.startsWith("-"))
+                {
+                    if(arg.equals("--help") || arg.equals("-?"))
+                    {
+                        String jarName = new java.io.File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getName();
+
+                        Terminal.printTerminal("Usage: java -jar " + jarName + " [options] file output-folder abstraction-depth");
+                        Terminal.printTerminal("--help\t\t\tDisplay this message");
+                        Terminal.printTerminal("--version\t\tDisplay application version information");
+
+                        System.exit(0);
+                    }
+                    else if(arg.equals("--version") || arg.equals("-v"))
+                    {
+                        printBanner();
+
+                        System.exit(0);
+                    }
+                    else if(arg.equals("--terminal") || arg.equals("-t"))
+                    {
+                        terminalMode = true;
+
+                        printBanner();
+
+                        terminalService.systemReady();
+
+                        return;
+                    }
+                    else if(arg.length() >= 3 && i < arg.length() - 3)
+                    {
+                        Terminal.printTerminalWarning("arg: " + arg + " is an invalid option!");
+                    }
+                }
+
+                i++;
+            }
+
+            int numOfArgs = args.length;
+            boolean missingArguments = false;
+
+            if(numOfArgs >= 3)
+            {
+                //Get input file location
+                if(!args[numOfArgs - 3].startsWith("-"))
+                {
+                    file = args[numOfArgs - 3];
+
+                    File inputFile = new File(file);
+                    if(!inputFile.exists())
+                    {
+                        Terminal.printTerminalError("Input file: '" + file + "' does not exist!");
+
+                        missingArguments = true;
+                    }
+                }
+                else
+                {
+                    missingArguments = true;
+                }
+
+                //Get output folder
+                if(!args[numOfArgs - 2].startsWith("-"))
+                {
+                    outputFolder = args[numOfArgs - 2];
+                }
+                else
+                {
+                    missingArguments = true;
+                }
+
+                //Parse abstraction depth (last argument)
+                try
+                {
+                    abstractionDepth = Integer.parseInt(args[numOfArgs - 1]);
+                }
+                catch(Exception e)
+                {
+                    Terminal.printTerminalError("Arg 3: Abstraction-depth is not a valid number!");
+
+                    missingArguments = true;
+                }
+            }
+            else
+            {
+                missingArguments = true;
+            }
+
+            if(missingArguments)
+            {
+                Terminal.printTerminalError("Missing arguments!");
+                Terminal.printTerminalInfo("Use option '--help' to get the correct command syntax.");
+
+                System.exit(-1);
+            }
+        }
     }
 
     private static void applyReductionRuleRecursive(Block block)
@@ -119,75 +204,36 @@ public class Main extends Application
         }
     }
 
-    private static ProgramBlock generateOUTPUT(String file, String exportLocation, int abstractionDepth)
+    private static ProgramBlock runBlockGenerator(String file, String exportLocation, int abstractionDepth) throws Exception
     {
         CodeParser codeParser = new Antlr();
-        GraphTool graphTool = new GraphTool();
 
         Vector<Block> blocks = null;
 
         File exportFolder = new File(exportLocation);
         exportFolder.mkdirs();
 
-        try
-        {
-            blocks = codeParser.parseCodeFile(file, CodeParser.Grammar.C);
-        }
-        catch(Exception e)
-        {
-            System.err.println(e.getMessage());
+        Terminal.printTerminalInfo("Generating block model from file: " + file);
 
-            e.printStackTrace();
-        }
-
-        System.out.println("\n*****Block view*****");
-        for(Block block : blocks)
-        {
-            System.out.println(block.toStringRecursive() + "\n");
-        }
-
-        System.out.println("\n*****Code view*****");
-        for(Block block : blocks)
-        {
-            System.out.println(block.getCodeString() + "\n");
-        }
-/*
-        System.out.println("\n*****Leaf blocks*****");
-        for(Block block : blocks)
-        {
-            MethodBlock methodBlock = (MethodBlock) block;
-
-            System.out.println("Method: " + methodBlock.getMethodName());
-
-            for(Block leafblock : block.getLeafs())
-            {
-                System.out.println(leafblock.toString());
-            }
-        }
-*/
-/*
-        for(Block block : blocks)
-        {
-            //graphTool.createGraphFromBlock(block);
-        }
-
-        graphTool.createGraphFromBlock(blocks.get(2));
-
-        ReductionRule rule = new BasicBlockReductionRule();
-
-        Block ruleBlock = rule.applyRule(blocks.get(2).getChildBlock(2));
-
-        graphTool.createGraphFromBlock(blocks.get(2));
-
-        for(Block block : blocks)
-        {
-            //graphTool.createGraphFromBlock(block);
-        }*/
+        //Parse file and generate block model
+        blocks = codeParser.parseCodeFile(file, CodeParser.Grammar.C);
 
         //Apply basic block reduction
         for(Block methodBlock : blocks)
         {
             applyReductionRuleRecursive(methodBlock);
+        }
+
+        Terminal.printTerminal("*****Block view*****");
+        for(Block block : blocks)
+        {
+            System.out.println(block.toStringRecursive() + "\n");
+        }
+
+        Terminal.printTerminal("*****Code view*****");
+        for(Block block : blocks)
+        {
+            System.out.println(block.getCodeString() + "\n");
         }
 
         ProgramBlock programBlock = new ProgramBlock("PROGRAM");
@@ -197,6 +243,10 @@ public class Main extends Application
             programBlock.addChildBlock(methodBlock);
         }
 
+        Terminal.printTerminalInfo("Block generation complete!");
+
+        Terminal.printTerminalInfo("Generating timed automaton model...");
+
         ExportTool exportTool = new UppaalModelExport();
 
         String[] exportArgs = {Integer.toString(abstractionDepth)};
@@ -205,78 +255,62 @@ public class Main extends Application
 
         for(Block methodBlock : programBlock.getChildBlocks())
         {
-            try
-            {
-                automata.add(((UppaalModelExport)exportTool).createTimedAutomaton(methodBlock, abstractionDepth));
-            }
-            catch(Exception e)
-            {
-                System.err.println("Could not create automaton from method block!\n");
-                System.err.println(e.getMessage());
-            }
+            automata.add(((UppaalModelExport)exportTool).createTimedAutomaton(methodBlock, abstractionDepth));
         }
+
+        Terminal.printTerminalInfo("Timed automaton generation complete!");
+
+        Terminal.printTerminalInfo("Exporting UPPAAL project file...");
 
         ((UppaalModelExport)exportTool).exportToXML(automata, exportLocation + "uppaal.xml");
 
         BlockModelExport benchmarkExport = new BlockModelExport();
 
-        //Generate UPPAAL C source files for benchmarking
-        File uppaalCSourceFolder = new File(exportLocation + "UPPAAL_source/");
-        uppaalCSourceFolder.mkdirs();
+        //Generate UPPAAL source files for benchmarking
+        File uppaalSourceFolder = new File(exportLocation + "UPPAAL_source/");
+        uppaalSourceFolder.mkdirs();
+
+        Terminal.printTerminalInfo("Exporting UPPAAL source files...");
 
         for(TimedAutomaton automaton : automata)
         {
-            try
-            {
-                benchmarkExport.generateSourceOfTimedAutomaton(exportLocation + "UPPAAL_source/", automaton, CodeParser.Grammar.C);
-            }
-            catch(Exception e)
-            {
-                System.err.println("Could not create source file for automaton!");
-                System.err.println(e.getMessage());
-            }
+            benchmarkExport.generateSourceOfTimedAutomaton(exportLocation + "UPPAAL_source/", automaton, CodeParser.Grammar.C);
         }
 
-        //Generate HPA C source files for benchmarking
-        File hpaCSourceFolder = new File(exportLocation + "HPA_source/");
-        hpaCSourceFolder.mkdirs();
+        //Generate HPA source files for benchmarking
+        File hpaSourceFolder = new File(exportLocation + "HPA_source/");
+        hpaSourceFolder.mkdirs();
 
-        try
+        Terminal.printTerminalInfo("Exporting block model source files...");
+
+        for(Block methodBlock : blocks)
         {
-            for(Block methodBlock : blocks)
+            applyAbstractionRuleRecursive(methodBlock, abstractionDepth);
+            applyReductionRuleRecursive(methodBlock);
+
+            for(Block leafBlock : methodBlock.getLeafs())
             {
-                applyAbstractionRuleRecursive(methodBlock, abstractionDepth);
-                applyReductionRuleRecursive(methodBlock);
-
-                graphTool.createGraphFromBlock(methodBlock);
-
-                for(Block leafBlock : methodBlock.getLeafs())
-                {
-                    benchmarkExport.generateSourceOfBlock(exportLocation + "HPA_source/" + ((MethodBlock)methodBlock).getMethodName() + "_", leafBlock, CodeParser.Grammar.C);
-                }
+                benchmarkExport.generateSourceOfBlock(exportLocation + "HPA_source/" + ((MethodBlock)methodBlock).getMethodName() + "_", leafBlock, CodeParser.Grammar.C);
             }
         }
-        catch(Exception e)
-        {
-            System.err.println("Could not generate benchmark source files!");
-            System.err.println(e.getMessage());
-        }
+
+        Terminal.printTerminalInfo("Generated files will be available in the folder: " + outputFolder);
 
         return programBlock;
     }
 
     private static void printBanner()
     {
-        System.out.println(
+        Terminal.printTerminal(
                 " _____  _____ ______ ______   ___   \n" +
                 "/  __ \\|  _  || ___ \\| ___ \\ / _ \\ \n" +
                 "| /  \\/| | | || |_/ /| |_/ // /_\\ \\\n" +
                 "| |    | | | || ___ \\|    / |  _  |\n" +
                 "| \\__/\\\\ \\_/ /| |_/ /| |\\ \\ | | | |\n" +
-                " \\____/ \\___/ \\____/ \\_| \\_|\\_| |_/ \n");
+                " \\____/ \\___/ \\____/ \\_| \\_|\\_| |_/ ");
 
-        System.out.println("COBRA-framework - BlockGenerator");
-        System.out.println("================================\n");
-        System.out.println("Developed by: Thomas Huybrechts - 2016 MOSAIC\n");
+        Terminal.printTerminal("====================================");
+        Terminal.printTerminal(":: COBRA framework - 0.0.1(alpha) ::");
+        Terminal.printTerminal("\nCOBRA - Block Generator [Version " + Main.class.getPackage().getImplementationVersion() + "]\nCopyright \u00a9 2016-2017 Thomas Huybrechts, IDLab,\nUniversity of Antwerp, Belgium. All rights reserved.\nThis program has NO WARRANTY.");
     }
 }

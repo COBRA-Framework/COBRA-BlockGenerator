@@ -7,5 +7,5 @@ import be.uantwerpen.cobra.blockgen.models.blocks.Block;
  */
 public interface ExportTool
 {
-    int exportToXML(Block model, String exportFile, String[] args) throws IllegalArgumentException;
+    int exportToXML(Block model, String exportFile, String[] args) throws Exception;
 }

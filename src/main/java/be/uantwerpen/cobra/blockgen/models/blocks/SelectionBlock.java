@@ -20,19 +20,6 @@ public class SelectionBlock extends BasicBlock implements Block
     }
 
     @Override
-    public void addChildBlock(int index, Block child)
-    {
-        if(index < 0 || index > 1)
-        {
-            throw new IndexOutOfBoundsException("Index out of bound. A selection block can have only two children. 0: False - 1: True");
-        }
-        else
-        {
-            this.childBlocks.get(index).addChildBlock(child);
-        }
-    }
-
-    @Override
     public Vector<Block> getLeafs()
     {
         Vector<Block> leafs = new Vector<Block>();
