@@ -19,8 +19,10 @@ public interface Block
     void addChildBlock(Block child);
     void removeChildBlock(int index);
     Vector<Block> getChildBlocks();
+    Vector<Block> getDescendantBlocks();
     Vector<Block> getLeafs();
     int getNumOfChildren();
+    int getNumOfDescendants();
     String toStringRecursive();
     CodeSegment getCodeSegment();
     int getStartRowNumber();

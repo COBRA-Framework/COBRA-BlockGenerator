@@ -41,7 +41,7 @@ public class BlockFactory
         }
         else
         {
-            System.err.println("Statement declared outside method. Statement: char#." + start + "-" + end +" will be ignored!");
+            //System.err.println("Statement declared outside method. Statement: char#." + start + "-" + end +" will be ignored!");
         }
     }
 

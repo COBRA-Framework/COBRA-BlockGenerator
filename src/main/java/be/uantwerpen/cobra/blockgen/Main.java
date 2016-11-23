@@ -14,11 +14,9 @@ import be.uantwerpen.cobra.blockgen.tools.export.blockmodel.BlockModelExport;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.TimedAutomaton;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.UppaalModelExport;
 import be.uantwerpen.cobra.blockgen.tools.interfaces.CodeParser;
-import be.uantwerpen.cobra.blockgen.tools.jgraph.GraphTool;
 import be.uantwerpen.cobra.blockgen.tools.terminal.Terminal;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
@@ -311,6 +309,7 @@ public class Main
 
         Terminal.printTerminal("====================================");
         Terminal.printTerminal(":: COBRA framework - 0.0.1(alpha) ::");
-        Terminal.printTerminal("\nCOBRA - Block Generator [Version " + Main.class.getPackage().getImplementationVersion() + "]\nCopyright \u00a9 2016-2017 Thomas Huybrechts, IDLab,\nUniversity of Antwerp, Belgium. All rights reserved.\nThis program has NO WARRANTY.");
+        Terminal.printTerminal("\nCOBRA - Block Generator [Version " + Main.class.getPackage().getImplementationVersion() + "]\nCopyright (c) 2016-2017 Thomas Huybrechts, IDLab,\nUniversity of Antwerp, Belgium. All rights reserved.");
+        Terminal.printTerminal("This program comes with ABSOLUTELY NO WARRANTY.");
     }
 }

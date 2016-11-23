@@ -43,6 +43,33 @@ public class SelectionBlock extends BasicBlock implements Block
     }
 
     @Override
+    public Vector<Block> getDescendantBlocks()
+    {
+        Vector<Block> descendants = new Vector<Block>();
+
+        for(Block child : this.getChildBlocks())
+        {
+            //Don't add case blocks as descendant blocks
+            descendants.addAll(child.getDescendantBlocks());
+        }
+
+        return descendants;
+    }
+
+    @Override
+    public int getNumOfDescendants()
+    {
+        int descendants = 0;
+
+        for(Block child : this.getChildBlocks())
+        {
+            descendants = descendants + child.getNumOfDescendants();
+        }
+
+        return descendants;
+    }
+
+    @Override
     public String getCodeString()
     {
         String codeString = new String();

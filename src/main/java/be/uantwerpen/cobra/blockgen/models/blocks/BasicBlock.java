@@ -109,6 +109,19 @@ public class BasicBlock implements Block
         return this.childBlocks;
     }
 
+    public Vector<Block> getDescendantBlocks()
+    {
+        Vector<Block> descendants = new Vector<Block>();
+
+        for(Block child : this.getChildBlocks())
+        {
+            descendants.add(child);
+            descendants.addAll(child.getDescendantBlocks());
+        }
+
+        return descendants;
+    }
+
     public Vector<Block> getLeafs()
     {
         Vector<Block> leafs = new Vector<Block>();
@@ -141,6 +154,18 @@ public class BasicBlock implements Block
     public int getNumOfChildren()
     {
         return this.childBlocks.size();
+    }
+
+    public int getNumOfDescendants()
+    {
+        int descendants = getNumOfChildren();
+
+        for(Block child : this.getChildBlocks())
+        {
+            descendants = descendants + child.getNumOfDescendants();
+        }
+
+        return descendants;
     }
 
     @Override

@@ -3,35 +3,36 @@ package be.uantwerpen.cobra.blockgen.tools.export.uppaal.models;
 /**
  * Created by Thomas on 18/11/2016.
  */
-public class NodeLinker
+public class NodeLinker extends Node
 {
-    private Node node;
     private int linkDistance;
 
-    private NodeLinker()
+    public NodeLinker()
     {
-        this(null, 1);
+        super();
+        this.linkDistance = 1;
     }
 
-    public NodeLinker(Node node)
+    public NodeLinker(int id, String name, String invariant, String comments)
     {
-        this(node, 1);
+        super(id, name, invariant, comments);
+        this.linkDistance = 1;
     }
 
-    public NodeLinker(Node node, int linkDistance)
+    public NodeLinker(int id, String name, String invariant, String comments, int linkDistance)
     {
-        this.node = node;
+        super(id, name, invariant, comments);
         this.linkDistance = linkDistance;
-    }
-
-    public Node getNode()
-    {
-        return this.node;
     }
 
     public boolean isLocked()
     {
         return this.linkDistance > 0;
+    }
+
+    public void setLinkDistance(int linkDistance)
+    {
+        this.linkDistance = linkDistance;
     }
 
     public int getLinkDistance()
@@ -43,6 +44,6 @@ public class NodeLinker
     {
         this.linkDistance = this.linkDistance - 1;
 
-        return isLocked();
+        return !isLocked();
     }
 }
