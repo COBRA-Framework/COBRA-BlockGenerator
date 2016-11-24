@@ -177,4 +177,30 @@ public class Node
 
         return leafs;
     }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if(object == null)
+        {
+            return false;
+        }
+        if(object == this)
+        {
+            return true;
+        }
+        if(!(object instanceof Node))
+        {
+            return false;
+        }
+
+        Node aNode = (Node)object;
+
+        if(aNode.id == this.id)
+        {
+            return true;
+        }
+
+        return false;
+    }
 }

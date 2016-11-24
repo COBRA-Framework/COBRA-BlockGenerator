@@ -3,6 +3,7 @@ package be.uantwerpen.cobra.blockgen.tools.export.uppaal;
 import be.uantwerpen.cobra.blockgen.models.blocks.*;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.models.Link;
 import be.uantwerpen.cobra.blockgen.tools.export.uppaal.models.Node;
+import be.uantwerpen.cobra.blockgen.tools.export.uppaal.models.NodeLinker;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -23,7 +24,7 @@ public class TimedAutomaton
         this.name = "AUTOMATON";
         this.nodes = new Vector<Node>();
         this.links = new Vector<Link>();
-        this.endNode = new Node();
+        this.endNode = new NodeLinker();
         this.endNode.setName("END");
         this.endNode.setComments("");
     }
@@ -41,7 +42,7 @@ public class TimedAutomaton
         this.name = ((MethodBlock)model).getMethodName();
 
         //Set initial node
-        Node node = new Node();
+        Node node = new NodeLinker();
         node.setId(getNextFreeId());
         node.setName(((MethodBlock) model).getMethodName());
         node.setInitial(true);
@@ -77,15 +78,7 @@ public class TimedAutomaton
         if(!endNodes.isEmpty())
         {
             //Create links
-            for(Node lastNode : endNodes)
-            {
-                Link link = getEmptyTargetLink(lastNode);
-
-                //Set link target
-                link.setTargetNode(this.endNode);
-
-                this.links.add(link);
-            }
+            createLinks(endNodes, this.endNode);
         }
 
         this.prettifyLayout();
@@ -120,19 +113,10 @@ public class TimedAutomaton
 
                 this.nodes.add(node);
 
-                //Create link
-                for(Node lastNode : lastNodes)
-                {
-                    Link link = getEmptyTargetLink(lastNode);
-
-                    //Set link target
-                    link.setTargetNode(node);
-
-                    this.links.add(link);
-                }
+                //Create links with last nodes
+                lastNodes = createLinks(lastNodes, node);
 
                 //Set new last node
-                lastNodes.clear();
                 lastNodes.add(node);
 
                 if(block.getNumOfChildren() > 0 && leftAbstractionLevel != 0)
@@ -181,7 +165,7 @@ public class TimedAutomaton
         int endRow;
 
         //Create node
-        node = new Node();
+        node = new NodeLinker();
         node.setId(getNextFreeId());
 
         startRow = block.getStartRowNumber();
@@ -221,18 +205,9 @@ public class TimedAutomaton
             this.nodes.add(node);
 
             //Create link
-            for(Node lastNode : lastNodes)
-            {
-                Link link = getEmptyTargetLink(lastNode);
-
-                //Set link target
-                link.setTargetNode(node);
-
-                this.links.add(link);
-            }
+            lastNodes = createLinks(lastNodes, node);
 
             //Set new last node
-            lastNodes.clear();
             lastNodes.add(node);
         }
         else
@@ -241,37 +216,37 @@ public class TimedAutomaton
             {
                 String initString = iterationBlock.getCodeSegment().toString();
                 initString = initString.split(";")[0];
-                initString = initString.split("\\(")[1];
+
+                try
+                {
+                    initString = initString.split("\\(")[1];
+                }
+                catch(ArrayIndexOutOfBoundsException e)
+                {
+                    //No space placed between ( and ;
+                    initString = new String();
+                }
 
                 //Create initialisation node
                 if(!initString.isEmpty())
                 {
-                    Node node = new Node();
+                    Node node = new NodeLinker();
                     node.setId(getNextFreeId());
                     node.setName("r" + iterationBlock.getStartRowNumber() + "_init");
                     node.setComments(initString + ";");
 
                     this.nodes.add(node);
 
-                    //Create link with last nodes
-                    for(Node lastNode : lastNodes)
-                    {
-                        Link link = getEmptyTargetLink(lastNode);
-
-                        //Set link target
-                        link.setTargetNode(node);
-
-                        this.links.add(link);
-                    }
+                    //Create links with last nodes
+                    lastNodes = createLinks(lastNodes, node);
 
                     //Set new last node
-                    lastNodes.clear();
                     lastNodes.add(node);
                 }
             }
 
             //Create iteration condition node
-            Node conditionNode = new Node();
+            Node conditionNode = new NodeLinker();
             String conditionString = iterationBlock.getCodeSegment().toString();
 
             if(!iterationBlock.isDoWhileStatement())
@@ -306,24 +281,17 @@ public class TimedAutomaton
             this.nodes.add(conditionNode);
 
             //Create link with last nodes
-            for(Node lastNode : lastNodes)
-            {
-                Link link = getEmptyTargetLink(lastNode);
-
-                //Set link target
-                link.setTargetNode(conditionNode);
-
-                this.links.add(link);
-            }
+            lastNodes = createLinks(lastNodes, conditionNode);
 
             //Set new last node
-            lastNodes.clear();
             lastNodes.add(conditionNode);
 
             Vector<Node> iterationInNodes = new Vector<Node>(lastNodes);
 
             //Add iteration body
             lastNodes = addNodesRecursive(iterationBlock, lastNodes, nextAbstractionLevel);
+
+            Vector<Node> postIterationNodes = new Vector<Node>();
 
             if(iterationBlock.getCodeSegment().toString().startsWith("for"))
             {
@@ -334,7 +302,7 @@ public class TimedAutomaton
                 //Create post statement node
                 if(!postString.isEmpty())
                 {
-                    Node node = new Node();
+                    Node node = new NodeLinker();
                     node.setId(getNextFreeId());
                     node.setName("r" + iterationBlock.getStartRowNumber() + "_post");
                     node.setComments(postString + ";");
@@ -342,26 +310,16 @@ public class TimedAutomaton
                     this.nodes.add(node);
 
                     //Create link with last nodes
-                    for(Node lastNode : lastNodes)
-                    {
-                        Link link = getEmptyTargetLink(lastNode);
+                    lastNodes = createLinks(lastNodes, node);
 
-                        //Set link target
-                        link.setTargetNode(node);
-
-                        this.links.add(link);
-                    }
-
-                    //Set new last node
-                    lastNodes.clear();
-                    lastNodes.add(node);
+                    //Add post iteration nodes to vector
+                    postIterationNodes.add(node);
                 }
             }
-
-            if(iterationBlock.isDoWhileStatement())
+            else if(iterationBlock.isDoWhileStatement())
             {
                 //Create iteration condition node at the end
-                Node conditionDoWhileNode = new Node();
+                Node conditionDoWhileNode = new NodeLinker();
 
                 conditionDoWhileNode.setName("r" + iterationBlock.getStartRowNumber());
                 conditionDoWhileNode.setId(getNextFreeId());
@@ -370,42 +328,43 @@ public class TimedAutomaton
                 this.nodes.add(conditionDoWhileNode);
 
                 //Create link with last nodes
-                for(Node lastNode : lastNodes)
-                {
-                    Link link = getEmptyTargetLink(lastNode);
+                lastNodes = createLinks(lastNodes, conditionDoWhileNode);
 
-                    //Set link target
-                    link.setTargetNode(conditionDoWhileNode);
-
-                    this.links.add(link);
-                }
-
-                //Set new last node
-                lastNodes.clear();
-                lastNodes.add(conditionDoWhileNode);
+                //Add post iteration nodes to vector
+                postIterationNodes.add(conditionDoWhileNode);
+            }
+            else
+            {
+                postIterationNodes.addAll(lastNodes);
             }
 
             //Create iteration loop links
-            for(Node lastNode : lastNodes)
+            for(Node postNode : postIterationNodes)
             {
-                //Get iteration start nodes
-                for(Node iterationInNode : iterationInNodes)
+                if(((NodeLinker)postNode).tryLinking())
                 {
-                    Link link = getEmptyTargetLink(lastNode);
-
-                    //Set link target
-                    link.setTargetNode(iterationInNode);
-
-                    //Add iteration loop link to last nodes of loop
-                    lastNode.addLink(link);
-
-                    if(iterationBlock.isDoWhileStatement())
+                    //Get iteration start nodes
+                    for(Node iterationInNode : iterationInNodes)
                     {
-                        //Set link guard (True statement)
-                        link.setGuard("true");
-                    }
+                        if(!((NodeLinker)iterationInNode).isLocked())
+                        {
+                            Link link = getEmptyTargetLink(postNode);
 
-                    this.links.add(link);
+                            //Set link target
+                            link.setTargetNode(iterationInNode);
+
+                            //Add iteration loop link to last nodes of loop
+                            postNode.addLink(link);
+
+                            if(iterationBlock.isDoWhileStatement())
+                            {
+                                //Set link guard (True statement)
+                                link.setGuard("true");
+                            }
+
+                            this.links.add(link);
+                        }
+                    }
                 }
             }
 
@@ -415,24 +374,43 @@ public class TimedAutomaton
             {
                 for(Node iterationInNode : iterationInNodes)
                 {
-                    Link link = getEmptyTargetLink(iterationInNode);
+                    if(!((NodeLinker)iterationInNode).isLocked())
+                    {
+                        Link link = getEmptyTargetLink(iterationInNode);
 
-                    //Set link guard (False statement)
-                    link.setGuard("false");
+                        //Set link guard (False statement)
+                        link.setGuard("false");
 
-                    //Add node to last node list
-                    lastNodes.clear();
-                    lastNodes.add(iterationInNode);
+                        //Add node to last node list
+                        Iterator<Node> it = lastNodes.iterator();
+
+                        while(it.hasNext())
+                        {
+                            Node lastNode = it.next();
+
+                            if(!((NodeLinker)lastNode).isLocked())
+                            {
+                                it.remove();
+                            }
+                        }
+
+                        lastNodes.add(iterationInNode);
+                    }
                 }
             }
             else
             {
-                for(Node lastNode : lastNodes)
-                {
-                    Link link = getEmptyTargetLink(lastNode);
+                lastNodes.addAll(postIterationNodes);
 
-                    //Set link guard (False statement)
-                    link.setGuard("false");
+                for(Node postNodes : postIterationNodes)
+                {
+                    if(!((NodeLinker)postNodes).isLocked())
+                    {
+                        Link link = getEmptyTargetLink(postNodes);
+
+                        //Set link guard (False statement)
+                        link.setGuard("false");
+                    }
                 }
             }
         }
@@ -443,7 +421,7 @@ public class TimedAutomaton
     private Vector<Node> createSelectionNode(SelectionBlock selectionBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
     {
         int nextAbstractionLevel = leftAbstractionLevel - 1;
-        Vector<Node> lastNodes = new Vector<Node>();
+        Vector<Node> lastNodes = new Vector<Node>(parentNodes);
 
         if(leftAbstractionLevel == 0)
         {
@@ -452,15 +430,7 @@ public class TimedAutomaton
             this.nodes.add(node);
 
             //Create link
-            for(Node parentNode : parentNodes)
-            {
-                Link link = getEmptyTargetLink(parentNode);
-
-                //Set link target
-                link.setTargetNode(node);
-
-                this.links.add(link);
-            }
+            lastNodes = createLinks(lastNodes, node);
 
             //Set new last nodes
             lastNodes.add(node);
@@ -468,7 +438,7 @@ public class TimedAutomaton
         else
         {
             //Create selection condition node
-            Node selectionNode = new Node();
+            Node selectionNode = new NodeLinker();
             String selectionString = selectionBlock.getCodeSegment().toString();
 
             selectionNode.setName("r" + selectionBlock.getStartRowNumber());
@@ -478,15 +448,7 @@ public class TimedAutomaton
             this.nodes.add(selectionNode);
 
             //Create link with parent nodes
-            for(Node parentNode : parentNodes)
-            {
-                Link link = getEmptyTargetLink(parentNode);
-
-                //Set link target
-                link.setTargetNode(selectionNode);
-
-                this.links.add(link);
-            }
+            lastNodes = createLinks(lastNodes, selectionNode);
 
             if(selectionBlock.getCodeSegment().toString().startsWith("if"))
             {
@@ -520,7 +482,48 @@ public class TimedAutomaton
                         link.setGuard(guardString);
 
                         //Add selection branch body
-                        lastNodes.addAll(addNodesRecursive(caseBlock, new Vector<Node>(Collections.singleton(selectionNode)), nextAbstractionLevel));
+                        lastNodes.add(selectionNode);
+
+                        Vector<Node> newNodes = new Vector<Node>();
+                        newNodes = addNodesRecursive(caseBlock, lastNodes, nextAbstractionLevel);
+
+                        //Add link distance to blocks inside a selection branch if needed
+                        int numOfLinkSkips = 0;
+
+                        //Add link skips when switching to the false case branch
+                        for(int i = caseBlock.getParentBlock().getChildBlocks().indexOf(caseBlock) + 1; i < caseBlock.getParentBlock().getNumOfChildren(); i++)
+                        {
+                            numOfLinkSkips += caseBlock.getParentBlock().getChildBlock(i).getNumOfDescendants();
+
+                            //Add one link skip for each iteration loop
+                            for(Block block : caseBlock.getParentBlock().getChildBlock(i).getChildBlocks())
+                            {
+                                if(block.getClass() == IterationBlock.class)
+                                {
+                                    numOfLinkSkips++;
+                                }
+                            }
+                        }
+
+                        if(numOfLinkSkips > 0)
+                        {
+                            for(Node node : newNodes)
+                            {
+                                //Check if node is a new added node
+                                if(!lastNodes.contains(node))
+                                {
+                                    int linkDistance = ((NodeLinker)node).getLinkDistance();
+
+                                    if(linkDistance <= 1)
+                                    {
+                                        //Add link distance according to following nodes in next case branches
+                                        ((NodeLinker)node).setLinkDistance(linkDistance + numOfLinkSkips);
+                                    }
+                                }
+                            }
+                        }
+
+                        lastNodes = newNodes;
                     }
                 }
 
@@ -532,6 +535,8 @@ public class TimedAutomaton
                     //Set link guard
                     link.setGuard("true");
 
+                    ((NodeLinker)selectionNode).setLinkDistance(1);
+
                     lastNodes.add(selectionNode);
                 }
                 else if(!falseStatement && trueStatement)               //Close false case if not existing
@@ -542,10 +547,14 @@ public class TimedAutomaton
                     //Set link guard
                     link.setGuard("false");
 
+                    ((NodeLinker)selectionNode).setLinkDistance(1);
+
                     lastNodes.add(selectionNode);
                 }
                 else if(!(trueStatement && falseStatement))            //None completed if-else statement or non-functional selection statement if();
                 {
+                    ((NodeLinker)selectionNode).setLinkDistance(1);
+
                     lastNodes.add(selectionNode);
                 }
             }
@@ -557,7 +566,7 @@ public class TimedAutomaton
                 //Switch-case statement
                 for(Block caseBlock : selectionBlock.getChildBlocks())
                 {
-                    Node caseNode = new Node();
+                    Node caseNode = new NodeLinker();
                     String caseString = caseBlock.getCodeSegment().toString();
 
                     caseNode.setName("r" + caseBlock.getStartRowNumber());
@@ -567,6 +576,7 @@ public class TimedAutomaton
                     this.nodes.add(caseNode);
 
                     //Create link with previous case nodes
+                    //TODO: Check if this section is correct
                     for(Node previousCaseNode : previousCaseNodes)
                     {
                         Link link = getEmptyTargetLink(previousCaseNode);
@@ -608,7 +618,7 @@ public class TimedAutomaton
                     lastNodes.add(selectionNode);
                 }
 
-                //To Do: Build check for cases without break statement!!
+                //TODO: Build check for cases without break statement!!
             }
         }
 
@@ -618,10 +628,10 @@ public class TimedAutomaton
     private Vector<Node> createJumpNode(JumpBlock jumpBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
     {
         int nextAbstractionLevel = leftAbstractionLevel - 1;
-        Vector<Node> lastNodes = new Vector<Node>();
+        Vector<Node> lastNodes = new Vector<Node>(parentNodes);
 
         //Create jump node
-        Node jumpNode = new Node();
+        Node jumpNode = new NodeLinker();
         String jumpString = jumpBlock.getCodeSegment().toString();
 
         jumpNode.setName("r" + jumpBlock.getStartRowNumber());
@@ -631,15 +641,7 @@ public class TimedAutomaton
         this.nodes.add(jumpNode);
 
         //Create link with parent nodes
-        for(Node parentNode : parentNodes)
-        {
-            Link link = getEmptyTargetLink(parentNode);
-
-            //Set link target
-            link.setTargetNode(jumpNode);
-
-            this.links.add(link);
-        }
+        lastNodes = createLinks(lastNodes, jumpNode);
 
         if(jumpNode.getComments().contains("return"))
         {
@@ -655,18 +657,84 @@ public class TimedAutomaton
         else if(jumpNode.getComments().contains("break"))
         {
             //Break statement
+            //Check for iteration/case parent block
+            boolean foundMatchingParent = false;
+            Block checkParent = jumpBlock.getParentBlock();
+
+            while(!foundMatchingParent && checkParent != null)
+            {
+                if(checkParent.getClass() == IterationBlock.class || checkParent.getClass() == CaseBlock.class)
+                {
+                    if(checkParent.getClass() == CaseBlock.class)
+                    {
+                        //Check if selection case is not a boolean case
+                        if(checkParent.getCodeSegment() != null)
+                        {
+                            foundMatchingParent = true;
+                        }
+                    }
+                    else
+                    {
+                        foundMatchingParent = true;
+                    }
+                }
+
+                if(!foundMatchingParent)
+                {
+                    checkParent = checkParent.getParentBlock();
+                }
+            }
+
+            int linkDistance = 1;
+
+            if(foundMatchingParent)
+            {
+                linkDistance = checkParent.getNumOfDescendants() - (checkParent.getDescendantBlocks().indexOf(jumpBlock) + 1) + 2;
+
+                ((NodeLinker)jumpNode).setLinkDistance(linkDistance);
+            }
+            else
+            {
+                //Unused break statement detected
+            }
+
             //Add node to last nodes list to connect loop exit
-            //lastNodes.add(jumpNode);
-            System.err.println("Break statement block is not yet implemented!");
-            System.err.println("Results will not be correct!");
+            lastNodes.add(jumpNode);
         }
         else if(jumpNode.getComments().contains("continue"))
         {
             //Continue statement
+            //Check for iteration parent block
+            boolean foundMatchingParent = false;
+            Block checkParent = jumpBlock.getParentBlock();
+
+            while(!foundMatchingParent && checkParent != null)
+            {
+                if(checkParent.getClass() == IterationBlock.class)
+                {
+                    foundMatchingParent = true;
+                }
+                else
+                {
+                    checkParent = checkParent.getParentBlock();
+                }
+            }
+
+            int linkDistance = 1;
+
+            if(foundMatchingParent)
+            {
+                linkDistance = checkParent.getNumOfDescendants() - (checkParent.getDescendantBlocks().indexOf(jumpBlock) + 1) + 1;
+
+                ((NodeLinker)jumpNode).setLinkDistance(linkDistance);
+            }
+            else
+            {
+                System.out.println("Unused continue statement detected!");
+            }
+
             //Add node to last nodes list to connect to next iteration evaluation
-            //lastNodes.add(jumpNode);
-            System.err.println("Continue statement block is not yet implemented!");
-            System.err.println("Results will not be correct!");
+            lastNodes.add(jumpNode);
         }
         else if(jumpNode.getComments().contains("goto"))
         {
@@ -708,6 +776,33 @@ public class TimedAutomaton
     public Node getEndNode()
     {
         return this.endNode;
+    }
+
+    private Vector<Node> createLinks(Vector<Node> sourceNodes, Node targetNode)
+    {
+        Vector<Node> remainingNodes = new Vector<Node>(sourceNodes);
+
+        //Create links
+        Iterator<Node> it = remainingNodes.iterator();
+
+        while(it.hasNext())
+        {
+            Node sourceNode = it.next();
+
+            if(((NodeLinker)sourceNode).tryLinking())
+            {
+                Link link = getEmptyTargetLink(sourceNode);
+
+                //Set link target
+                link.setTargetNode(targetNode);
+
+                this.links.add(link);
+
+                it.remove();
+            }
+        }
+
+        return remainingNodes;
     }
 
     private void prettifyLayout()
