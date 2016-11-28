@@ -172,13 +172,14 @@ public class UppaalModelExport implements ExportTool
                 //Write nodes
                 for(Node node : system.getNodes())
                 {
-                    String nodeString = "<location id=\"id" + node.getId() + "\" x=\"" + node.getLocX() + "\" y=\"" + node.getLocY() + "\"><name x=\"" + (node.getLocX() + 16) + "\" y=\"" + (node.getLocY() - 16) + "\">" + node.getName() + "</name><label kind=\"comments\">" + formatXMLString(node.getComments()) + "</label></location>" + eol;
+                    String nodeString = "<location id=\"id" + node.getId() + "\" x=\"" + node.getLocX() + "\" y=\"" + node.getLocY() + "\"><name x=\"" + (node.getLocX() + 16) + "\" y=\"" + (node.getLocY() - 16) + "\">" + node.getName() + "</name><label kind=\"comments\">" + formatXMLString(node.getComments()) + "</label>" + (node.isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
                     buffWriter.write(nodeString);
                 }
 
-                //Write end node
-                String nodeString = "<location id=\"id" + system.getEndNode().getId() + "\" x=\"" + system.getEndNode().getLocX() + "\" y=\"" + system.getEndNode().getLocY() + "\"><name x=\"" + (system.getEndNode().getLocX() + 16) + "\" y=\"" + (system.getEndNode().getLocY() - 16) + "\">" + system.getEndNode().getName() + "</name><label kind=\"comments\">" + formatXMLString(system.getEndNode().getComments()) + "</label></location>" + eol;
-                buffWriter.write(nodeString);
+  
+                //Write exit node
+                String exitnodeString = "<location id=\"id" + system.getExitNode().getId() + "\" x=\"" + system.getExitNode().getLocX() + "\" y=\"" + system.getExitNode().getLocY() + "\"><name x=\"" + (system.getExitNode().getLocX() + 16) + "\" y=\"" + (system.getExitNode().getLocY() - 16) + "\">" + system.getExitNode().getName() + "</name><label kind=\"comments\">" + formatXMLString(system.getExitNode().getComments()) + "</label>" + (system.getExitNode().isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
+                buffWriter.write(exitnodeString);
 
                 //Set initial node
                 int i = 0;

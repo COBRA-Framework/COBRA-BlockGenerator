@@ -17,15 +17,31 @@ public class TimedAutomaton
     private Vector<Node> nodes;
     private Vector<Link> links;
     private Node endNode;
-
+    private Node startNode;
+    private Node exitNode;
+    private ChanSet ChanSet;
+    private Node testNode;
+    
     public TimedAutomaton()
     {
         this.name = "AUTOMATON";
         this.nodes = new Vector<Node>();
         this.links = new Vector<Link>();
+        this.ChanSet = new ChanSet();
+        this.startNode = new Node();
+        this.startNode.setName("START");
+        this.startNode.setComments("");
+        this.startNode.setInitial(true);
         this.endNode = new Node();
         this.endNode.setName("END");
         this.endNode.setComments("");
+        this.endNode.setCommitted(true);
+        this.exitNode = new Node();
+        this.exitNode.setName("EXIT");
+        this.exitNode.setComments("");
+        this.testNode = new Node();
+        this.testNode.setName("TEST");
+        this.testNode.setComments("");
     }
 
     public int createAutomaton(Block model, int abstractionDepth) throws Exception
@@ -39,13 +55,22 @@ public class TimedAutomaton
 
         //Set automaton name
         this.name = ((MethodBlock)model).getMethodName();
-
-        //Set initial node
+        
+        //Set start/initial node
+        this.startNode.setId(getNextFreeId());
+        this.nodes.add(this.startNode);
+        
+        //Set committed start node in main file
+        if (this.name.equals("main")) 
+        {
+        	this.startNode.setCommitted(true); 
+        }
+        
         Node node = new Node();
         node.setId(getNextFreeId());
         node.setName(((MethodBlock) model).getMethodName());
-        node.setInitial(true);
-
+       
+        
         if(abstractionDepth != 0)
         {
             node.setComments(model.getCodeSegment().toString());
@@ -54,8 +79,23 @@ public class TimedAutomaton
         {
             node.setComments(model.getCodeString());
         }
-
+        
         this.nodes.add(node);
+        
+        this.testNode.setId(getNextFreeId());
+        this.nodes.add(this.testNode);
+        
+        
+        Link linkStart = getEmptyTargetLink(this.startNode);
+
+        //Set link from start node to target
+        linkStart.setTargetNode(node);
+        if(!this.name.equals("main"))
+        {
+        	WaitChan(linkStart, this.name);
+        }
+        
+        this.links.add(linkStart);
 
         if(abstractionDepth != 0)
         {
@@ -72,27 +112,91 @@ public class TimedAutomaton
 
         //Set id of end node
         this.endNode.setId(getNextFreeId());
-
-        //Link to end if no return node is available
+        
+        this.nodes.add(this.endNode);
+        
+        //Set id of exit node
+        this.exitNode.setId(getNextFreeId());     
+        
+        //Link to end and end to exit if no return node is available 
         if(!endNodes.isEmpty())
         {
+        	
             //Create links
             for(Node lastNode : endNodes)
             {
+            	//Set last node to end
                 Link link = getEmptyTargetLink(lastNode);
 
                 //Set link target
                 link.setTargetNode(this.endNode);
-
+          
                 this.links.add(link);
-            }
+                
+                //Set end node to exit node
+                Link linkExit = getEmptyTargetLink(this.endNode);
+
+                //Set link target
+                linkExit.setTargetNode(this.exitNode);
+               
+                if(!this.name.equals("main"))
+                {
+                	SetChan(linkExit, this.name + "_out");
+                }
+          
+                this.links.add(linkExit);         
+            }      
         }
 
+        //Set the beginning node of the Chain
+        //if(this.name.equals("main"))
+        	
+        	
+        	
+        for(Node ChanStartNode : nodes )
+        {
+        	if(ChanStartNode.getComments().split("();").length == ChanStartNode.getComments().split("\n").length && ChanStartNode.getComments().contains("();") )
+        	{
+        		ChanStartNode.setCommitted(true); 
+        		
+        		String[] Chan = ChanStartNode.getComments().replaceAll("\n", "").replaceAll(" ", "").split("\\(" + "\\)" + ";");
+        		
+        		Vector<Link> Links = ChanStartNode.getLinks();
+        		
+        		for(int cnt=0; cnt< Chan.length ; cnt++)
+        		{
+        			this.ChanSet.addChanSet(Chan[cnt]); 
+        		}
+     
+        		for(Link link : Links)
+                {	
+        			link.setSync("_" + ChanSet.getChanSet(0) + "!");    
+                }    	
+        		
+        		//this.nodes.add(ChanStartNode);
+        	}        	
+        }
+        
+       // if(this.name.equals("quicksort_init"))
+       this.ChanSet.addChanSet("222");
+    
+       System.out.println("aaaaaaaaaaaaaaaaaaaaa" + ChanSet.getChanSet(0));
+        
         this.prettifyLayout();
 
         return 0;
     }
 
+    private void SetChan (Link link, String ChanName)
+    {
+    	link.setSync("_" + ChanName + "!");
+    }
+    
+    private void WaitChan (Link link, String ChanName)
+    {
+    	link.setSync("_" + ChanName + "?");
+    }
+    
     private Vector<Node> addNodesRecursive(Block currentBlock, Vector<Node> parentNodes, int leftAbstractionLevel)
     {
         int startRow = 0;
@@ -118,7 +222,10 @@ public class TimedAutomaton
             {
                 Node node = createBasicNode(block, leftAbstractionLevel);
 
-                this.nodes.add(node);
+                //this.nodes.add(node);
+                
+                //this.nodes.add(testNode);
+                functionCallCheck(node);
 
                 //Create link
                 for(Node lastNode : lastNodes)
@@ -145,6 +252,39 @@ public class TimedAutomaton
         return lastNodes;
     }
 
+    private void functionCallCheck(Node node)
+    {
+    	
+    	
+    	if(node.getComments().split("();").length == node.getComments().split("\n").length && node.getComments().contains("();") )
+    	{	     		
+    		String[] Chan = node.getComments().replaceAll("\n", "").replaceAll(" ", "").split("\\(" + "\\)" + ";");
+ 
+    		for(int cnt=0; cnt< Chan.length ; cnt++)
+    		{
+    			node.setCommitted(true);
+    			node.setComments(Chan[cnt] + "();");
+    			
+    			Node funtionCallEndNode = new Node();    			
+    			funtionCallEndNode.setId(getNextFreeId());
+    			funtionCallEndNode.setName(Chan[cnt] + "out");
+
+ 
+    		
+    			
+    			this.nodes.add(funtionCallEndNode);
+    			
+    		}
+ 
+ 	     	   		
+    	} 
+    	else
+    	{
+    		this.nodes.add(node);
+    	}
+    	
+    	return;
+    }
     private Link getEmptyTargetLink(Node node)
     {
         Link link = null;
@@ -651,6 +791,14 @@ public class TimedAutomaton
             link.setTargetNode(this.endNode);
 
             this.links.add(link);
+            
+            //Set end node to exit node
+            Link linkExit = getEmptyTargetLink(this.endNode);
+
+            //Set link target
+            linkExit.setTargetNode(this.exitNode);
+      
+            this.links.add(linkExit);     
         }
         else if(jumpNode.getComments().contains("break"))
         {
@@ -710,6 +858,11 @@ public class TimedAutomaton
         return this.endNode;
     }
 
+    public Node getExitNode()
+    {
+        return this.exitNode;
+    }
+    
     private void prettifyLayout()
     {
         int locX = 0;
@@ -722,7 +875,7 @@ public class TimedAutomaton
             locX = locX;
             locY = locY + 64;
         }
-
-        this.endNode.setLocation(locX, locY);
+        
+        this.exitNode.setLocation(locX, locY);
     }
 }

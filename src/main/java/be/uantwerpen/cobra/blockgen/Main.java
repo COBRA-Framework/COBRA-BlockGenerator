@@ -248,7 +248,7 @@ public class Main extends Application
                 applyAbstractionRuleRecursive(methodBlock, abstractionDepth);
                 applyReductionRuleRecursive(methodBlock);
 
-                graphTool.createGraphFromBlock(methodBlock);
+                //graphTool.createGraphFromBlock(methodBlock);
 
                 for(Block leafBlock : methodBlock.getLeafs())
                 {
