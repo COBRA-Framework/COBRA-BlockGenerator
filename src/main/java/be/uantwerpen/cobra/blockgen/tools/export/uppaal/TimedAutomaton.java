@@ -18,7 +18,6 @@ public class TimedAutomaton
     private Vector<Link> links;
     private Node endNode;
     private Node startNode;
-    private Node exitNode;
     private ChanSet ChanSet;
 
     
@@ -36,9 +35,6 @@ public class TimedAutomaton
         this.endNode.setName("END");
         this.endNode.setComments("");
         this.endNode.setCommitted(true);
-        this.exitNode = new Node();
-        this.exitNode.setName("EXIT");
-        this.exitNode.setComments("");
 
     }
 
@@ -107,16 +103,9 @@ public class TimedAutomaton
         //Set id of end node
         this.endNode.setId(getNextFreeId());
         
-        this.nodes.add(this.endNode);
+        //this.nodes.add(this.endNode);
         
-        //Set id of exit node
-        this.exitNode.setId(getNextFreeId()); 
         
-        //Set exit node in main committed
-        if(this.name.equals("main"))
-        {
-        	exitNode.setCommitted(true);;
-        }
         
         //Link to end and end to exit if no return node is available 
         if(!endNodes.isEmpty())
@@ -137,7 +126,7 @@ public class TimedAutomaton
                 Link linkExit = getEmptyTargetLink(this.endNode);
 
                 //Set link target
-                linkExit.setTargetNode(this.exitNode);
+                linkExit.setTargetNode(this.startNode);
                
                 if(!this.name.equals("main"))
                 {
@@ -833,13 +822,6 @@ public class TimedAutomaton
 
             this.links.add(link);
             
-            //Set end node to exit node
-            Link linkExit = getEmptyTargetLink(this.endNode);
-
-            //Set link target
-            linkExit.setTargetNode(this.exitNode);
-      
-            this.links.add(linkExit);     
         }
         else if(jumpNode.getComments().contains("break"))
         {
@@ -898,11 +880,6 @@ public class TimedAutomaton
     {
         return this.endNode;
     }
-
-    public Node getExitNode()
-    {
-        return this.exitNode;
-    }
     
     private void prettifyLayout()
     {
@@ -917,6 +894,6 @@ public class TimedAutomaton
             locY = locY + 64;
         }
         
-        this.exitNode.setLocation(locX, locY);
+        this.endNode.setLocation(locX, locY);
     }
 }

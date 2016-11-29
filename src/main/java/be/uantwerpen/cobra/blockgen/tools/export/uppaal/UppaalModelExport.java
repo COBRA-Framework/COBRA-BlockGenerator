@@ -206,8 +206,8 @@ public class UppaalModelExport implements ExportTool
                     buffWriter.write(nodeString);
                 }
   
-                //Write exit node
-                String exitnodeString = "<location id=\"id" + system.getExitNode().getId() + "\" x=\"" + system.getExitNode().getLocX() + "\" y=\"" + system.getExitNode().getLocY() + "\"><name x=\"" + (system.getExitNode().getLocX() + 16) + "\" y=\"" + (system.getExitNode().getLocY() - 16) + "\">" + system.getExitNode().getName() + "</name><label kind=\"comments\">" + formatXMLString(system.getExitNode().getComments()) + "</label>" + (system.getExitNode().isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
+                //Write end node
+                String exitnodeString = "<location id=\"id" + system.getEndNode().getId() + "\" x=\"" + system.getEndNode().getLocX() + "\" y=\"" + system.getEndNode().getLocY() + "\"><name x=\"" + (system.getEndNode().getLocX() + 16) + "\" y=\"" + (system.getEndNode().getLocY() - 16) + "\">" + system.getEndNode().getName() + "</name><label kind=\"comments\">" + formatXMLString(system.getEndNode().getComments()) + "</label>" + (system.getEndNode().isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
                 buffWriter.write(exitnodeString);
 
                 //Set initial node
