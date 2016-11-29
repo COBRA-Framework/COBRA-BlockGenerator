@@ -57,15 +57,15 @@ public class Main extends Application
         }
 
         generateOUTPUT(args[0], args[1], abstractionDepth);
-
+/*
         try
         {
-            System.in.read();
+            //System.in.read();
         }
         catch(IOException e)
         {
             e.printStackTrace();
-        }
+        }*/
 
         System.exit(0);
     }

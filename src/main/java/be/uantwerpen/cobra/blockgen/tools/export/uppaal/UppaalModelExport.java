@@ -150,11 +150,23 @@ public class UppaalModelExport implements ExportTool
             String eol = System.getProperty("line.separator");
             writer = new FileWriter(file.getAbsoluteFile());
             buffWriter = new BufferedWriter(writer);
-
+            
+            //Declare global clock
+            String gclock = "clock t;";
+            
+            //Declare chan
+            String ChanSet = " ";
+            for(TimedAutomaton system : systems)
+            {
+            	ChanSet = ChanSet + "_" + system.getName() + ", " + "_" + system.getName() + "_out, ";
+            }
+            
+            ChanSet = "chan " + ChanSet.substring(0,ChanSet.length() - 2) + ";";
+            
             //Write file introduction
-            String fileHeader = "<?xml version='1.0' encoding='utf-8'?><!DOCTYPE nta SYSTEM 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'>" + eol + "<nta>" + eol + "<declaration>// Created with COBRA-Framework Export Tool v0.1" + eol + "// Developed by: Thomas Huybrechts - MOSAIC 2016" + eol + "// Place global variables here." + "</declaration>" + eol;
+            String fileHeader = "<?xml version='1.0' encoding='utf-8'?><!DOCTYPE nta SYSTEM 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd'>" + eol + "<nta>" + eol + "<declaration>// Created with COBRA-Framework Export Tool v0.1" + eol + "// Developed by: Thomas Huybrechts - MOSAIC 2016" + eol + "// Place global variables here." + eol + gclock + eol + ChanSet + eol + "</declaration>" + eol;
             buffWriter.write(fileHeader);
-
+            
             for(TimedAutomaton system : systems)
             {
                 //Create model declaration
@@ -166,16 +178,33 @@ public class UppaalModelExport implements ExportTool
                 buffWriter.write(parameterList);
 
                 //Write local variables
-                String localVariables = "<declaration>" + "// Place local variables here." + "</declaration>" + eol;
+                
+                //Declare global clock
+                String lclock = "clock x;";
+                
+                //Declare chan
+                String nodeWCET = " ";
+                
+                for(Node node : system.getNodes())
+                {	
+                	if(node.getName().matches("r"+ ".*"))
+                	{
+                		nodeWCET = nodeWCET + node.getName() + "_WCET=20, ";
+                	}
+                	
+                }
+                
+                nodeWCET = "int" + nodeWCET.substring(0,nodeWCET.length() - 2) + ";";
+                
+                String localVariables = "<declaration>" + "// Place local variables here." + eol + lclock + eol + nodeWCET +"</declaration>" + eol;
                 buffWriter.write(localVariables);
 
                 //Write nodes
                 for(Node node : system.getNodes())
                 {
-                    String nodeString = "<location id=\"id" + node.getId() + "\" x=\"" + node.getLocX() + "\" y=\"" + node.getLocY() + "\"><name x=\"" + (node.getLocX() + 16) + "\" y=\"" + (node.getLocY() - 16) + "\">" + node.getName() + "</name><label kind=\"comments\">" + formatXMLString(node.getComments()) + "</label>" + (node.isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
+                    String nodeString = "<location id=\"id" + node.getId() + "\" x=\"" + node.getLocX() + "\" y=\"" + node.getLocY() + "\"><name x=\"" + (node.getLocX() + 16) + "\" y=\"" + (node.getLocY() - 16) + "\">" + node.getName() + "</name>" + "<label kind=\"invariant\"" + " x=\"" + (node.getLocX() + 20) + "\" y=\"" + node.getLocY() + "\">" + (node.getName().matches("r"+ ".*") ? node.getInvariant() : "") + "</label>" + "<label kind=\"comments\">" + formatXMLString(node.getComments()) + "</label>" + (node.isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
                     buffWriter.write(nodeString);
                 }
-
   
                 //Write exit node
                 String exitnodeString = "<location id=\"id" + system.getExitNode().getId() + "\" x=\"" + system.getExitNode().getLocX() + "\" y=\"" + system.getExitNode().getLocY() + "\"><name x=\"" + (system.getExitNode().getLocX() + 16) + "\" y=\"" + (system.getExitNode().getLocY() - 16) + "\">" + system.getExitNode().getName() + "</name><label kind=\"comments\">" + formatXMLString(system.getExitNode().getComments()) + "</label>" + (system.getExitNode().isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
@@ -302,24 +331,29 @@ public class UppaalModelExport implements ExportTool
             }
 
             //Write system declaration
-            String systemDeclaration = "<system>// Place template instantiations here." + eol + eol + "// List one or more processes to be composed into a system." + eol + "system ";
-
+            
+            //Template instantiations
+            String templateinstantiation = "";
+            //Processes 
+            String processesdeclaration = "";
+      
             int i = 0;
+            
             for(TimedAutomaton system : systems)
             {
-                systemDeclaration = systemDeclaration + system.getName();
+            	
+            	templateinstantiation = templateinstantiation + "p_" + system.getName() + " = " +  system.getName() +"();" + eol;
 
-                i++;
+            	processesdeclaration = processesdeclaration + "p_" + system.getName() + ", ";
 
-                if(i < systems.size())
-                {
-                    systemDeclaration = systemDeclaration + ", ";
-                }
             }
-
+            
+            processesdeclaration = "system " + processesdeclaration.substring(0,processesdeclaration.length() - 2) + ";";
+           
             //Write system declaration end
-            systemDeclaration = systemDeclaration + ";</system>" + eol;
-
+            
+            String systemDeclaration = "<system>// Place template instantiations here." + eol + eol + templateinstantiation + eol + "// List one or more processes to be composed into a system." + eol + processesdeclaration + eol + "</system>";
+            
             buffWriter.write(systemDeclaration);
 
             //Write file closing
