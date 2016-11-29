@@ -90,7 +90,7 @@ public class Link
 
     public String getUpdate()
     {
-        return update;
+        return this.update;
     }
 
     public void setUpdate(String update)

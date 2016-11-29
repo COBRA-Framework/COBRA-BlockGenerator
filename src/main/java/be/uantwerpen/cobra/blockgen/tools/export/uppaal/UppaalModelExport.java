@@ -178,31 +178,13 @@ public class UppaalModelExport implements ExportTool
                 buffWriter.write(parameterList);
 
                 //Write local variables
-                
-                //Declare global clock
-                String lclock = "clock x;";
-                
-                //Declare chan
-                String nodeWCET = " ";
-                
-                for(Node node : system.getNodes())
-                {	
-                	if(node.getName().matches("r"+ ".*"))
-                	{
-                		nodeWCET = nodeWCET + node.getName() + "_WCET=20, ";
-                	}
-                	
-                }
-                
-                nodeWCET = "int" + nodeWCET.substring(0,nodeWCET.length() - 2) + ";";
-                
-                String localVariables = "<declaration>" + "// Place local variables here." + eol + lclock + eol + nodeWCET +"</declaration>" + eol;
+                String localVariables = "<declaration>" + "// Place local variables here." + eol + system.getLocalVariables() +"</declaration>" + eol;
                 buffWriter.write(localVariables);
 
                 //Write nodes
                 for(Node node : system.getNodes())
                 {
-                    String nodeString = "<location id=\"id" + node.getId() + "\" x=\"" + node.getLocX() + "\" y=\"" + node.getLocY() + "\"><name x=\"" + (node.getLocX() + 16) + "\" y=\"" + (node.getLocY() - 16) + "\">" + node.getName() + "</name>" + "<label kind=\"invariant\"" + " x=\"" + (node.getLocX() + 20) + "\" y=\"" + node.getLocY() + "\">" + (node.getName().matches("r"+ ".*") ? node.getInvariant() : "") + "</label>" + "<label kind=\"comments\">" + formatXMLString(node.getComments()) + "</label>" + (node.isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
+                    String nodeString = "<location id=\"id" + node.getId() + "\" x=\"" + node.getLocX() + "\" y=\"" + node.getLocY() + "\"><name x=\"" + (node.getLocX() + 16) + "\" y=\"" + (node.getLocY() - 16) + "\">" + node.getName() + "</name>" + "<label kind=\"invariant\"" + " x=\"" + (node.getLocX() + 20) + "\" y=\"" + node.getLocY() + "\">" + (node.getName().matches("r"+ "\\d+.*") ? node.getInvariant() : "") + "</label>" + "<label kind=\"comments\">" + formatXMLString(node.getComments()) + "</label>" + (node.isCommitted() ? "<committed/>" : "" ) + "</location>" + eol;
                     buffWriter.write(nodeString);
                 }
   

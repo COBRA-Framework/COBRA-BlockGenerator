@@ -19,7 +19,8 @@ public class TimedAutomaton
     private Node endNode;
     private Node startNode;
     private ChanSet ChanSet;
-
+    private String localVariables;
+    String eol = System.getProperty("line.separator");
     
     public TimedAutomaton()
     {
@@ -35,6 +36,7 @@ public class TimedAutomaton
         this.endNode.setName("END");
         this.endNode.setComments("");
         this.endNode.setCommitted(true);
+        this.localVariables = "";
 
     }
 
@@ -137,6 +139,22 @@ public class TimedAutomaton
             }      
         }
         
+        //Set Update of links to x:=0 for timing analysis
+        for(Link itlink : this.links)
+        {
+        	itlink.setUpdate("x:=0");   	
+        }
+        
+        
+        //Declare local clock
+        String lclock = "clock x;";
+        
+        //Declare local WCET variables
+        String localVariablesWCET = "";
+        
+        //Declare local iterator variables
+        String localIterators = "";
+        
         for(Node itnode : this.nodes)
         {
         	//Commit function call nodes
@@ -144,27 +162,108 @@ public class TimedAutomaton
         	{
         		itnode.setCommitted(true);
         	}
-        	
-        	if(itnode.getName().matches("r"+ ".*"))
-        	{
-        		itnode.setInvariant( "x&lt;=" + itnode.getName() + "_WCET" );
-        		Vector<Link> links = itnode.getLinks();
         		
-        		for(Link link : links)
+        	if(itnode.getName().matches("r"+ "\\d+.*"))
+        	{
+        		
+        		
+        		//Set Guard of normal links
+	        	Vector<Link> links = itnode.getLinks();
+	        	
+	        	for(Link link : links)
+	        	{       			
+	        		link.setGuard( "x&gt;=" + itnode.getName() + "_WCET" );
+	        	}
+	        	
+        		//Set Invariant of normal nodes and special nodes
+        		itnode.setInvariant( "x&lt;=" + itnode.getName() + "_WCET" );
+        		
+        		//Set Update of links of _init block of iteration statements
+        		if(itnode.getName().contains("_init"))
         		{
-        			link.setGuard("x&gt;=" + itnode.getName() + "_WCET" );
+        			
+        			Vector<Link> initlinks = itnode.getLinks();
+            		
+            		for(Link link : initlinks)
+            		{       			
+            			String[] iterator = itnode.getComments().replaceAll(" ", "").replaceAll("\\d+.*", "").replaceAll(";","").split("=");
+            			
+            			for(int cnt=0; cnt<iterator.length;cnt++)
+            			{
+            				//Set Update of link for iteration nodes
+            				link.setUpdate(link.getUpdate() + ", " + iterator[cnt] + ":=0");
+        				
+            				//Collect local iterator variables
+                			//Remove repeated variables
+                			localIterators = localIterators.replaceAll(iterator[cnt] + ", ", "");
+                			localIterators = localIterators + iterator[cnt] + ", ";
+            			}            			            			
+            		}      			
         		}
+        		
+        		//Set Update and Guard of links of _post block of iteration statements
+        		if(itnode.getName().contains("_post"))
+        		{
+        			//Set Guard for iteration nodes
+            		Node conditionNode = new Node();
+            		//Find the correspondent condition node
+            		for(Node findConditionNode : this.nodes )
+            		{
+            			String conditionNodeName = itnode.getName().replaceAll("_post", "_cond");
+            			if(findConditionNode.getName().equals(conditionNodeName))
+            			{
+            				conditionNode = findConditionNode;
+            			}					
+            		}
+            		
+            		String guardCondition = conditionNode.getComments().replaceAll(" ", "").replaceAll("for\\(", "").replaceAll("if\\(", "").replaceAll("\\)", "").replaceAll(";", "").replaceAll("&&", "&amp;&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");           		
+            		//Set Update for iteration nodes
+        			Vector<Link> postlinks = itnode.getLinks();
+            		
+            		for(Link link : postlinks)
+            		{       			
+            			String iteratorUpdate = itnode.getComments().replaceAll(" ", "").replaceAll("=", ":=").replaceAll(";","");
+            			
+            			//Set Update of link of _post node
+            			link.setUpdate("x:=0, " + iteratorUpdate);  
+            			//Set Guard of link of _post node
+            			String guardCondition_temp =link.getGuard()!= null ? link.getGuard()+"&amp;&amp; " : "";
+            			
+            			link.setGuard(guardCondition_temp.replaceAll("&amp;&amp; " + guardCondition, "") + guardCondition);
+            		
+            		} 
+            		
+        		}
+        		
+        		
+	        	//Collect local WCET variables
+	        	localVariablesWCET = localVariablesWCET + itnode.getName() + "_WCET=20, ";
         		
         	}     
         	
         }
-        
-        for(Link itlink : this.links)
+     
+        //Write local clock
+        setLocalVariables(lclock + eol);
+        //Write local WCET variables
+        localVariablesWCET = "int " + localVariablesWCET.substring(0,localVariablesWCET.length() - 2) + ";";
+        setLocalVariables(localVariablesWCET + eol);
+        //Write local iterator variables
+        if(!localIterators.isEmpty())
         {
-        	itlink.setUpdate("x:=0");
-        	
-        	
+        	localIterators = "int " + localIterators.substring(0,localIterators.length() - 2) + ";";
+        	setLocalVariables(localIterators + eol);
         }
+        
+       
+        
+        
+        
+        
+        localVariablesWCET = "int" + localVariablesWCET.substring(0,localVariablesWCET.length() - 2) + ";";
+
+        
+
         
         
         
@@ -879,6 +978,17 @@ public class TimedAutomaton
     public Node getEndNode()
     {
         return this.endNode;
+    }
+    
+    public void setLocalVariables(String localVariable)
+    {
+        this.localVariables = this.localVariables + localVariable;
+        
+    }
+    
+    public String getLocalVariables()
+    {
+    	return this.localVariables;
     }
     
     private void prettifyLayout()
