@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>be.uantwerpen.cobra</groupId>
+    <groupId>be.uantwerpen.idlab.cobra</groupId>
     <artifactId>BlockGenerator</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>${packaging}</packaging>
@@ -73,7 +73,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>be.uantwerpen.cobra.blockgen.Main</mainClass>
+                            <mainClass>be.uantwerpen.idlab.cobra.blockgen.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
