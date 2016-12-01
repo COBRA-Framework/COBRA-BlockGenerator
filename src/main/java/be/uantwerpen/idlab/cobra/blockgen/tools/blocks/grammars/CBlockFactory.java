@@ -4,6 +4,7 @@ import be.uantwerpen.idlab.cobra.blockgen.models.CodeFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.*;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks.BooleanCaseBlock;
+import be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks.DefaultCaseBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks.ValueCaseBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.iterationblocks.DoWhileBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.iterationblocks.ForBlock;
@@ -255,18 +256,32 @@ public class CBlockFactory extends BlockFactory
         CodeSegment codeSegment = generateCodeSegment(start, end);
 
         String codeStream = codeSegment.toString();
-        String labelStatement = new String();
+        String caseType = codeStream.trim().toLowerCase();
 
-        try
+        if(caseType.startsWith("default"))
         {
-            labelStatement = codeStream.substring(codeStream.indexOf(':') + 1).trim();
+            caseBlock = new DefaultCaseBlock(codeSegment);
         }
-        catch(IndexOutOfBoundsException e)
+        else if(caseType.startsWith("case"))
         {
-            labelStatement = "";
-        }
+            String labelStatement = new String();
 
-        caseBlock = new ValueCaseBlock(labelStatement, codeSegment);
+            try
+            {
+                labelStatement = codeStream.substring(codeStream.indexOf("case") + 4, codeStream.lastIndexOf(':')).trim();
+            }
+            catch(IndexOutOfBoundsException e)
+            {
+                labelStatement = "";
+            }
+
+            caseBlock = new ValueCaseBlock(labelStatement, codeSegment);
+        }
+        else
+        {
+            reportFactoryError("Case type can not be determined for the statement: (r." + codeSegment.getRowNumber(codeSegment.getStartIndex()) + "-" + codeSegment.getColumnNumber(codeSegment.getStartIndex()) + ") " + codeStream, new Throwable().getStackTrace().toString());
+            return;
+        }
 
         currentBlockPointer.addChildBlock(caseBlock);
 

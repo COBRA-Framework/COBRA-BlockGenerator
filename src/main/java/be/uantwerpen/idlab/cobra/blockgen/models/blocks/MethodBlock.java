@@ -1,6 +1,10 @@
 package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Thomas on 22/03/2016.
@@ -8,6 +12,7 @@ import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 public class MethodBlock extends BasicBlock implements Block
 {
     private String methodName;
+    private String parameters;
 
     protected MethodBlock()
     {
@@ -35,5 +40,16 @@ public class MethodBlock extends BasicBlock implements Block
     public String toString()
     {
         return "[Method block] " + this.codeSegment.toString();
+    }
+
+    @Override
+    public List<XMLElement> getXMLElements()
+    {
+        List<XMLElement> elements = new ArrayList<XMLElement>();
+
+        //Element: method name
+        elements.add(new XMLElement("name", this.codeSegment));
+
+        return elements;
     }
 }

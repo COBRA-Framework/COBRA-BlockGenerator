@@ -3,6 +3,10 @@ package be.uantwerpen.idlab.cobra.blockgen.models.blocks.iterationblocks;
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.IterationBlock;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Thomas on 29/11/2016.
@@ -71,5 +75,18 @@ public class ForBlock extends IterationBlock
     public String toString()
     {
         return "[Iteration block] " + this.codeSegment.toString();
+    }
+
+    public List<XMLElement> getXMLElements()
+    {
+        List<XMLElement> elements = super.getXMLElements();
+
+        //Element: init statement
+        elements.add(new XMLElement("init", this.initStatement));
+
+        //Element: post statement
+        elements.add(new XMLElement("post", this.postStatement));
+
+        return elements;
     }
 }

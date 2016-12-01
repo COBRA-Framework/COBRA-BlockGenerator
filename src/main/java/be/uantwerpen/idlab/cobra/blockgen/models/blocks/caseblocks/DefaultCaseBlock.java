@@ -1,23 +1,23 @@
-package be.uantwerpen.idlab.cobra.blockgen.models.blocks.jumpblocks;
+package be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.JumpBlock;
+import be.uantwerpen.idlab.cobra.blockgen.models.blocks.CaseBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Thomas on 29/11/2016.
+ * Created by Thomas on 1/12/2016.
  */
-public class BreakBlock extends JumpBlock
+public class DefaultCaseBlock extends CaseBlock
 {
-    protected BreakBlock()
+    protected DefaultCaseBlock()
     {
         super();
     }
 
-    public BreakBlock(CodeSegment codeSegment)
+    public DefaultCaseBlock(CodeSegment codeSegment)
     {
         super(codeSegment);
     }

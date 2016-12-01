@@ -1,7 +1,10 @@
 package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -123,5 +126,15 @@ public abstract class SelectionBlock extends BasicBlock implements Block
     public String toString()
     {
         return "[Selection block] " + this.codeSegment.toString();
+    }
+
+    @Override
+    public List<XMLElement> getXMLElements()
+    {
+        List<XMLElement> elements = new ArrayList<XMLElement>();
+
+        //Element: selection statement
+        elements.add(new XMLElement("selection", this.selectionStatement));
+        return elements;
     }
 }

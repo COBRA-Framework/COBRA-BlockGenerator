@@ -9,6 +9,7 @@ import be.uantwerpen.idlab.cobra.blockgen.models.blocks.ProgramBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.SelectionBlock;
 import be.uantwerpen.idlab.cobra.blockgen.services.TerminalService;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.Antlr;
+import be.uantwerpen.idlab.cobra.blockgen.tools.export.ProjectExport;
 import be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.BlockModelExport;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
 import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
@@ -258,6 +259,14 @@ public class Main
         }
 
         Terminal.printTerminalInfo("Generated files will be available in the folder: " + outputFolder);
+
+        Terminal.printTerminalInfo("Exporting block model to project file...");
+
+        ProjectExport projectExport = new ProjectExport();
+
+        projectExport.exportToXML(programBlock, exportLocation + "model.xml", null);
+
+        Terminal.printTerminalInfo("Block model exported to: " + exportLocation + "model.xml");
 
         return programBlock;
     }

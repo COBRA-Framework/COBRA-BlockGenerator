@@ -1,13 +1,17 @@
 package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLBlock;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
  * Created by Thomas on 18/03/2016.
  */
-public class BasicBlock implements Block
+public class BasicBlock extends XMLBlock implements Block
 {
     protected CodeSegment codeSegment;
     protected Block parentBlock;
@@ -15,6 +19,8 @@ public class BasicBlock implements Block
 
     protected BasicBlock()
     {
+        super();
+
         this.codeSegment = null;
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
@@ -22,6 +28,8 @@ public class BasicBlock implements Block
 
     public BasicBlock(CodeSegment codeSegment)
     {
+        super();
+
         this.codeSegment = codeSegment;
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
@@ -184,5 +192,15 @@ public class BasicBlock implements Block
         }
 
         return string;
+    }
+
+    public List<XMLElement> getXMLElements()
+    {
+        List<XMLElement> elements = new ArrayList<XMLElement>();
+
+        //Element: code string
+        elements.add(new XMLElement("code", this.codeSegment));
+
+        return elements;
     }
 }
