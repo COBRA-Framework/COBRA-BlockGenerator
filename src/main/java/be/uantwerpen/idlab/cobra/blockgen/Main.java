@@ -12,8 +12,11 @@ import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.Antlr;
 import be.uantwerpen.idlab.cobra.blockgen.tools.export.ProjectExport;
 import be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.BlockModelExport;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
+import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
+import be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx.JGraphX;
 import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.Vector;
 
@@ -24,6 +27,7 @@ public class Main
 {
     private static TerminalService terminalService = new TerminalService();
     private static boolean terminalMode = false;
+    private static boolean showGraph = false;
     private static String file = new String();
     private static String outputFolder = new String();
     private static int abstractionDepth = -1;
@@ -73,6 +77,7 @@ public class Main
                         Terminal.printTerminal("Usage: java -jar " + jarName + " [options] file output-folder abstraction-depth");
                         Terminal.printTerminal("--help\t\t\tDisplay this message");
                         Terminal.printTerminal("--version\t\tDisplay application version information");
+                        Terminal.printTerminal("--show-graph\tDisplay a graphical view of the block model");
 
                         System.exit(0);
                     }
@@ -91,6 +96,10 @@ public class Main
                         terminalService.systemReady();
 
                         return;
+                    }
+                    else if(arg.equals("--show-graph") || arg.equals("-g"))
+                    {
+                        showGraph = true;
                     }
                     else if(arg.length() >= 3 && i < arg.length() - 3)
                     {
@@ -215,7 +224,7 @@ public class Main
         //Apply basic block reduction
         for(Block methodBlock : blocks)
         {
-            //applyReductionRuleRecursive(methodBlock);
+            applyReductionRuleRecursive(methodBlock);
         }
 
         Terminal.printTerminal("*****Block view*****");
@@ -268,6 +277,20 @@ public class Main
 
         Terminal.printTerminalInfo("Block model exported to: " + exportLocation + "model.xml");
 
+        if(showGraph)
+        {
+            //Create graphical view of the block models
+            GraphDisplay graphDisplay = new JGraphX();
+            Vector<JFrame> displays = new Vector<JFrame>();
+
+            for(Block block : blocks)
+            {
+                displays.add(graphDisplay.DisplayGraphFromBlock(block));
+            }
+
+            Terminal.printTerminalInfo("Block Viewer is ready. Close the Block Viewer window or use 'ctrl+c' in the console to terminate the application.");
+        }
+
         return programBlock;
     }
 
@@ -281,8 +304,8 @@ public class Main
                 "| \\__/\\\\ \\_/ /| |_/ /| |\\ \\ | | | |\n" +
                 " \\____/ \\___/ \\____/ \\_| \\_|\\_| |_/ ");
 
-        Terminal.printTerminal("====================================");
-        Terminal.printTerminal(":: COBRA framework - 0.0.1(alpha) ::");
+        Terminal.printTerminal("==================================");
+        Terminal.printTerminal(":: COBRA framework - 0.1(alpha) ::");
         Terminal.printTerminal("\nCOBRA - Block Generator [Version " + Main.class.getPackage().getImplementationVersion() + "]\nCopyright (c) 2016-2017 Thomas Huybrechts, IDLab,\nUniversity of Antwerp, Belgium. All rights reserved.");
         Terminal.printTerminal("This program comes with ABSOLUTELY NO WARRANTY.");
     }

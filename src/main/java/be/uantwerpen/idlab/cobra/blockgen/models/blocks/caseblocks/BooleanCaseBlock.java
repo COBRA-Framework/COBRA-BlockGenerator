@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks;
 
+import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.CaseBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
 
@@ -44,5 +45,37 @@ public class BooleanCaseBlock extends CaseBlock
         elements.add(new XMLElement("value", this.booleanValue));
 
         return elements;
+    }
+
+    @Override
+    public String getCodeString()
+    {
+        String codeString = new String();
+
+        //If statement
+        if(this.getNumOfChildren() > 0)
+        {
+            //False statement (else)
+            if(!this.booleanValue)
+            {
+                codeString = codeString.concat("}\nelse\n{\n");
+            }
+
+            for(Block block : this.getChildBlocks())
+            {
+                for(String subString : block.getCodeString().split("\n"))
+                {
+                    codeString = codeString.concat("\t" + subString + "\n");
+                }
+            }
+        }
+
+        return codeString;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "[" + this.booleanValue + "]";
     }
 }

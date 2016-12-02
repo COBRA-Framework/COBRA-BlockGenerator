@@ -1,6 +1,5 @@
 package be.uantwerpen.idlab.cobra.blockgen.services;
 
-import be.uantwerpen.idlab.cobra.blockgen.Main;
 import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
 
 /**

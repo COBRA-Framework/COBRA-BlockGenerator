@@ -7,37 +7,19 @@ import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
  */
 public abstract class CaseBlock extends BasicBlock implements Block
 {
-    private boolean ifSelection;
-
     protected CaseBlock()
     {
         super();
-
-        this.ifSelection = false;
     }
 
     public CaseBlock(CodeSegment codeSegment)
     {
         super(codeSegment);
-
-        this.ifSelection = false;
     }
 
     public CaseBlock(boolean ifSelection)
     {
         super();
-
-        this.ifSelection = ifSelection;
-    }
-
-    public void setIfSelectionValue(boolean ifSelection)
-    {
-        this.ifSelection = ifSelection;
-    }
-
-    public boolean getIfSelectionValue()
-    {
-        return this.ifSelection;
     }
 
     @Override
@@ -45,31 +27,7 @@ public abstract class CaseBlock extends BasicBlock implements Block
     {
         String codeString = new String();
 
-        if(this.codeSegment != null)
-        {
-            //Case statement
-            codeString = super.getCodeString();
-        }
-        else
-        {
-            //If statement
-            if(this.getNumOfChildren() > 0)
-            {
-                //False statement (else)
-                if(!this.ifSelection)
-                {
-                    codeString = codeString.concat("}\nelse\n{\n");
-                }
-
-                for(Block block : this.getChildBlocks())
-                {
-                    for(String subString : block.getCodeString().split("\n"))
-                    {
-                        codeString = codeString.concat("\t" + subString + "\n");
-                    }
-                }
-            }
-        }
+        codeString = super.getCodeString();
 
         return codeString;
     }
@@ -77,13 +35,6 @@ public abstract class CaseBlock extends BasicBlock implements Block
     @Override
     public String toString()
     {
-        if(this.codeSegment != null)
-        {
-            return "[Case block] " + this.codeSegment;
-        }
-        else
-        {
-            return "[" + this.ifSelection + "]";
-        }
+        return "[Case block] " + this.codeSegment;
     }
 }

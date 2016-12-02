@@ -38,14 +38,14 @@ public class XMLElement
 
         xml = "<" + this.getName() + ">";
 
-        xml = xml.concat(reformatValue(this.getValue().toString()));
+        xml = xml.concat(formatXMLString(this.getValue().toString()));
 
         xml = xml.concat("</" + this.getName() + ">");
 
         return xml;
     }
 
-    private String reformatValue(String value)
+    private String formatXMLString(String value)
     {
         String reformattedString = value;
 
@@ -57,6 +57,12 @@ public class XMLElement
 
         //Remove '>' chars
         reformattedString = reformattedString.replaceAll(">", "&gt;");
+
+        //Remove '"' chars
+        reformattedString = reformattedString.replaceAll("\"", "&quot;");
+
+        //Remove ' chars
+        reformattedString = reformattedString.replaceAll("'", "&apos;");
 
         //Remove 'new line' chars
         reformattedString = reformattedString.replaceAll("\n", eol);
