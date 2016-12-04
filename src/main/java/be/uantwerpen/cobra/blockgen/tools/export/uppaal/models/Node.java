@@ -116,6 +116,11 @@ public class Node
         this.committed = committed;
     }
 
+    public boolean getCommitted()
+    {
+        return this.committed;
+    }
+    
     public int getLocX()
     {
         return locX;
