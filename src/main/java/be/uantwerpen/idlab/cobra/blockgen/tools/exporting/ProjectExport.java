@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.export;
+package be.uantwerpen.idlab.cobra.blockgen.tools.exporting;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLBlock;
@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Thomas on 30/11/2016.
@@ -17,7 +18,7 @@ public class ProjectExport implements ExportTool
     private static final int MINOR_VERSION = 1;
     private static final String eol = System.getProperty("line.separator");
 
-    public int exportToXML(Block model, String exportFile, String[] args) throws Exception
+    public int exportToXML(List<Block> models, String exportFile, String[] args) throws Exception
     {
         File file;
 
@@ -37,10 +38,10 @@ public class ProjectExport implements ExportTool
             throw new IOException("Could not open file: " + exportFile + "\nMessage: " + e.getMessage());
         }
 
-        return writeProjectFile(model, file);
+        return writeProjectFile(models, file);
     }
 
-    private int writeProjectFile(Block model, File file) throws Exception
+    private int writeProjectFile(List<Block> models, File file) throws Exception
     {
         FileWriter writer;
         BufferedWriter buffWriter;
@@ -59,18 +60,23 @@ public class ProjectExport implements ExportTool
             buffWriter.write(xmlIntroductionComments);
 
             //Write project file metadata
-            String projectMetaData = "<project>" + eol + "\t<version>" + MAIN_VERSION + "." + MINOR_VERSION + "</version>" + eol;
+            String projectMetaData = "<blockmodel>" + eol + "\t<version>" + MAIN_VERSION + "." + MINOR_VERSION + "</version>" + eol + "\t<models>" + eol;
             buffWriter.write(projectMetaData);
 
             //Write project file body
-            buffWriter.write("\t<model>" + eol);
+            for(Block model : models)
+            {
+                buffWriter.write("\t\t<model>" + eol);
 
-            String modelData = getModelXML(model);
-            buffWriter.write(modelData);
+                String modelData = getModelXML(model);
+                buffWriter.write(modelData);
 
-            buffWriter.write("\t</model>" + eol);
+                buffWriter.write("\t\t</model>" + eol);
+            }
 
-            buffWriter.write("</project>" + eol);
+            buffWriter.write("\t</models>" + eol);
+
+            buffWriter.write("</blockmodel>" + eol);
 
             buffWriter.close();
         }
@@ -88,9 +94,9 @@ public class ProjectExport implements ExportTool
         String modelXML = new String();
 
         //Add tabs to xml elements
-        for(String subString : ((XMLBlock)model).getXMLObject().split(eol))
+        for(String subString : ((XMLBlock)model).getXMLString().split(eol))
         {
-            modelXML = modelXML.concat("\t\t" + subString + eol);
+            modelXML = modelXML.concat("\t\t\t" + subString + eol);
         }
 
         return modelXML;

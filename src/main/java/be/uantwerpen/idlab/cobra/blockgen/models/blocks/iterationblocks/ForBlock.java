@@ -4,6 +4,7 @@ import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.IterationBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,9 +78,9 @@ public class ForBlock extends IterationBlock
         return "[Iteration block] " + this.codeSegment.toString();
     }
 
-    public List<XMLElement> getXMLElements()
+    public List<XMLObject> getXMLElements()
     {
-        List<XMLElement> elements = super.getXMLElements();
+        List<XMLObject> elements = super.getXMLElements();
 
         //Element: init statement
         elements.add(new XMLElement("init", this.initStatement));

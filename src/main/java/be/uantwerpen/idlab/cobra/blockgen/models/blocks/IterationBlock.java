@@ -2,6 +2,7 @@ package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +37,9 @@ public abstract class IterationBlock extends BasicBlock implements Block
     }
 
     @Override
-    public List<XMLElement> getXMLElements()
+    public List<XMLObject> getXMLElements()
     {
-        List<XMLElement> elements = new ArrayList<XMLElement>();
+        List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: condition string
         elements.add(new XMLElement("condition", this.iterationCondition));

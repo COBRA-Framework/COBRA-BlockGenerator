@@ -32,7 +32,7 @@ public class JGraphX implements GraphDisplay
             graphComponent = new mxGraphComponent(generateGraphFromBlock(block));
             graphComponent.setToolTips(true);
 
-            frame = createFrame(graphComponent, block.getCodeSegment().toString());
+            frame = createFrame(graphComponent, block.toString());
         }
         catch(Exception e)
         {

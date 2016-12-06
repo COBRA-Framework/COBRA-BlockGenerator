@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel;
+package be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 

@@ -5,5 +5,5 @@ package be.uantwerpen.idlab.cobra.blockgen.models.xml;
  */
 public interface XMLObject
 {
-    String getXMLObject();
+    String getXMLString();
 }

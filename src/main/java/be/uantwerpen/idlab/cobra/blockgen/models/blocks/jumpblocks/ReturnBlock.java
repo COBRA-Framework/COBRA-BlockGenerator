@@ -3,6 +3,7 @@ package be.uantwerpen.idlab.cobra.blockgen.models.blocks.jumpblocks;
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.JumpBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,9 @@ public class ReturnBlock extends JumpBlock
     }
 
     @Override
-    public List<XMLElement> getXMLElements()
+    public List<XMLObject> getXMLElements()
     {
-        List<XMLElement> elements = new ArrayList<XMLElement>();
+        List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: return value
         elements.add(new XMLElement("statement", this.returnStatement));

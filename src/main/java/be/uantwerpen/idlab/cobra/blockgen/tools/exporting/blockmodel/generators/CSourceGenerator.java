@@ -1,9 +1,9 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.generators;
+package be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel.generators;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.MethodBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.ProgramBlock;
-import be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.SourceGenerator;
+import be.uantwerpen.idlab.cobra.blockgen.models.blocks.SourceBlock;
+import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel.SourceGenerator;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,9 +21,9 @@ public class CSourceGenerator extends BasicSourceGenerator implements SourceGene
         FileWriter writer;
         BufferedWriter buffWriter;
 
-        if(codeBlock.getClass() == ProgramBlock.class)
+        if(codeBlock.getClass() == SourceBlock.class)
         {
-            throw new Exception("Program block export is not supported!");
+            throw new Exception("Program block exporting is not supported!");
         }
 
         //Get file

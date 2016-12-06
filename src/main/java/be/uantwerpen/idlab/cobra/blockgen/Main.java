@@ -1,16 +1,13 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
-import be.uantwerpen.idlab.cobra.blockgen.blockreduction.interfaces.ReductionRule;
-import be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules.AbstractionReductionRule;
-import be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules.BasicBlockReductionRule;
+import be.uantwerpen.idlab.cobra.blockgen.models.ProjectConfig;
+import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.MethodBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.ProgramBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.SelectionBlock;
+import be.uantwerpen.idlab.cobra.blockgen.models.blocks.SourceBlock;
+import be.uantwerpen.idlab.cobra.blockgen.services.BlockGenerationService;
 import be.uantwerpen.idlab.cobra.blockgen.services.TerminalService;
-import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.Antlr;
-import be.uantwerpen.idlab.cobra.blockgen.tools.export.ProjectExport;
-import be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.BlockModelExport;
+import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.ProjectExport;
+import be.uantwerpen.idlab.cobra.blockgen.tools.importing.ProjectFileManager;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
 import be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx.JGraphX;
@@ -18,6 +15,8 @@ import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
 
 import javax.swing.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -26,28 +25,61 @@ import java.util.Vector;
 public class Main
 {
     private static TerminalService terminalService = new TerminalService();
+    private static ProjectFileManager projectFileManager = new ProjectFileManager();
     private static boolean terminalMode = false;
     private static boolean showGraph = false;
-    private static String file = new String();
-    private static String outputFolder = new String();
-    private static int abstractionDepth = -1;
+    private static String file = null;
+    private static String outputFolder = null;
+    private static ProjectConfig projectConfig = null;
 
     public static void main(String[] args)
     {
+        List<SourceBlock> sourceBlocks = new ArrayList<SourceBlock>();
+
         checkArguments(args);
 
         if(!terminalMode)
         {
             try
             {
-                runBlockGenerator(file, outputFolder, abstractionDepth);
+                projectConfig = projectFileManager.parseProjectConfig(file);
+
+                Terminal.printTerminalInfo("Performing block generation with the following configuration:");
+                Terminal.printTerminal(projectConfig.toString());
+
+                //Generate models for each source file
+                for(SourceFile sourceFile : projectConfig.getSourceFiles())
+                {
+                    sourceBlocks.add((runBlockGenerator(sourceFile, outputFolder, projectConfig.getGrammar())));
+                }
+
+                Terminal.printTerminalInfo("Exporting block model to project file...");
+
+                ProjectExport projectExport = new ProjectExport();
+
+                projectExport.exportToXML((List<Block>)(Object)sourceBlocks, outputFolder + "model.xml", null);
+
+                Terminal.printTerminalInfo("Block model exported to: " + outputFolder + "model.xml");
+
+                if(showGraph)
+                {
+                    //Create graphical view of the block models
+                    GraphDisplay graphDisplay = new JGraphX();
+                    Vector<JFrame> displays = new Vector<JFrame>();
+
+                    for(Block sourceBlock : sourceBlocks)
+                    {
+                        displays.add(graphDisplay.DisplayGraphFromBlock(sourceBlock));
+                    }
+
+                    Terminal.printTerminalInfo("Block Viewer is ready. Close the Block Viewer window or use 'ctrl+c' in the console to terminate the application.");
+                }
             }
             catch(Exception e)
             {
                 Terminal.printTerminalError("Failed to generate block model!");
                 Terminal.printTerminalError(e.getMessage());
                 Terminal.printTerminalError("Block generation will be terminated!");
-                //e.printStackTrace();
             }
         }
     }
@@ -74,9 +106,10 @@ public class Main
                     {
                         String jarName = new java.io.File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getName();
 
-                        Terminal.printTerminal("Usage: java -jar " + jarName + " [options] file output-folder abstraction-depth");
+                        Terminal.printTerminal("Usage: java -jar " + jarName + " [options] config-file");
                         Terminal.printTerminal("--help\t\t\tDisplay this message");
                         Terminal.printTerminal("--version\t\tDisplay application version information");
+                        Terminal.printTerminal("--output\t\tSet the output folder location (default: config file folder)");
                         Terminal.printTerminal("--show-graph\tDisplay a graphical view of the block model");
 
                         System.exit(0);
@@ -97,11 +130,28 @@ public class Main
 
                         return;
                     }
+                    else if(arg.equals("--output") || arg.equals("-o"))
+                    {
+                        //Get output folder
+                        if(!args[i + 1].startsWith("-"))
+                        {
+                            outputFolder = args[i + 1];
+
+                            //Skip output folder arg in next iteration
+                            i++;
+                        }
+                        else
+                        {
+                            Terminal.printTerminalError("arg: " + args[i + 1] + " is an invalid output location!");
+
+                            System.exit(-1);
+                        }
+                    }
                     else if(arg.equals("--show-graph") || arg.equals("-g"))
                     {
                         showGraph = true;
                     }
-                    else if(arg.length() >= 3 && i < arg.length() - 3)
+                    else if(arg.length() >= 2 && i < arg.length() - 2)
                     {
                         Terminal.printTerminalWarning("arg: " + arg + " is an invalid option!");
                     }
@@ -113,45 +163,29 @@ public class Main
             int numOfArgs = args.length;
             boolean missingArguments = false;
 
-            if(numOfArgs >= 3)
+            if(numOfArgs >= 1)
             {
                 //Get input file location
-                if(!args[numOfArgs - 3].startsWith("-"))
+                if(!args[numOfArgs - 1].startsWith("-"))
                 {
-                    file = args[numOfArgs - 3];
+                    file = args[numOfArgs - 1];
 
                     File inputFile = new File(file);
                     if(!inputFile.exists())
                     {
-                        Terminal.printTerminalError("Input file: '" + file + "' does not exist!");
+                        Terminal.printTerminalError("Config file: '" + file + "' does not exist!");
 
                         missingArguments = true;
+                    }
+
+                    //Get output folder if not defined
+                    if(outputFolder == null)
+                    {
+                        outputFolder = inputFile.getParent() + File.separator;
                     }
                 }
                 else
                 {
-                    missingArguments = true;
-                }
-
-                //Get output folder
-                if(!args[numOfArgs - 2].startsWith("-"))
-                {
-                    outputFolder = args[numOfArgs - 2];
-                }
-                else
-                {
-                    missingArguments = true;
-                }
-
-                //Parse abstraction depth (last argument)
-                try
-                {
-                    abstractionDepth = Integer.parseInt(args[numOfArgs - 1]);
-                }
-                catch(Exception e)
-                {
-                    Terminal.printTerminalError("Arg 3: Abstraction-depth is not a valid number!");
-
                     missingArguments = true;
                 }
             }
@@ -170,128 +204,37 @@ public class Main
         }
     }
 
-    private static void applyReductionRuleRecursive(Block block)
+    private static SourceBlock runBlockGenerator(SourceFile file, String exportLocation, CodeParser.Grammar grammar) throws Exception
     {
-        ReductionRule blockReduction = new BasicBlockReductionRule();
-
-        blockReduction.applyRule(block);
-
-        for(Block childBlock : block.getChildBlocks())
-        {
-            applyReductionRuleRecursive(childBlock);
-        }
-    }
-
-    private static void applyAbstractionRuleRecursive(Block block, int abstractionLevel)
-    {
-        ReductionRule abstractionRule = new AbstractionReductionRule();
-
-        if(abstractionLevel <= 0)
-        {
-            abstractionRule.applyRule(block);
-        }
-        else
-        {
-            for(Block childBlock : block.getChildBlocks())
-            {
-                if(childBlock.getClass() == SelectionBlock.class)
-                {
-                    //Case statements are the same abstraction level
-                    applyAbstractionRuleRecursive(childBlock, abstractionLevel);
-                }
-                else
-                {
-                    applyAbstractionRuleRecursive(childBlock, abstractionLevel - 1);
-                }
-            }
-        }
-    }
-
-    private static ProgramBlock runBlockGenerator(String file, String exportLocation, int abstractionDepth) throws Exception
-    {
-        CodeParser codeParser = new Antlr();
-
-        Vector<Block> blocks = null;
-
-        File exportFolder = new File(exportLocation);
-        exportFolder.mkdirs();
+        SourceBlock sourceBlock;
 
         Terminal.printTerminalInfo("Generating block model from file: " + file);
 
-        //Parse file and generate block model
-        blocks = codeParser.parseCodeFile(file, CodeParser.Grammar.C);
-
-        //Apply basic block reduction
-        for(Block methodBlock : blocks)
-        {
-            applyReductionRuleRecursive(methodBlock);
-        }
-
-        Terminal.printTerminal("*****Block view*****");
-        for(Block block : blocks)
-        {
-            System.out.println(block.toStringRecursive() + "\n");
-        }
-
-        Terminal.printTerminal("*****Code view*****");
-        for(Block block : blocks)
-        {
-            System.out.println(block.getCodeString() + "\n");
-        }
-
-        ProgramBlock programBlock = new ProgramBlock("PROGRAM");
-
-        for(Block methodBlock : blocks)
-        {
-            programBlock.addChildBlock(methodBlock);
-        }
+        sourceBlock = BlockGenerationService.parseProgramFile(file, exportLocation, grammar);
 
         Terminal.printTerminalInfo("Block generation complete!");
 
+
+        /*
         BlockModelExport benchmarkExport = new BlockModelExport();
 
         //Generate HPA source files for benchmarking
-        File hpaSourceFolder = new File(exportLocation + "HPA_source/");
+        File hpaSourceFolder = new File(exportLocation + "HPA_source" + File.separator);
         hpaSourceFolder.mkdirs();
 
         Terminal.printTerminalInfo("Exporting block model source files...");
 
-        for(Block methodBlock : blocks)
+        for(Block methodBlock : sourceBlock.getChildBlocks())
         {
-            //applyAbstractionRuleRecursive(methodBlock, abstractionDepth);
-            //applyReductionRuleRecursive(methodBlock);
-
             for(Block leafBlock : methodBlock.getLeafs())
             {
-                benchmarkExport.generateSourceOfBlock(exportLocation + "HPA_source/" + ((MethodBlock)methodBlock).getMethodName() + "_", leafBlock, CodeParser.Grammar.C);
+                benchmarkExport.generateSourceOfBlock(exportLocation + "HPA_source" + File.separator + ((MethodBlock)methodBlock).getMethodName() + "_", leafBlock, grammar);
             }
         }
 
-        Terminal.printTerminalInfo("Generated files will be available in the folder: " + outputFolder);
+        Terminal.printTerminalInfo("Generated files will be available in the folder: " + outputFolder);*/
 
-        Terminal.printTerminalInfo("Exporting block model to project file...");
-
-        ProjectExport projectExport = new ProjectExport();
-
-        projectExport.exportToXML(programBlock, exportLocation + "model.xml", null);
-
-        Terminal.printTerminalInfo("Block model exported to: " + exportLocation + "model.xml");
-
-        if(showGraph)
-        {
-            //Create graphical view of the block models
-            GraphDisplay graphDisplay = new JGraphX();
-            Vector<JFrame> displays = new Vector<JFrame>();
-
-            for(Block block : blocks)
-            {
-                displays.add(graphDisplay.DisplayGraphFromBlock(block));
-            }
-
-            Terminal.printTerminalInfo("Block Viewer is ready. Close the Block Viewer window or use 'ctrl+c' in the console to terminate the application.");
-        }
-
-        return programBlock;
+        return sourceBlock;
     }
 
     private static void printBanner()

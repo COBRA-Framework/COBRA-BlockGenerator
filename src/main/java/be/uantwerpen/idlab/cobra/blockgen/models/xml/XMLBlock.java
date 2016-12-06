@@ -16,16 +16,19 @@ public abstract class XMLBlock implements XMLObject, Block
         eol = System.getProperty("line.separator");
     }
 
-    public String getXMLObject()
+    public String getXMLString()
     {
         String xml = new String();
 
         xml = "<block type=\"" + this.getClass().getSimpleName() + "\">";
 
         //Add block specific field elements
-        for(XMLElement element : this.getXMLElements())
+        for(XMLObject element : this.getXMLElements())
         {
-            xml = xml.concat(eol + "\t" + element.getXMLString());
+            for(String line : element.getXMLString().split(eol))
+            {
+                xml = xml.concat(eol + "\t" + line);
+            }
         }
 
         if(!this.getChildBlocks().isEmpty())
@@ -38,7 +41,7 @@ public abstract class XMLBlock implements XMLObject, Block
                 String blockXML = new String();
 
                 //Add tabs to xml elements
-                for(String subString : ((XMLBlock)childBlock).getXMLObject().split(eol))
+                for(String subString : ((XMLBlock)childBlock).getXMLString().split(eol))
                 {
                     blockXML = blockXML.concat(eol + "\t\t" + subString);
                 }
@@ -58,5 +61,5 @@ public abstract class XMLBlock implements XMLObject, Block
         return xml;
     }
 
-    public abstract List<XMLElement> getXMLElements();
+    public abstract List<XMLObject> getXMLElements();
 }

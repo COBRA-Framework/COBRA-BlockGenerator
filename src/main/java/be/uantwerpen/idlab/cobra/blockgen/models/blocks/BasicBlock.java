@@ -3,6 +3,7 @@ package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,12 +195,12 @@ public class BasicBlock extends XMLBlock implements Block
         return string;
     }
 
-    public List<XMLElement> getXMLElements()
+    public List<XMLObject> getXMLElements()
     {
-        List<XMLElement> elements = new ArrayList<XMLElement>();
+        List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: code string
-        elements.add(new XMLElement("code", this.codeSegment));
+        elements.add(this.codeSegment);
 
         return elements;
     }

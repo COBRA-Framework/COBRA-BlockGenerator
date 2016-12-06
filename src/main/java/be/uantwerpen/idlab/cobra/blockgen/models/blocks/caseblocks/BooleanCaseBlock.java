@@ -3,6 +3,7 @@ package be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.CaseBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,9 @@ public class BooleanCaseBlock extends CaseBlock
     }
 
     @Override
-    public List<XMLElement> getXMLElements()
+    public List<XMLObject> getXMLElements()
     {
-        List<XMLElement> elements = new ArrayList<XMLElement>();
+        List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: boolean value
         elements.add(new XMLElement("value", this.booleanValue));

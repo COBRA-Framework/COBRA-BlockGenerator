@@ -3,22 +3,30 @@ package be.uantwerpen.idlab.cobra.blockgen.models;
 /**
  * Created by Thomas on 22/03/2016.
  */
-public class CodeFile
+public class CodeFile extends SourceFile
 {
     private String codeStream;
     private String grammar;
-    private String sourceLocation;
 
     protected CodeFile()
     {
-
+        super();
     }
 
     public CodeFile(String codeStream, String grammar, String sourceLocation)
     {
+        super();
+
         this.codeStream = codeStream;
         this.grammar = grammar;
-        this.sourceLocation = sourceLocation;
+    }
+
+    public CodeFile(String codeStream, String grammar, String sourceLocation, long id)
+    {
+        super(id, sourceLocation);
+
+        this.codeStream = codeStream;
+        this.grammar = grammar;
     }
 
     public String getCodeStream()
@@ -39,16 +47,6 @@ public class CodeFile
     public void setGrammar(String grammar)
     {
         this.grammar = grammar;
-    }
-
-    public String getSourceLocation()
-    {
-        return this.sourceLocation;
-    }
-
-    public void setSourceLocation(String sourceLocation)
-    {
-        this.sourceLocation = sourceLocation;
     }
 
     @Override

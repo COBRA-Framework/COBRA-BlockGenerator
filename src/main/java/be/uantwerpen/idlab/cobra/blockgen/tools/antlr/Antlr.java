@@ -1,6 +1,7 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeFile;
+import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c.AntlrCLexer;
@@ -30,7 +31,7 @@ import java.util.Vector;
  */
 public class Antlr implements CodeParser
 {
-    public Vector<Block> parseCodeFile(String fileName, Grammar grammar) throws Exception
+    public Vector<Block> parseCodeFile(SourceFile file, Grammar grammar) throws Exception
     {
         AntlrLexer lexer;
         AntlrParser parser;
@@ -46,15 +47,15 @@ public class Antlr implements CodeParser
         //Get file stream of code file
         try
         {
-            fileStream = new ANTLRFileStream(fileName);
+            fileStream = new ANTLRFileStream(file.getSourceLocation());
         }
         catch(IOException ex)
         {
-            throw new IOException("Could not open file stream: \"" + fileName + "\" for parsing!\n\n" + ex.getMessage());
+            throw new IOException("Could not open file stream: \"" + file + "\" for parsing!\n\n" + ex.getMessage());
         }
 
         //Create code file
-        codeFile = new CodeFile(fileStream.getText(Interval.of(0, fileStream.size())), grammar.name(), fileStream.getSourceName());
+        codeFile = new CodeFile(fileStream.getText(Interval.of(0, fileStream.size())), grammar.name(), fileStream.getSourceName(), file.getId());
 
         //Create block parser
         blockParser = getBlockFactory(grammar, codeFile);

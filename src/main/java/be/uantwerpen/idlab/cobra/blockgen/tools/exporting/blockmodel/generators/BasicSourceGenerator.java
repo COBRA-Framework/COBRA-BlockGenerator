@@ -1,6 +1,6 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.generators;
+package be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel.generators;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.export.blockmodel.SourceGenerator;
+import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel.SourceGenerator;
 
 import java.io.File;
 import java.io.IOException;

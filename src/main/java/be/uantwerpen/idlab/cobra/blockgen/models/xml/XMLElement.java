@@ -3,7 +3,7 @@ package be.uantwerpen.idlab.cobra.blockgen.models.xml;
 /**
  * Created by Thomas on 1/12/2016.
  */
-public class XMLElement
+public class XMLElement implements XMLObject
 {
     private final String eol;
     private String name;
