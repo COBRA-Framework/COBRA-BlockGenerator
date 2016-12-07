@@ -1,6 +1,7 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeFile;
+import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
 import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;

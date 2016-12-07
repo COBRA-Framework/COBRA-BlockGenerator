@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.interfaces;
 
+import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
 import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 
@@ -10,12 +11,5 @@ import java.util.Vector;
  */
 public interface CodeParser
 {
-    enum Grammar
-    {
-        C,
-        CPP,
-        UNKNOWN
-    }
-
     Vector<Block> parseCodeFile(SourceFile fileName, Grammar grammar) throws Exception;
 }

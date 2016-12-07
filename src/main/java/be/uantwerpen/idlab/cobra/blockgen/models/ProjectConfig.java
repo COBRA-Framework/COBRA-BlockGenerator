@@ -1,27 +1,24 @@
 package be.uantwerpen.idlab.cobra.blockgen.models;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
-import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Thomas on 2/12/2016.
  */
-public class ProjectConfig extends XMLElement
+public class ProjectConfig
 {
     private String name;
     private String version;
     private List<SourceFile> sourceFiles;
-    private CodeParser.Grammar grammar;
+    private Grammar grammar;
 
     protected ProjectConfig()
     {
         this.sourceFiles = new ArrayList<SourceFile>();
     }
 
-    public ProjectConfig(String name, String version, CodeParser.Grammar grammar)
+    public ProjectConfig(String name, String version, Grammar grammar)
     {
         this();
 
@@ -30,14 +27,14 @@ public class ProjectConfig extends XMLElement
         this.grammar = grammar;
     }
 
-    public ProjectConfig(String name, String version, CodeParser.Grammar grammar, SourceFile sourceFile)
+    public ProjectConfig(String name, String version, Grammar grammar, SourceFile sourceFile)
     {
         this(name, version, grammar);
 
         this.sourceFiles.add(sourceFile);
     }
 
-    public ProjectConfig(String name, String version, CodeParser.Grammar grammar, List<SourceFile> sourceFiles)
+    public ProjectConfig(String name, String version, Grammar grammar, List<SourceFile> sourceFiles)
     {
         this(name, version, grammar);
 
@@ -54,7 +51,7 @@ public class ProjectConfig extends XMLElement
         return this.version;
     }
 
-    public CodeParser.Grammar getGrammar()
+    public Grammar getGrammar()
     {
         return this.grammar;
     }
@@ -74,7 +71,7 @@ public class ProjectConfig extends XMLElement
         this.version = version;
     }
 
-    public void setGrammar(CodeParser.Grammar grammar)
+    public void setGrammar(Grammar grammar)
     {
         this.grammar = grammar;
     }

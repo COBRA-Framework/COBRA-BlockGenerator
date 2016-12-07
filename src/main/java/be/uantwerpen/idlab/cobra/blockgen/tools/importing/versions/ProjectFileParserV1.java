@@ -1,9 +1,9 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.importing.versions;
 
+import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
 import be.uantwerpen.idlab.cobra.blockgen.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.tools.importing.ProjectFileParser;
-import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -83,7 +83,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         String name = null;
         String version = null;
         List<SourceFile> sourceFiles = new ArrayList<SourceFile>();
-        CodeParser.Grammar grammar = CodeParser.Grammar.UNKNOWN;
+        Grammar grammar = Grammar.UNKNOWN;
 
         BufferedReader buffReader = null;
 
@@ -163,7 +163,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
 
                     try
                     {
-                        grammar = CodeParser.Grammar.valueOf(grammarString);
+                        grammar = Grammar.valueOf(grammarString);
                     }
                     catch(IllegalArgumentException e)
                     {
@@ -185,7 +185,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
             throw new Exception("Could not parse the project file: " + projectFile.getName() + " (" + e.getMessage() + ")");
         }
 
-        if(name == null || version == null || grammar == CodeParser.Grammar.UNKNOWN)
+        if(name == null || version == null || grammar == Grammar.UNKNOWN)
         {
             throw new Exception("Configuration file is corrupted! Missing or invalid configuration fields detected...");
         }

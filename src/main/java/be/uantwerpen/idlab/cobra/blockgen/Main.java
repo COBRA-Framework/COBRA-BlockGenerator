@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
+import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
 import be.uantwerpen.idlab.cobra.blockgen.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
@@ -8,7 +9,6 @@ import be.uantwerpen.idlab.cobra.blockgen.services.BlockGenerationService;
 import be.uantwerpen.idlab.cobra.blockgen.services.TerminalService;
 import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.ProjectExport;
 import be.uantwerpen.idlab.cobra.blockgen.tools.importing.ProjectFileManager;
-import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
 import be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx.JGraphX;
 import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
@@ -106,7 +106,7 @@ public class Main
                     {
                         String jarName = new java.io.File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getName();
 
-                        Terminal.printTerminal("Usage: java -jar " + jarName + " [options] config-file");
+                        Terminal.printTerminal("Usage: java -jar " + jarName + " [options] config_file");
                         Terminal.printTerminal("--help\t\t\tDisplay this message");
                         Terminal.printTerminal("--version\t\tDisplay application version information");
                         Terminal.printTerminal("--output\t\tSet the output folder location (default: config file folder)");
@@ -135,7 +135,7 @@ public class Main
                         //Get output folder
                         if(!args[i + 1].startsWith("-"))
                         {
-                            outputFolder = args[i + 1];
+                            outputFolder = new File(args[i + 1]).getPath() + File.separator;
 
                             //Skip output folder arg in next iteration
                             i++;
@@ -165,7 +165,7 @@ public class Main
 
             if(numOfArgs >= 1)
             {
-                //Get input file location
+                //Get config file location
                 if(!args[numOfArgs - 1].startsWith("-"))
                 {
                     file = args[numOfArgs - 1];
@@ -204,7 +204,7 @@ public class Main
         }
     }
 
-    private static SourceBlock runBlockGenerator(SourceFile file, String exportLocation, CodeParser.Grammar grammar) throws Exception
+    private static SourceBlock runBlockGenerator(SourceFile file, String exportLocation, Grammar grammar) throws Exception
     {
         SourceBlock sourceBlock;
 

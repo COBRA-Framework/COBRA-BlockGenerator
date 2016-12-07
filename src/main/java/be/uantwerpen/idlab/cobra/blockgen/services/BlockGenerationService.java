@@ -3,6 +3,7 @@ package be.uantwerpen.idlab.cobra.blockgen.services;
 import be.uantwerpen.idlab.cobra.blockgen.blockreduction.interfaces.ReductionRule;
 import be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules.AbstractionReductionRule;
 import be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules.BasicBlockReductionRule;
+import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
 import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.SourceBlock;
@@ -19,7 +20,7 @@ import java.util.Vector;
  */
 public class BlockGenerationService
 {
-    public static SourceBlock parseProgramFile(SourceFile file, String exportLocation, CodeParser.Grammar grammar) throws Exception
+    public static SourceBlock parseProgramFile(SourceFile file, String exportLocation, Grammar grammar) throws Exception
     {
         CodeParser codeParser = new Antlr();
 

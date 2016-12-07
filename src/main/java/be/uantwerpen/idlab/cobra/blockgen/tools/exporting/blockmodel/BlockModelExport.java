@@ -1,15 +1,15 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel;
 
+import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.blockmodel.generators.CSourceGenerator;
-import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
 
 /**
  * Created by Thomas on 09/05/2016.
  */
 public class BlockModelExport
 {
-    public int generateSourceOfBlock(String fileLocation, Block codeBlock, CodeParser.Grammar grammar) throws Exception
+    public int generateSourceOfBlock(String fileLocation, Block codeBlock, Grammar grammar) throws Exception
     {
         SourceGenerator generator;
         int startRowNumber = codeBlock.getStartRowNumber();
