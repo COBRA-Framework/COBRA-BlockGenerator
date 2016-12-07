@@ -27,7 +27,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
 
     public String getVersionCompatibility()
     {
-        return this.VERSION;
+        return VERSION;
     }
 
     public Boolean isCompatible(File projectFile) throws Exception
@@ -58,7 +58,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
                     String versionString = line.split("<version>", 2)[1];
                     versionString = versionString.split("</version>", 2)[0];
 
-                    if(versionString.trim().equals(this.VERSION))
+                    if(versionString.trim().equals(VERSION))
                     {
                         compatible = true;
                     }

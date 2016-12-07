@@ -6,7 +6,6 @@ import be.uantwerpen.idlab.cobra.blockgen.models.blocks.IterationBlock;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

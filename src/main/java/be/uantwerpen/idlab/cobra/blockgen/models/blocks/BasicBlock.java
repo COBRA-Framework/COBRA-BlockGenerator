@@ -2,7 +2,6 @@ package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLElement;
 import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
 
 import java.util.ArrayList;
