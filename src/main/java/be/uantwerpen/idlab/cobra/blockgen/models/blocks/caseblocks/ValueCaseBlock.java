@@ -43,7 +43,8 @@ public class ValueCaseBlock extends CaseBlock
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: label value
-        elements.add(new XMLElement("label", this.labelValue));
+        elements.add(new XMLElement("label_value", this.labelValue));
+        elements.addAll(super.getXMLElements());
 
         return elements;
     }

@@ -43,7 +43,8 @@ public class ReturnBlock extends JumpBlock
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: return value
-        elements.add(new XMLElement("statement", this.returnStatement));
+        elements.add(new XMLElement("return_statement", this.returnStatement));
+        elements.addAll(super.getXMLElements());
 
         return elements;
     }

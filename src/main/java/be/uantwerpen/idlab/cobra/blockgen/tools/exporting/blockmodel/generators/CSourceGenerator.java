@@ -67,7 +67,7 @@ public class CSourceGenerator extends BasicSourceGenerator implements SourceGene
 
             if(codeBlock.getClass() == MethodBlock.class)
             {
-                benchmarkFunctionHeader = "void " + ((MethodBlock)codeBlock).getMethodName() + "(void)" + eol + "{" + eol;
+                benchmarkFunctionHeader = "void " + ((MethodBlock)codeBlock).getName() + "(void)" + eol + "{" + eol;
             }
             else
             {
@@ -97,7 +97,7 @@ public class CSourceGenerator extends BasicSourceGenerator implements SourceGene
 
             if(codeBlock.getClass() == MethodBlock.class)
             {
-                mainFunction = mainFunction.concat(((MethodBlock)codeBlock).getMethodName() + "();" + eol + "}");
+                mainFunction = mainFunction.concat(((MethodBlock)codeBlock).getName() + "();" + eol + "}");
             }
             else
             {

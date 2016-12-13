@@ -30,6 +30,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         return VERSION;
     }
 
+    //TODO: improve parsing with XML DOM Parser
     public Boolean isCompatible(File projectFile) throws Exception
     {
         boolean compatible = false;
@@ -77,6 +78,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         return compatible;
     }
 
+    //TODO: improve parsing with XML DOM Parser
     public ProjectConfig parseProjectFile(File projectFile) throws Exception
     {
         ProjectConfig config;
@@ -182,7 +184,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         }
         catch(Exception e)
         {
-            throw new Exception("Could not parse the project file: " + projectFile.getName() + " (" + e.getMessage() + ")");
+            throw new Exception("Could not parse the project file: " + projectFile.getName() + " (" + e.getClass().getName() + ": " + e.getMessage() + ")");
         }
 
         if(name == null || version == null || grammar == Grammar.UNKNOWN)
@@ -220,6 +222,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         return remappedPath;
     }
 
+    //TODO: improve parsing with XML DOM Parser
     private List<SourceFile> parseSourceFiles(BufferedReader reader, String projectFileLocation) throws Exception
     {
         List<SourceFile> sourceFiles = new ArrayList<SourceFile>();

@@ -10,6 +10,7 @@ import java.util.List;
 public abstract class XMLBlock implements XMLObject, Block
 {
     private final String eol;
+    private final static String BLOCK_NAMESPACE_ROOT = "be.uantwerpen.idlab.cobra.blockgen.models.blocks";
 
     public XMLBlock()
     {
@@ -19,8 +20,9 @@ public abstract class XMLBlock implements XMLObject, Block
     public String getXMLString()
     {
         String xml = new String();
+        String typeName = this.getClass().getCanonicalName().split(BLOCK_NAMESPACE_ROOT)[1].substring(1);
 
-        xml = "<block type=\"" + this.getClass().getSimpleName() + "\">";
+        xml = "<block type=\"" + typeName + "\">";
 
         //Add block specific field elements
         for(XMLObject element : this.getXMLElements())

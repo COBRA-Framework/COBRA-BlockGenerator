@@ -135,7 +135,9 @@ public abstract class SelectionBlock extends BasicBlock implements Block
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: selection statement
-        elements.add(new XMLElement("selection", this.selectionStatement));
+        elements.add(new XMLElement("selection_statement", this.selectionStatement));
+        elements.addAll(super.getXMLElements());
+
         return elements;
     }
 }

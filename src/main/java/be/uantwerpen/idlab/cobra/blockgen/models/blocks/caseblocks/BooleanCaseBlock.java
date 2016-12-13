@@ -43,7 +43,7 @@ public class BooleanCaseBlock extends CaseBlock
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: boolean value
-        elements.add(new XMLElement("value", this.booleanValue));
+        elements.add(new XMLElement("boolean_value", this.booleanValue));
 
         return elements;
     }

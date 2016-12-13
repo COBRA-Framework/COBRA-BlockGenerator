@@ -82,10 +82,12 @@ public class ForBlock extends IterationBlock
         List<XMLObject> elements = super.getXMLElements();
 
         //Element: init statement
-        elements.add(new XMLElement("init", this.initStatement));
+        elements.add(new XMLElement("init_statement", this.initStatement));
 
         //Element: post statement
-        elements.add(new XMLElement("post", this.postStatement));
+        elements.add(new XMLElement("post_statement", this.postStatement));
+
+        elements.addAll(super.getXMLElements());
 
         return elements;
     }

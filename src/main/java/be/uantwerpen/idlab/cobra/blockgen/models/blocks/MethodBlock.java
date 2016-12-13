@@ -27,12 +27,12 @@ public class MethodBlock extends BasicBlock implements Block
         this.methodName = methodName;
     }
 
-    public String getMethodName()
+    public String getName()
     {
         return this.methodName;
     }
 
-    public void setMethodName(String name)
+    public void setName(String name)
     {
         this.methodName = name;
     }
@@ -50,6 +50,7 @@ public class MethodBlock extends BasicBlock implements Block
 
         //Element: method name
         elements.add(new XMLElement("name", this.codeSegment));
+        elements.addAll(super.getXMLElements());
 
         return elements;
     }

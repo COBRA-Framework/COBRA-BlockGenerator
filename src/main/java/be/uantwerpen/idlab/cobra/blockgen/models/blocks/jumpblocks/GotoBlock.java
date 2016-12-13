@@ -43,7 +43,8 @@ public class GotoBlock extends JumpBlock
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: label value
-        elements.add(new XMLElement("label", this.jumpLabel));
+        elements.add(new XMLElement("jump_label", this.jumpLabel));
+        elements.addAll(super.getXMLElements());
 
         return elements;
     }

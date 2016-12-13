@@ -1,6 +1,10 @@
 package be.uantwerpen.idlab.cobra.blockgen.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
+import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Thomas on 12/04/2016.
@@ -36,5 +40,15 @@ public abstract class CaseBlock extends BasicBlock implements Block
     public String toString()
     {
         return "[Case block] " + this.codeSegment;
+    }
+
+    @Override
+    public List<XMLObject> getXMLElements()
+    {
+        List<XMLObject> elements = new ArrayList<XMLObject>();
+
+        elements.addAll(super.getXMLElements());
+
+        return elements;
     }
 }

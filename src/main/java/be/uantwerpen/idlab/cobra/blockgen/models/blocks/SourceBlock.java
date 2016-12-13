@@ -25,7 +25,7 @@ public class SourceBlock extends BasicBlock implements Block
         this.sourceName = sourceName;
     }
 
-    public String getSourceName()
+    public String getName()
     {
         return this.sourceName;
     }

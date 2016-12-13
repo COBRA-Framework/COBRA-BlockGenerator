@@ -42,7 +42,8 @@ public abstract class IterationBlock extends BasicBlock implements Block
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: condition string
-        elements.add(new XMLElement("condition", this.iterationCondition));
+        elements.add(new XMLElement("iteration_condition", this.iterationCondition));
+        elements.addAll(super.getXMLElements());
 
         return elements;
     }
