@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -121,32 +123,183 @@ public class TimedAutomaton {
 			this.links.add(linkExit);
 		}
 
-		// Set Update of links to x:=0 for timing analysis
+		// Set Update of links to localclock:=0 for timing analysis
 		for (Link itlink : this.links) {
-			itlink.setUpdate("x:=0");
+			itlink.setUpdate("localclock:=0");
 		}
 
 		// Declare local clock
-		String lclock = "clock x;";
+		String lclock = "clock localclock;";
 
-		// Declare local WCET variables
+		// Model transformation for iteration blocks
+
+		Vector<Node> forNodes = forNodesCollection(this.nodes);
+		Vector<Node> whileNodes = whileNodesCollection(this.nodes);
+		Vector<Node> dowhileNodes = dowhileNodesCollection(this.nodes);
+
+		genericModelTransformation(this.nodes, this.name);
+
+		forLoopModelTransformation(forNodes);
+
+		whileLoopModelTransformation(whileNodes);
+
+		dowhileLoopModelTransformation(dowhileNodes);
+
+		// Write local clock
+		setLocalVariables(lclock + eol);
+
+		/*
+		 * try { PrintWriter writer = new PrintWriter(
+		 * "/Users/HLi/Documents/UA/Haoxuan/Benchmarks/TEST/" + this.name +
+		 * ".txt", "UTF-8"); writer.println(whilevariables_post_list_export);
+		 * writer.close(); } catch (IOException e) { // do something }
+		 */
+		/*
+		 * BufferedReader whilevariables_post_list_buffer = new BufferedReader(
+		 * new FileReader("/Users/HLi/Documents/UA/Haoxuan/Benchmarks/TEST/" +
+		 * this.name + ".txt")); StringBuilder whilevariables_post_list_write =
+		 * new StringBuilder(); try { String line =
+		 * whilevariables_post_list_buffer.readLine();
+		 * 
+		 * while (line != null) { whilevariables_post_list_write.append(line);
+		 * whilevariables_post_list_write.append("\n"); line =
+		 * whilevariables_post_list_buffer.readLine(); }
+		 * 
+		 * } finally { whilevariables_post_list_buffer.close(); }
+		 * setLocalVariables(whilevariables_post_list_write.toString());
+		 * 
+		 * try { PrintWriter writer = new PrintWriter(new FileOutputStream( new
+		 * File("/Users/HLi/Documents/UA/Haoxuan/Benchmarks/TEST/" +
+		 * "testprintf" + ".txt"), true));
+		 * 
+		 * writer.println("aaaa"); writer.close(); } catch (IOException e) { //
+		 * do something }
+		 */
+
+		linkTransformation(this.links);
+
+		// Adjust layout
+		this.prettifyLayout();
+
+		return 0;
+	}
+
+	private Vector<Node> forNodesCollection(Vector<Node> nodes) {
+		// Temporary Node vector to collect iteration nodes
+		Vector<Node> iterationNodes_temp = new Vector<Node>();
+		// Collect for iteration nodes
+		Vector<Node> forNodes = new Vector<Node>();
+		for (Node itnode : nodes) {
+			if (itnode.getName().matches("r" + "\\d+_init")) {
+				iterationNodes_temp.add(itnode);
+			}
+		}
+
+		for (Node fornode : iterationNodes_temp) {
+			String fornodename = fornode.getName().replaceAll("_init", "");
+			for (Node itnode : nodes) {
+				if (itnode.getName().contains(fornodename)) {
+					forNodes.add(itnode);
+				}
+			}
+		}
+		return forNodes;
+	}
+
+	private Vector<Node> whileNodesCollection(Vector<Node> nodes) {
+		// Temporary Node vector to collect iteration nodes
+		Vector<Node> iterationNodes_temp = new Vector<Node>();
+		// Collect while iteration nodes and dowhile iteration nodes
+		Vector<Node> whileNodes = new Vector<Node>();
+
+		// Collect while nodes (including the while nodes in dowhile loop)
+		for (Node itnode : nodes) {
+			if (itnode.getName().matches("r" + "\\d+_cond") && itnode.getComments().startsWith("while")) {
+				iterationNodes_temp.add(itnode);
+			}
+		}
+		for (Node whilenode : iterationNodes_temp) {
+			String whilenodename = whilenode.getName().replaceAll("_cond", "");
+			for (Node itnode : nodes) {
+				if (itnode.getName().contains(whilenodename)) {
+					whileNodes.add(itnode);
+				}
+			}
+		}
+
+		iterationNodes_temp.clear();
+
+		// Collect dowhile nodes
+		Vector<Node> dowhileNodes = new Vector<Node>();
+
+		for (Node itnode : nodes) {
+			if (itnode.getName().matches("r" + "\\d+_do")) {
+				iterationNodes_temp.add(itnode);
+			}
+		}
+		for (Node dowhilenode : iterationNodes_temp) {
+			String dowhilenodename = dowhilenode.getName().replaceAll("_do", "");
+			for (Node itnode : nodes) {
+				if (itnode.getName().contains(dowhilenodename)) {
+					dowhileNodes.add(itnode);
+					whileNodes.remove(itnode);
+				}
+			}
+		}
+		return whileNodes;
+
+	}
+
+	private Vector<Node> dowhileNodesCollection(Vector<Node> nodes) {
+		// Temporary Node vector to collect iteration nodes
+		Vector<Node> iterationNodes_temp = new Vector<Node>();
+		// Collect while iteration nodes and dowhile iteration nodes
+		Vector<Node> whileNodes = new Vector<Node>();
+
+		// Collect while nodes (including the while nodes in dowhile loop)
+		for (Node itnode : nodes) {
+			if (itnode.getName().matches("r" + "\\d+_cond") && itnode.getComments().startsWith("while")) {
+				iterationNodes_temp.add(itnode);
+			}
+		}
+		for (Node whilenode : iterationNodes_temp) {
+			String whilenodename = whilenode.getName().replaceAll("_cond", "");
+			for (Node itnode : nodes) {
+				if (itnode.getName().contains(whilenodename)) {
+					whileNodes.add(itnode);
+				}
+			}
+		}
+
+		iterationNodes_temp.clear();
+
+		// Collect dowhile nodes
+		Vector<Node> dowhileNodes = new Vector<Node>();
+
+		for (Node itnode : nodes) {
+			if (itnode.getName().matches("r" + "\\d+_do")) {
+				iterationNodes_temp.add(itnode);
+			}
+		}
+		for (Node dowhilenode : iterationNodes_temp) {
+			String dowhilenodename = dowhilenode.getName().replaceAll("_do", "");
+			for (Node itnode : nodes) {
+				if (itnode.getName().contains(dowhilenodename)) {
+					dowhileNodes.add(itnode);
+					whileNodes.remove(itnode);
+				}
+			}
+		}
+		return dowhileNodes;
+
+	}
+
+	private void genericModelTransformation(Vector<Node> nodes, String name) {
 		String localVariablesWCET = "";
 
-		// Declare local iterator variables
-		String localIterators = "";
-
-		// Declare the variables in while_cond
-		String localWhileConditionVariables = "";
-
-		// Declare elements needed to write the update function of while_post
-		// while_post conditional variable value lists
-		String whilevariables_post = "";
-		// while_post counters
-		String while_post_counter = "";
-
-		for (Node itnode : this.nodes) {
+		for (Node itnode : nodes) {
 			// Commit function call nodes
-			if (itnode.getName().equals(this.name)) {
+			if (itnode.getName().equals(name)) {
 				itnode.setCommitted(true);
 			}
 
@@ -158,228 +311,19 @@ public class TimedAutomaton {
 
 				for (Link link : links) {
 					String guard_org = link.getGuard() != null ? link.getGuard() : "";
-					link.setGuard(guard_org.replaceAll("x&gt;=" + itnode.getName() + "_WCET", "") + "x&gt;="
-							+ itnode.getName() + "_WCET");
+					link.setGuard(guard_org.replaceAll("localclock&gt;=" + itnode.getName() + "_WCET", "")
+							+ "localclock&gt;=" + itnode.getName() + "_WCET");
 				}
 
 				// Set Invariant of normal nodes and special nodes
-				itnode.setInvariant("x&lt;=" + itnode.getName() + "_WCET");
+				itnode.setInvariant("localclock&lt;=" + itnode.getName() + "_WCET");
 			}
 
 			// Set links for special nodes (_cond _init _post)
 			if (itnode.getName().matches("r" + "\\d+.*")) {
 
-				// Set Update of links of _init block of iteration statements
-				if (itnode.getName().contains("_init")) {
-
-					Vector<Link> initlinks = itnode.getLinks();
-
-					for (Link link : initlinks) {
-						String[] iterator = itnode.getComments().replaceAll(" ", "").replaceAll("\\d+.*", "")
-								.replaceAll(";", "").split("=");
-
-						for (int cnt = 0; cnt < iterator.length; cnt++) {
-							// Set Update of link for iteration nodes
-							link.setUpdate(link.getUpdate() + ", " + iterator[cnt] + ":=0");
-
-							// Collect local iterator variables
-							// Remove repeated variables
-							localIterators = localIterators.replaceAll(iterator[cnt] + ", ", "");
-							localIterators = localIterators + iterator[cnt] + ", ";
-
-						}
-					}
-				}
-
 				// Set Update and Guard of links of _post block of iteration
 				// statements
-
-				if (itnode.getName().contains("_cond")) {
-
-					Node conditionNode = new Node();
-					conditionNode = itnode;
-
-					String[] variable = conditionNode.getComments().replaceAll("while", "").replaceAll("for", "")
-							.replaceAll("[)(,;\n\\s]+", "").split("[!><=&|]+");
-
-					String[] operator_temp = conditionNode.getComments().replaceAll("while", "").replaceAll("for", "")
-							.replaceAll("[)(,;\n\\s]+", "").split("[a-zA-Z_0-9]+");
-
-					String[] nonOperator_temp = conditionNode.getComments().replaceAll("while", "")
-							.replaceAll("for", "").replaceAll("[)(,;\n\\s]+", "").split("[!><=&|]+");
-
-					Vector<String> operator = new Vector<String>();
-					for (int cnt = 0; cnt < operator_temp.length; cnt++) {
-						if (!operator_temp[cnt].isEmpty()) {
-							operator.add(operator_temp[cnt]);
-						}
-					}
-
-					Vector<String> nonOperator = new Vector<String>();
-					for (int cnt = 0; cnt < nonOperator_temp.length; cnt++) {
-						if (!nonOperator_temp[cnt].isEmpty()) {
-							nonOperator.add(nonOperator_temp[cnt]);
-						}
-					}
-
-					// Set the guard to be added to true link (for loop)
-					String guardCondition = conditionNode.getComments().replace(" ", "").replace("for", "")
-							.replace("while", "").replace("(", "").replace(")", "").replace(";", "")
-							.replace("&&", "&amp;&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("==", "=")
-							.replace(",", "");
-
-					// While loop
-					String guardConditionWhile = "";
-					for (int cnt = 0; cnt < nonOperator.size() - 1; cnt++) {
-						if (nonOperator.get(cnt).replaceAll("[0-9]", "").isEmpty()) {
-							guardConditionWhile = guardConditionWhile + nonOperator.get(cnt) + operator.get(cnt);
-
-						} else {
-							guardConditionWhile = guardConditionWhile + nonOperator.get(cnt) + "_"
-									+ conditionNode.getName() + operator.get(cnt);
-						}
-
-					}
-
-					if (!nonOperator.isEmpty()) {
-						if (nonOperator.get(nonOperator.size() - 1).replaceAll("[0-9]", "").isEmpty()) {
-							guardConditionWhile = guardConditionWhile + nonOperator.get(nonOperator.size() - 1);
-
-						} else {
-							guardConditionWhile = guardConditionWhile + nonOperator.get(nonOperator.size() - 1) + "_"
-									+ conditionNode.getName();
-						}
-					}
-					// Replace operators
-					guardConditionWhile = guardConditionWhile.replace("&&", "&amp;&amp;").replace("<", "&lt;")
-							.replace(">", "&gt;").replace("==", "=").replace(",", "");
-
-					// Set Guard of the false link of _cond node
-					Vector<Link> condlinks = conditionNode.getLinks();
-
-					// While loop _cond node link set for loop _cond node set
-
-					if (itnode.getComments().startsWith("while")) {
-
-						for (Link link : condlinks) {
-
-							// Set Guard of link of false link of _cond node
-							if (link.getGuard().contains("false")) {
-								String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; !("
-										: "";
-								link.setGuard(
-										guardCondition_temp.replace("&amp;&amp; !(" + guardConditionWhile + ")", "")
-												+ guardConditionWhile + ")");
-
-							}
-							// Set Guard of link of true link of _cond node
-							if (link.getGuard().contains("true")) {
-								String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; ("
-										: "";
-								link.setGuard(
-										guardCondition_temp.replace("&amp;&amp; (" + guardConditionWhile + ")", "")
-												+ guardConditionWhile + ")");
-							}
-
-						}
-
-					} else {
-						for (Link link : condlinks) {
-							// Set Guard of link of false link of _cond node
-							if (link.getGuard().contains("false")) {
-								String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; !("
-										: "";
-								link.setGuard(guardCondition_temp.replace("&amp;&amp; !(" + guardCondition + ")", "")
-										+ guardCondition + ")");
-
-							}
-
-							// Set Guard of link of true link of _cond node
-							if (link.getGuard().contains("true")) {
-								String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; ("
-										: "";
-								link.setGuard(guardCondition_temp.replace("&amp;&amp; (" + guardCondition + ")", "")
-										+ guardCondition + ")");
-							}
-
-						}
-					}
-
-					// Get the condition variables in while loop
-					if (itnode.getComments().startsWith("while")) {
-						for (int cnt = 0; cnt < variable.length; cnt++) {
-							// Collect local iterator variables
-							// Remove repeated variables
-							if ((!variable[cnt].isEmpty()) && (!variable[cnt].replaceAll("[0-9]", "").isEmpty())) {
-								localWhileConditionVariables = localWhileConditionVariables
-										.replaceAll(variable[cnt] + "_" + itnode.getName() + ", ", "");
-								localWhileConditionVariables = localWhileConditionVariables + variable[cnt] + "_"
-										+ itnode.getName() + ", ";
-							}
-						}
-					}
-					condNodes.add(conditionNode);
-				}
-
-				// For loop
-				if (itnode.getName().contains("_post")) {
-					// Find Update for link of _post node
-					String iteratorUpdate = itnode.getComments().replaceAll(" ", "").replaceAll("=", ":=")
-							.replaceAll(";", "");
-
-					// Set Update for iteration nodes
-					Vector<Link> postlinks = itnode.getLinks();
-					for (Link link : postlinks) {
-						// Set Update of link of _post node
-						link.setUpdate("x:=0, " + iteratorUpdate);
-					}
-				}
-
-				// While loop
-				if (itnode.getComments().matches("while_post")) {
-
-					// Find all the elements need to write the update function
-					// of _post node
-
-					// Find all the counter for the update function
-					String while_post_counter_temp = itnode.getName() + "_counter = 0, ";
-
-					while_post_counter = while_post_counter + while_post_counter_temp;
-
-					// Find the variables needed for the update function
-					String whilecondNode_name = itnode.getName().replaceAll("_post", "_cond");
-
-					for (Node conditionNode_post : this.nodes) {
-						if (conditionNode_post.getName().equals(whilecondNode_name)) {
-
-							String[] whilevariables_post_list = conditionNode_post.getComments().replaceAll("while", "")
-									.replaceAll("[)(,;\n\\s]+", "").split("[!><=&|]+");
-
-							for (int cnt = 0; cnt < whilevariables_post_list.length; cnt++) {
-
-								if ((!whilevariables_post_list[cnt].isEmpty())
-										&& (!whilevariables_post_list[cnt].replaceAll("[0-9]", "").isEmpty())) {
-									String whilevariables_post_temp = conditionNode_post.getName() + "_"
-											+ whilevariables_post_list[cnt] + "_" + itnode.getName()
-											+ "_post_appendix_pin";
-									whilevariables_post = whilevariables_post.replaceAll(whilevariables_post_temp, "")
-											+ whilevariables_post_temp;
-								}
-							}
-						}
-					}
-
-					// localWhileConditionVariables
-					// Define Update for link of _post node
-					String iteratorUpdate = itnode.getName() + "_update()";
-
-					// Set Update for iteration nodes
-					Vector<Link> postlinks = itnode.getLinks();
-					for (Link link : postlinks) {
-						// Set Update of link of _post node
-						link.setUpdate("x:=0, " + iteratorUpdate);
-					}
-				}
 
 				// Collect local WCET variables
 				localVariablesWCET = localVariablesWCET + itnode.getName() + "_WCET=1, ";
@@ -388,124 +332,194 @@ public class TimedAutomaton {
 
 		}
 
-		// Write local clock
-		setLocalVariables(lclock + eol);
-		// Write local WCET variables
-		localVariablesWCET = "int " + localVariablesWCET.substring(0, localVariablesWCET.length() - 2) + ";";
-		setLocalVariables(localVariablesWCET + eol);
-		// Write local iterator variables
-		if (!localIterators.isEmpty()) {
-			localIterators = "int " + localIterators.substring(0, localIterators.length() - 2) + ";";
-			setLocalVariables(localIterators + eol);
+		if (!localVariablesWCET.isEmpty()) {
+			localVariablesWCET = "int " + localVariablesWCET.substring(0, localVariablesWCET.length() - 2) + ";";
+			setLocalVariables(localVariablesWCET + eol);
 		}
 
-		if (!localWhileConditionVariables.isEmpty()) {
-			localWhileConditionVariables = "int "
-					+ localWhileConditionVariables.substring(0, localWhileConditionVariables.length() - 2) + ";";
-			setLocalVariables(localWhileConditionVariables + eol);
-		}
-		
-		// Write Update function for while loop
-		// Write while_post counter to Declaration
-		if (!while_post_counter.isEmpty()) {
-			setLocalVariables("int " + while_post_counter.substring(0, while_post_counter.length() - 2) + ";");
-		}
+	}
 
-		// Write while_post conditional variable values to Declaration
+	private void forLoopModelTransformation(Vector<Node> forNodes) {
+		String Counters = "";
+		String LoopBounds = "";
 
-		/*
-		 * String whilevariables_post_list_export = ""; if
-		 * (!whilevariables_post.isEmpty()) {
-		 * 
-		 * String[] whilevariables_post_list =
-		 * whilevariables_post.split("_post_appendix_pin"); for (int cnt = 0;
-		 * cnt < whilevariables_post_list.length; cnt++) {
-		 * whilevariables_post_list_export = whilevariables_post_list_export +
-		 * eol + "const int " + whilevariables_post_list[cnt] +
-		 * "_list[10] = {1,1,2,3,4,5,6,7,8,9};"; setLocalVariables( eol +
-		 * "const int " + whilevariables_post_list[cnt] +
-		 * "_list[10] = {1,1,2,3,4,5,6,7,8,9};"); } }
-		 * 
-		 * 
-		 * 
-		 * try{ PrintWriter writer = new
-		 * PrintWriter("/Users/HLi/Documents/UA/Haoxuan/Benchmarks/TEST/" +
-		 * this.name + ".txt", "UTF-8");
-		 * writer.println(whilevariables_post_list_export); writer.close(); }
-		 * catch (IOException e) { // do something }
-		 */
-		
-		BufferedReader whilevariables_post_list_buffer = new BufferedReader(
-				new FileReader("/Users/HLi/Documents/UA/Haoxuan/Benchmarks/TEST/" + this.name + ".txt"));
-		StringBuilder whilevariables_post_list_write = new StringBuilder();
-		try {		
-			String line = whilevariables_post_list_buffer.readLine();
+		for (Node itnode : forNodes) {
+			// For loop _init node
 
-			while (line != null) {
-				whilevariables_post_list_write.append(line);
-				whilevariables_post_list_write.append("\n");
-				line = whilevariables_post_list_buffer.readLine();
-			}
-			
-		} finally {
-			whilevariables_post_list_buffer.close();
-		}
-		setLocalVariables(whilevariables_post_list_write.toString());
-		
-		// Write _post_update() function
+			// For loop _cond node
+			if (itnode.getName().contains("_cond")) {
+				// For loop set the guard to be added to true link
+				String Counter = itnode.getName().replaceAll("_cond", "") + "_Counter";
+				String LoopBound = itnode.getName().replaceAll("_cond", "") + "_LoopBound";
+				String annotation = "_Pragma( " + "loopbound min 1 max 100" + ")";
 
-		for (Node updateFucntionNode : condNodes) {
-			if (updateFucntionNode.getComments().startsWith("while")) {
+				String guardConditionFor = Counter + " &lt; " + LoopBound;
 
-				String name_post = updateFucntionNode.getName().replaceAll("_cond", "_post");
-				String whileupdatefunctionHead = "void " + name_post + "_update()";
-				String whileupdatefunctionBody = "";
-				String whileupdatefunctionTail = "	" + name_post + "_counter++;";
-				String[] whileupdateVariables = updateFucntionNode.getComments().replaceAll("while", "")
-						.replaceAll("[)(,;\n\\s]+", "").split("[!><=&|]+");
-				String whileupdateVariables_temp = "";
+				// Set Guard of the false link of _cond node
+				Vector<Link> condlinks = itnode.getLinks();
 
-				for (int cnt = 0; cnt < whileupdateVariables.length; cnt++) {
+				// For loop _cond node link set for loop _cond node set
+				for (Link link : condlinks) {
+					// Set Guard of link of false link of _cond node
+					if (link.getGuard().contains("false")) {
+						String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; !(" : "";
+						link.setGuard(guardCondition_temp.replace("&amp;&amp; !(" + guardConditionFor + ")", "")
+								+ guardConditionFor + ")");
 
-					if ((!whileupdateVariables[cnt].isEmpty())
-							&& (!whileupdateVariables[cnt].replaceAll("[0-9]", "").isEmpty())) {
-						whileupdateVariables_temp = whileupdateVariables_temp
-								.replaceAll(whileupdateVariables[cnt] + "_whileupdateVariables_temp_appendix_pin", "")
-								+ whileupdateVariables[cnt] + "_whileupdateVariables_temp_appendix_pin";
+					}
+					// Set Guard of link of true link of _cond node
+					if (link.getGuard().contains("true")) {
+						String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; (" : "";
+						link.setGuard(guardCondition_temp.replace("&amp;&amp; (" + guardConditionFor + ")", "")
+								+ guardConditionFor + ")");
 					}
 				}
+				// Get the condition variables in while loop
+				Counters = Counters + Counter + " = 0, ";
+				LoopBounds = LoopBounds + "int " + LoopBound + " ="
+						+ annotation.replaceAll(".*max", "").replaceAll("\\)", "") + ";" + eol;
+			}
 
-				String[] whileupdateVariable_list = whileupdateVariables_temp
-						.split("_whileupdateVariables_temp_appendix_pin", -1);
+			// For loop _post node
+			if (itnode.getName().contains("_post")) {
+				// Define Update for link of _post node
+				String iteratorUpdate = itnode.getName().replaceAll("_post", "") + "_Counter++";
+				// Set Update for iteration nodes
+				Vector<Link> postlinks = itnode.getLinks();
+				for (Link link : postlinks) {
+					// Set Update of link of _post node
+					link.setUpdate("localclock:=0, " + iteratorUpdate);
+				}
+			}
+		}
+		if (!Counters.isEmpty())
+			setLocalVariables("int " + Counters.substring(0, Counters.length() - 2) + ";" + eol);
+		if (!LoopBounds.isEmpty())
+			setLocalVariables(LoopBounds + eol);
+	}
 
-				for (int cnt = 0; cnt < whileupdateVariable_list.length; cnt++) {
-					if (!whileupdateVariable_list[cnt].matches("")) {
-						String whileupdatefunctionBody_temp = eol + "	" + whileupdateVariable_list[cnt] + "_"
-								+ updateFucntionNode.getName() + " = " + updateFucntionNode.getName() + "_"
-								+ whileupdateVariable_list[cnt] + "_" + name_post + "_list[" + name_post + "_counter"
-								+ "];";
-						whileupdatefunctionBody = whileupdatefunctionBody.replaceAll(whileupdatefunctionBody_temp, "")
-								+ whileupdatefunctionBody_temp;
+	private void whileLoopModelTransformation(Vector<Node> whileNodes) {
+		String Counters = "";
+		String LoopBounds = "";
+		for (Node itnode : whileNodes) {
+
+			if (itnode.getName().contains("_cond")) {
+
+				Node conditionNode = new Node();
+				conditionNode = itnode;
+				String Counter = itnode.getName().replaceAll("_cond", "") + "_Counter";
+				String LoopBound = itnode.getName().replaceAll("_cond", "") + "_LoopBound";
+				String annotation = "_Pragma( " + "loopbound min 1 max 100" + ")";
+				// While loop set the guard to be added to true link
+				String guardConditionWhile = Counter + " &lt; " + LoopBound;
+
+				// Set Guard of the false link of _cond node
+				Vector<Link> condlinks = conditionNode.getLinks();
+
+				// While loop _cond node link set for loop _cond node set
+				for (Link link : condlinks) {
+					// Set Guard of link of false link of _cond node
+					if (link.getGuard().contains("false")) {
+						String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; !(" : "";
+						link.setGuard(guardCondition_temp.replace("&amp;&amp; !(" + guardConditionWhile + ")", "")
+								+ guardConditionWhile + ")");
+					}
+					// Set Guard of link of true link of _cond node
+					if (link.getGuard().contains("true")) {
+						String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; (" : "";
+						link.setGuard(guardCondition_temp.replace("&amp;&amp; (" + guardConditionWhile + ")", "")
+								+ guardConditionWhile + ")");
 					}
 				}
+				// Get the condition variables in while loop
+				Counters = Counters + Counter + " = 0, ";
+				LoopBounds = LoopBounds + "int " + LoopBound + " ="
+						+ annotation.replaceAll(".*max", "").replaceAll("\\)", "") + ";" + eol;
+			}
 
-				String whileupdatefunction = eol + whileupdatefunctionHead + eol + "{" + whileupdatefunctionBody + eol
-						+ whileupdatefunctionTail + eol + "}";
-				setLocalVariables(whileupdatefunction);
+			// While loop
+			if (itnode.getName().contains("_post")) {
+				// Define Update for link of _post node
+				String iteratorUpdate = itnode.getName().replaceAll("_post", "") + "_Counter++";
+
+				// Set Update for iteration nodes
+				Vector<Link> postlinks = itnode.getLinks();
+				for (Link link : postlinks) {
+					// Set Update of link of _post node
+					link.setUpdate("localclock:=0, " + iteratorUpdate);
+				}
+			}
+		}
+		if (!Counters.isEmpty())
+			setLocalVariables("int " + Counters.substring(0, Counters.length() - 2) + ";" + eol);
+		if (!LoopBounds.isEmpty())
+			setLocalVariables(LoopBounds + eol);
+	}
+
+	private void dowhileLoopModelTransformation(Vector<Node> dowhileNodes) {
+		String Counters = "";
+		String LoopBounds = "";
+		for (Node itnode : dowhileNodes) {
+			if (itnode.getName().contains("_cond")) {
+
+				String Counter = itnode.getName().replaceAll("_cond", "") + "_Counter";
+				String LoopBound = itnode.getName().replaceAll("_cond", "") + "_LoopBound";
+				String annotation = "_Pragma( " + "loopbound min 1 max 100" + ")";
+				// While loop set the guard to be added to true link
+				String guardConditiondoWhile = Counter + " &lt; " + LoopBound;
+				// Set Guard of the false link of _cond node
+				Vector<Link> condlinks = itnode.getLinks();
+
+				// While loop _cond node link set for loop _cond node set
+				for (Link link : condlinks) {
+					// Set Guard of link of false link of _cond node
+					if (link.getGuard().contains("false")) {
+						String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; !(" : "";
+						link.setGuard(guardCondition_temp.replace("&amp;&amp; !(" + guardConditiondoWhile + ")", "")
+								+ guardConditiondoWhile + ")");
+					}
+					// Set Guard of link of true link of _cond node
+					if (link.getGuard().contains("true")) {
+						String guardCondition_temp = link.getGuard() != null ? link.getGuard() + "&amp;&amp; (" : "";
+						link.setGuard(guardCondition_temp.replace("&amp;&amp; (" + guardConditiondoWhile + ")", "")
+								+ guardConditiondoWhile + ")");
+					}
+				}
+				// Get the condition variables in while loop
+				Counters = Counters + Counter + " = 0, ";
+				LoopBounds = LoopBounds + "int " + LoopBound + " ="
+						+ annotation.replaceAll(".*max", "").replaceAll("\\)", "") + ";" + eol;
 
 			}
 
-		}
+			// While loop
+			if (itnode.getName().contains("_post")) {
+				// Define Update for link of _post node
+				String iteratorUpdate = itnode.getName().replaceAll("_post", "") + "_Counter++";
 
+				// Set Update for iteration nodes
+				Vector<Link> postlinks = itnode.getLinks();
+				for (Link link : postlinks) {
+					// Set Update of link of _post node
+					link.setUpdate("localclock:=0, " + iteratorUpdate);
+				}
+			}
+		}
+		if (!Counters.isEmpty())
+			setLocalVariables("int " + Counters.substring(0, Counters.length() - 2) + ";" + eol);
+		if (!LoopBounds.isEmpty())
+			setLocalVariables(LoopBounds + eol);
+	}
+
+	private void linkTransformation(Vector<Link> links) {
 		// Remove all false and true Guard in links
-		for (Link link : this.links) {
+		for (Link link : links) {
 			// Remove "true"
 			if (link.getGuard() != null) {
 				if (link.getGuard().contains("true")) {
 					String guardCondition_temp = link.getGuard();
 					link.setGuard(guardCondition_temp.replaceAll("true", ""));
 				}
-
 				// Remove "false"
 				if (link.getGuard().contains("false")) {
 					String guardCondition_temp = link.getGuard();
@@ -513,13 +527,7 @@ public class TimedAutomaton {
 				}
 			}
 		}
-
-		// Adjust layout
-		this.prettifyLayout();
-
-		return 0;
 	}
-
 
 	private void SetChan(Link link, String ChanName) {
 		link.setSync("_" + ChanName + "!");
@@ -575,14 +583,20 @@ public class TimedAutomaton {
 	private Vector<Node> functionCallCheck(Node node, int startRowNumber) {
 		Vector<Node> returnNodes = new Vector<Node>();
 
-		if (node.getComments().split("();").length == node.getComments().split("\n").length
-				&& node.getComments().contains("();")) {
-			String[] Chan = node.getComments().replaceAll("\n", "").replaceAll(" ", "").split("\\(" + "\\)" + ";");
-
+		// System.out.println((node.getComments().length() -
+		// node.getComments().replaceAll("[\\s]", "").replace(");",
+		// "").length())/2 + " " + (node.getComments().length() -
+		// node.getComments().replace(";", "").length()));
+		if ((node.getComments().length() - node.getComments().replace(");", "").length())
+				/ 2 == (node.getComments().length() - node.getComments().replace(";", "").length())
+				&& node.getComments().replaceAll("[\\s]", "").contains(");") && !node.getComments().contains("=")) {
+			String[] Chan = node.getComments().replaceAll("[\n\\s]", "").split("\\)" + ";");
 			for (int cnt = 0; cnt < Chan.length; cnt++) {
 				Node functionCallStartNode = new Node();
+				Chan[cnt] = Chan[cnt].replaceAll("\\(.*", "");
 				functionCallStartNode.setId(getNextFreeId());
 				functionCallStartNode.setName(Chan[cnt] + "_r" + (startRowNumber + cnt));
+				// System.out.println(Chan[cnt]);
 				functionCallStartNode.setComments(Chan[cnt] + "();");
 				functionCallStartNode.setCommitted(true);
 

@@ -118,7 +118,7 @@ public class UppaalModelExport implements ExportTool {
 			buffWriter = new BufferedWriter(writer);
 
 			// Declare global clock
-			String gclock = "clock t;";
+			String gclock = "clock globalclock;";
 
 			// Declare chan
 			String ChanSet = " ";
