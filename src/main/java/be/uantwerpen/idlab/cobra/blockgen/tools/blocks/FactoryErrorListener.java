@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class FactoryErrorListener
 {
-    List<FactoryError> errors;
+    private List<FactoryError> errors;
 
     public FactoryErrorListener()
     {

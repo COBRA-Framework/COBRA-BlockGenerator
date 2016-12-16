@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class ProjectFileManager
 {
-    List<ProjectFileParser> projectParsers;
+    private List<ProjectFileParser> projectParsers;
 
     public ProjectFileManager()
     {

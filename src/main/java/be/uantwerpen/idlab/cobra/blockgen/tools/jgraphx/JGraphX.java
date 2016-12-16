@@ -2,6 +2,7 @@ package be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx;
 
 import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
+import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
 import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
@@ -51,7 +52,7 @@ public class JGraphX implements GraphDisplay
             {
                 String result = "";
 
-                Object object = ((Block)((mxCell)cell).getValue());
+                Object object = (((mxCell)cell).getValue());
 
                 if(object != null)
                 {
@@ -75,13 +76,14 @@ public class JGraphX implements GraphDisplay
             public String getLabel(Object cell)
             {
                 String result = "";
+
                 if(cell != null)
                 {
                     mxCellState state = this.view.getState(cell);
-                    Map style = state != null?state.getStyle():this.getCellStyle(cell);
+                    Map style = state != null ? state.getStyle() : this.getCellStyle(cell);
                     if(this.labelsVisible && !mxUtils.isTrue(style, mxConstants.STYLE_NOLABEL, false))
                     {
-                        Object object = ((Block)((mxCell)cell).getValue());
+                        Object object = (((mxCell)cell).getValue());
 
                         try
                         {
@@ -151,7 +153,15 @@ public class JGraphX implements GraphDisplay
 
         frame.setTitle("Block Viewer (" + name + ") | COBRA - Block Generator [v." + this.getClass().getPackage().getImplementationVersion() + "]  -  Created by Thomas Huybrechts, IDLab, UAntwerpen (c) 2016-2017");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getClassLoader().getResource("images/BlockGenIcon.png")));
+
+        try
+        {
+            frame.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getClassLoader().getResource("images/BlockGenIcon.png")));
+        }
+        catch(Exception e)
+        {
+            Terminal.printTerminalWarning("Missing resources: \"images/BlockGenIcon.png\". Installation is corrupted!");
+        }
 
         graph.setEnabled(false);
         frame.getContentPane().add(graph);

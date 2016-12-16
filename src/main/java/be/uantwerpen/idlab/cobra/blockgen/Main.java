@@ -104,7 +104,7 @@ public class Main
                 {
                     if(arg.equals("--help") || arg.equals("-?"))
                     {
-                        String jarName = new java.io.File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getName();
+                        String jarName = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getFile()).getName();
 
                         Terminal.printTerminal("Usage: java -jar " + jarName + " [options] config_file");
                         Terminal.printTerminal("--help\t\t\tDisplay this message");
