@@ -221,7 +221,7 @@ public class Antlr implements CodeParser
                     syntaxMessages = syntaxMessages.concat(syntaxError + "\n");
                 }
 
-                syntaxMessages = syntaxMessages.substring(0, syntaxMessages.length() - 1);
+                syntaxMessages = syntaxMessages.trim();
             }
 
             return syntaxMessages;

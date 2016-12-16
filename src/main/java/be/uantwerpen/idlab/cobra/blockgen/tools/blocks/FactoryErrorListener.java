@@ -47,7 +47,7 @@ public class FactoryErrorListener
                 factoryMessages = factoryMessages.concat(factoryError.getMessage() + "\n");
             }
 
-            factoryMessages = factoryMessages.substring(0, factoryMessages.length() - 1);
+            factoryMessages = factoryMessages.trim();
         }
 
         return factoryMessages;

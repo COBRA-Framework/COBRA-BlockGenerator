@@ -64,7 +64,7 @@ public class JGraphX implements GraphDisplay
                         }
                         else
                         {
-                            result = ((Block)object).toString();
+                            result = object.toString();
                         }
                     }
                 }
@@ -80,7 +80,7 @@ public class JGraphX implements GraphDisplay
                 if(cell != null)
                 {
                     mxCellState state = this.view.getState(cell);
-                    Map style = state != null ? state.getStyle() : this.getCellStyle(cell);
+                    Map<String, Object> style = state != null ? state.getStyle() : this.getCellStyle(cell);
                     if(this.labelsVisible && !mxUtils.isTrue(style, mxConstants.STYLE_NOLABEL, false))
                     {
                         Object object = (((mxCell)cell).getValue());

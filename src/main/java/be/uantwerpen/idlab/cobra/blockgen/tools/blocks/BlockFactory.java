@@ -57,7 +57,7 @@ public abstract class BlockFactory
         }
         catch(NullPointerException e)
         {
-            reportFactoryError("Can not exit current block. Current block is null!", e.getStackTrace().toString());
+            reportFactoryError("Can not exit current block. Current block is null!", e.getMessage());
         }
     }
 
