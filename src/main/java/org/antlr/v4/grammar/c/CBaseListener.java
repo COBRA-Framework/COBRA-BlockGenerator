@@ -1,4 +1,4 @@
-// Generated from C:/Users/Thomas/IdeaProjects/HPAFramework/src/main/java/org/antlr/v4/grammar/c\C.g4 by ANTLR 4.5.1
+//Generated from C.g4 by ANTLR 4.6
 package org.antlr.v4.grammar.c;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -311,6 +311,18 @@ public class CBaseListener implements CListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDeclaration(CParser.DeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDeclarationStatement(CParser.DeclarationStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDeclarationStatement(CParser.DeclarationStatementContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

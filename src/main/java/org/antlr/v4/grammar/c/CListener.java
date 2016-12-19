@@ -1,4 +1,4 @@
-// Generated from C:/Users/Thomas/IdeaProjects/HPAFramework/src/main/java/org/antlr/v4/grammar/c\C.g4 by ANTLR 4.5.1
+//Generated from C.g4 by ANTLR 4.6
 package org.antlr.v4.grammar.c;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -257,6 +257,16 @@ public interface CListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDeclaration(CParser.DeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link CParser#declarationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterDeclarationStatement(CParser.DeclarationStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link CParser#declarationStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitDeclarationStatement(CParser.DeclarationStatementContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link CParser#declarationSpecifiers}.
 	 * @param ctx the parse tree

@@ -175,8 +175,12 @@ constantExpression
     ;
 
 declaration
-    :   declarationSpecifiers initDeclaratorList? ';'
+    :   declarationSpecifiers initDeclaratorList?
     |   staticAssertDeclaration
+    ;
+
+declarationStatement
+    :   declaration? ';'
     ;
 
 declarationSpecifiers
@@ -254,7 +258,7 @@ structDeclarationList
 
 structDeclaration
     :   specifierQualifierList structDeclaratorList? ';'
-    |   staticAssertDeclaration
+    |   staticAssertDeclaration ';'
     ;
 
 specifierQualifierList
@@ -443,7 +447,7 @@ designator
     ;
 
 staticAssertDeclaration
-    :   '_Static_assert' '(' constantExpression ',' StringLiteral+ ')' ';'
+    :   '_Static_assert' '(' constantExpression ',' StringLiteral+ ')'
     ;
 
 trueStatement
@@ -480,7 +484,7 @@ blockItemList
     ;
 
 blockItem
-    :   declaration
+    :   declarationStatement
     |   statement
     ;
 
@@ -497,7 +501,7 @@ iterationStatement
     :   'while' '(' expression ')' statement
     |   'do' statement 'while' '(' expression ')' ';'
     |   'for' '(' expression? ';' expression? ';' expression? ')' statement
-    |   'for' '(' declaration expression? ';' expression? ')' statement
+    |   'for' '(' declaration? ';' expression? ';' expression? ')' statement
     ;
 
 jumpStatement
@@ -519,7 +523,7 @@ translationUnit
 
 externalDeclaration
     :   functionDefinition
-    |   declaration
+    |   declarationStatement
     |   ';' // stray ;
     ;
 
@@ -528,8 +532,8 @@ functionDefinition
     ;
 
 declarationList
-    :   declaration
-    |   declarationList declaration
+    :   declarationStatement
+    |   declarationList declarationStatement
     ;
 
 Auto : 'auto';

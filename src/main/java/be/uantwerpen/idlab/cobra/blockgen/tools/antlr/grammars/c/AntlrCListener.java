@@ -67,7 +67,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
     }
 
     @Override
-    public void enterDeclaration(CParser.DeclarationContext ctx)
+    public void enterDeclarationStatement(CParser.DeclarationStatementContext ctx)
     {
         int startIndex = ctx.getStart().getStartIndex();
         int endIndex = ctx.getStop().getStopIndex() + 1;
