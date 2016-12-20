@@ -174,7 +174,14 @@ public class ProjectFileParserV1 implements ProjectFileParser
                 }
                 else if(line.trim().startsWith("<sources>"))
                 {
-                    sourceFiles = parseSourceFiles(buffReader, projectFile.getParent() + System.getProperty("file.separator"));
+                    String projectFileLocation = projectFile.getParent();
+
+                    if(projectFileLocation == null)
+                    {
+                        projectFileLocation = ".";
+                    }
+
+                    sourceFiles = parseSourceFiles(buffReader, projectFileLocation + System.getProperty("file.separator"));
                 }
 
                 line = buffReader.readLine();
