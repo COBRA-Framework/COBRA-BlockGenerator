@@ -35,7 +35,7 @@ public class ProjectExport implements ExportTool
         catch(IOException e)
         {
             //Could not create file
-            throw new IOException("Could not open file: " + exportFile + "\nMessage: " + e.getMessage());
+            throw new IOException("Could not open file: " + exportFile + "\nMessage: " + e.getMessage(), e);
         }
 
         return writeProjectFile(models, file);
@@ -83,7 +83,7 @@ public class ProjectExport implements ExportTool
         catch(IOException e)
         {
             //Could not write to file
-            throw new IOException("Could not write to file: " + file.getName() + "\nMessage: " + e.getMessage());
+            throw new IOException("Could not write to file: " + file.getName() + "\nMessage: " + e.getMessage(), e);
         }
 
         return 0;

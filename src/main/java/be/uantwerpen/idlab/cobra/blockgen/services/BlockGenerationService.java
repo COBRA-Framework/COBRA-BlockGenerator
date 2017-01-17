@@ -20,14 +20,11 @@ import java.util.Vector;
  */
 public class BlockGenerationService
 {
-    public static SourceBlock parseProgramFile(SourceFile file, String exportLocation, Grammar grammar) throws Exception
+    public static SourceBlock parseProgramFile(SourceFile file, Grammar grammar) throws Exception
     {
         CodeParser codeParser = new Antlr();
 
         Vector<Block> blocks = null;
-
-        File exportFolder = new File(exportLocation);
-        exportFolder.mkdirs();
 
         //Parse file and generate block model
         blocks = codeParser.parseCodeFile(file, grammar);
@@ -41,13 +38,13 @@ public class BlockGenerationService
         Terminal.printTerminal("*****Block view*****");
         for(Block block : blocks)
         {
-            System.out.println(block.toStringRecursive() + "\n");
+            Terminal.printTerminal(block.toStringRecursive() + "\n");
         }
 
         Terminal.printTerminal("*****Code view*****");
         for(Block block : blocks)
         {
-            System.out.println(block.getCodeString() + "\n");
+            Terminal.printTerminal(block.getCodeString() + "\n");
         }
 
         SourceBlock programBlock = new SourceBlock(file.toString());

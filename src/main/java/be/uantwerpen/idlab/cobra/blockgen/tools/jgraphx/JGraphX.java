@@ -37,7 +37,7 @@ public class JGraphX implements GraphDisplay
         }
         catch(Exception e)
         {
-            throw new Exception("Could not display graph in window! " + e.getMessage());
+            throw new Exception("Could not display graph in window! " + e.getMessage(), e);
         }
 
         return frame;
@@ -124,7 +124,7 @@ public class JGraphX implements GraphDisplay
         }
         catch(Exception e)
         {
-            throw new Exception("Could not generate JGraphX object! " + e.getMessage());
+            throw new Exception("Could not generate JGraphX object! " + e.getMessage(), e);
         }
         finally
         {

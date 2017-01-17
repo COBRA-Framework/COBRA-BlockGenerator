@@ -43,7 +43,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         }
         catch(FileNotFoundException e)
         {
-            throw new Exception("Could not read file: " + projectFile.getName());
+            throw new Exception("Could not read file: " + projectFile.getName(), e);
         }
 
         try
@@ -72,7 +72,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         }
         catch(Exception e)
         {
-            throw new Exception("Could not determine version compatibility for the file: " + projectFile.getName());
+            throw new Exception("Could not determine version compatibility for the file: " + projectFile.getName(), e);
         }
 
         return compatible;
@@ -96,7 +96,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         }
         catch(FileNotFoundException e)
         {
-            throw new Exception("Could not read file: " + projectFile.getName());
+            throw new Exception("Could not read file: " + projectFile.getName(), e);
         }
 
         try
@@ -132,7 +132,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
                     }
                     catch(Exception e)
                     {
-                        throw new Exception("Could not parse version field!");
+                        throw new Exception("Could not parse version field!", e);
                     }
                 }
                 else if(line.trim().startsWith("<name>"))
@@ -145,7 +145,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
                     }
                     catch(Exception e)
                     {
-                        throw new Exception("Could not parse name field!");
+                        throw new Exception("Could not parse name field!", e);
                     }
                 }
                 else if(line.trim().startsWith("<grammar>"))
@@ -160,7 +160,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
                     }
                     catch(Exception e)
                     {
-                        throw new Exception("Could not parse grammar field!");
+                        throw new Exception("Could not parse grammar field!", e);
                     }
 
                     try
@@ -169,7 +169,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
                     }
                     catch(IllegalArgumentException e)
                     {
-                        throw new Exception("Grammar: " + grammarString + " is not supported!");
+                        throw new Exception("Grammar: " + grammarString + " is not supported!", e);
                     }
                 }
                 else if(line.trim().startsWith("<sources>"))
@@ -191,7 +191,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         }
         catch(Exception e)
         {
-            throw new Exception("Could not parse the project file: " + projectFile.getName() + " (" + e.getClass().getName() + ": " + e.getMessage() + ")");
+            throw new Exception("Could not parse the project file: " + projectFile.getName() + " (" + e.getClass().getName() + ": " + e.getMessage() + ")", e);
         }
 
         if(name == null || version == null || grammar == Grammar.UNKNOWN)
@@ -218,7 +218,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
             }
             catch(Exception e)
             {
-                throw new Exception("Could not remap the source file location to the current working directory!");
+                throw new Exception("Could not remap the source file location to the current working directory!", e);
             }
         }
         else
@@ -258,7 +258,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
                 }
                 catch(Exception e)
                 {
-                    throw new Exception("Could not parse id attribute!");
+                    throw new Exception("Could not parse id attribute!", e);
                 }
 
                 line = reader.readLine();

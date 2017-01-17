@@ -50,7 +50,7 @@ public class Main
                 //Generate models for each source file
                 for(SourceFile sourceFile : projectConfig.getSourceFiles())
                 {
-                    sourceBlocks.add((runBlockGenerator(sourceFile, outputFolder, projectConfig.getGrammar())));
+                    sourceBlocks.add((runBlockGenerator(sourceFile, projectConfig.getGrammar())));
                 }
 
                 Terminal.printTerminalInfo("Exporting block model to project file...");
@@ -183,6 +183,29 @@ public class Main
                     {
                         outputFolder = inputFile.getParent() + File.separator;
                     }
+                    else
+                    {
+                        //Create output folder if not existing
+                        try
+                        {
+                            File outputFolderDirectory = new File(outputFolder);
+
+                            if(!outputFolderDirectory.exists())
+                            {
+                                if(!new File(outputFolder).mkdirs())
+                                {
+                                    throw new Exception("Invalid output folder location '" + outputFolder + "'");
+                                }
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Terminal.printTerminalError("Error while checking for output folder: " + e.getMessage());
+                            Terminal.printTerminalError("Application will terminate.");
+
+                            System.exit(-2);
+                        }
+                    }
                 }
                 else
                 {
@@ -204,13 +227,13 @@ public class Main
         }
     }
 
-    private static SourceBlock runBlockGenerator(SourceFile file, String exportLocation, Grammar grammar) throws Exception
+    private static SourceBlock runBlockGenerator(SourceFile file, Grammar grammar) throws Exception
     {
         SourceBlock sourceBlock;
 
         Terminal.printTerminalInfo("Generating block model from file: " + file);
 
-        sourceBlock = BlockGenerationService.parseProgramFile(file, exportLocation, grammar);
+        sourceBlock = BlockGenerationService.parseProgramFile(file, grammar);
 
         Terminal.printTerminalInfo("Block generation complete!");
 

@@ -110,7 +110,7 @@ public class CSourceGenerator extends BasicSourceGenerator implements SourceGene
         catch(IOException e)
         {
             //Could not write to file
-            throw new IOException("Could not write to file: " + exportFile + ".\n" + e.getMessage());
+            throw new IOException("Could not write to file: " + exportFile + ".\n" + e.getMessage(), e);
         }
 
         return 0;

@@ -50,9 +50,9 @@ public class Antlr implements CodeParser
         {
             fileStream = new ANTLRFileStream(file.getSourceLocation());
         }
-        catch(IOException ex)
+        catch(IOException e)
         {
-            throw new IOException("Could not open file stream: \"" + file + "\" for parsing!\n\n" + ex.getMessage());
+            throw new IOException("Could not open file stream: \"" + file + "\" for parsing!\n\n" + e.getMessage(), e);
         }
 
         //Create code file
