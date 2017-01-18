@@ -49,7 +49,7 @@ public class MethodBlock extends BasicBlock implements Block
         List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: method name
-        elements.add(new XMLElement("name", this.codeSegment));
+        elements.add(new XMLElement("name", this.methodName));
         elements.addAll(super.getXMLElements());
 
         return elements;
