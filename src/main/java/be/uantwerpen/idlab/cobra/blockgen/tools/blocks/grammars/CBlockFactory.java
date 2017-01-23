@@ -34,7 +34,7 @@ public class CBlockFactory extends BlockFactory
 
     public void createMethodBlock(String name, int start, int end)
     {
-        Block methodBlock = new MethodBlock(name, generateCodeSegment(start, end));
+        Block methodBlock = new MethodBlock(name, false, generateCodeSegment(start, end));
 
         currentBlockPointer = methodBlock;
 

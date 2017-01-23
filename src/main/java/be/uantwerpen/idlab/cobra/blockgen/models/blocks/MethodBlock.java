@@ -14,17 +14,21 @@ public class MethodBlock extends BasicBlock implements Block
 {
     private String methodName;
     private String parameters;
+    private boolean entryPoint;
 
     protected MethodBlock()
     {
         super();
+
+        this.entryPoint = false;
     }
 
-    public MethodBlock(String methodName, CodeSegment codeSegment)
+    public MethodBlock(String methodName, boolean isEntryPoint, CodeSegment codeSegment)
     {
         super(codeSegment);
 
         this.methodName = methodName;
+        this.entryPoint = isEntryPoint;
     }
 
     public String getName()
@@ -35,6 +39,16 @@ public class MethodBlock extends BasicBlock implements Block
     public void setName(String name)
     {
         this.methodName = name;
+    }
+
+    public boolean isEntryPoint()
+    {
+        return this.entryPoint;
+    }
+
+    public void setEntryPoint(boolean flag)
+    {
+        this.entryPoint = flag;
     }
 
     @Override
@@ -50,6 +64,10 @@ public class MethodBlock extends BasicBlock implements Block
 
         //Element: method name
         elements.add(new XMLElement("name", this.methodName));
+
+        //Element: entry point
+        elements.add(new XMLElement("entry_point", this.entryPoint));
+
         elements.addAll(super.getXMLElements());
 
         return elements;
