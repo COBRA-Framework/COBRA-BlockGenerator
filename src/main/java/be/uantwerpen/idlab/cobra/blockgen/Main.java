@@ -237,26 +237,6 @@ public class Main
 
         Terminal.printTerminalInfo("Block generation complete!");
 
-
-        /*
-        BlockModelExport benchmarkExport = new BlockModelExport();
-
-        //Generate HPA source files for benchmarking
-        File hpaSourceFolder = new File(exportLocation + "HPA_source" + File.separator);
-        hpaSourceFolder.mkdirs();
-
-        Terminal.printTerminalInfo("Exporting block model source files...");
-
-        for(Block methodBlock : sourceBlock.getChildBlocks())
-        {
-            for(Block leafBlock : methodBlock.getLeafs())
-            {
-                benchmarkExport.generateSourceOfBlock(exportLocation + "HPA_source" + File.separator + ((MethodBlock)methodBlock).getMethodName() + "_", leafBlock, grammar);
-            }
-        }
-
-        Terminal.printTerminalInfo("Generated files will be available in the folder: " + outputFolder);*/
-
         return sourceBlock;
     }
 
