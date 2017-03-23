@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.interfaces;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
+import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 
 import javax.swing.*;
 

@@ -1,10 +1,10 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
-import be.uantwerpen.idlab.cobra.blockgen.models.ProjectConfig;
-import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.SourceBlock;
+import be.uantwerpen.idlab.cobra.common.models.Grammar;
+import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
+import be.uantwerpen.idlab.cobra.common.models.SourceFile;
+import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
+import be.uantwerpen.idlab.cobra.common.models.blocks.SourceBlock;
 import be.uantwerpen.idlab.cobra.blockgen.services.BlockGenerationService;
 import be.uantwerpen.idlab.cobra.blockgen.services.TerminalService;
 import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.ProjectExport;

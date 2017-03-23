@@ -1,20 +1,20 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.blocks.grammars;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.CodeFile;
-import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.*;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks.BooleanCaseBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks.DefaultCaseBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.caseblocks.ValueCaseBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.iterationblocks.DoWhileBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.iterationblocks.ForBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.iterationblocks.WhileBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.jumpblocks.BreakBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.jumpblocks.ContinueBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.jumpblocks.GotoBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.jumpblocks.ReturnBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.selectionblocks.IfBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.selectionblocks.SwitchBlock;
+import be.uantwerpen.idlab.cobra.common.models.CodeFile;
+import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
+import be.uantwerpen.idlab.cobra.common.models.blocks.*;
+import be.uantwerpen.idlab.cobra.common.models.blocks.caseblocks.BooleanCaseBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.caseblocks.DefaultCaseBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.caseblocks.ValueCaseBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.iterationblocks.DoWhileBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.iterationblocks.ForBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.iterationblocks.WhileBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.jumpblocks.BreakBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.jumpblocks.ContinueBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.jumpblocks.GotoBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.jumpblocks.ReturnBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.selectionblocks.IfBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.selectionblocks.SwitchBlock;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 
 /**

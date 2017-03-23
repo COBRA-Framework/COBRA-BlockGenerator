@@ -1,7 +1,7 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.exporting;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
-import be.uantwerpen.idlab.cobra.blockgen.models.xml.XMLBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
+import be.uantwerpen.idlab.cobra.common.models.xml.XMLBlock;
 
 import java.io.BufferedWriter;
 import java.io.File;

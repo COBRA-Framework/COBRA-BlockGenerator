@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.importing;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.ProjectConfig;
+import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.blockgen.tools.importing.versions.ProjectFileParserV1;
 
 import java.io.File;

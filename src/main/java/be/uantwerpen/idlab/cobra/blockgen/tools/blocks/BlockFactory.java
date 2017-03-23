@@ -1,8 +1,8 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.CodeFile;
-import be.uantwerpen.idlab.cobra.blockgen.models.CodeSegment;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.*;
+import be.uantwerpen.idlab.cobra.common.models.CodeFile;
+import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
+import be.uantwerpen.idlab.cobra.common.models.blocks.*;
 
 import java.util.ArrayList;
 import java.util.List;

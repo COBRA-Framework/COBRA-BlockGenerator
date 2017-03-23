@@ -1,9 +1,9 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
-import be.uantwerpen.idlab.cobra.blockgen.models.CodeFile;
-import be.uantwerpen.idlab.cobra.blockgen.models.Grammar;
-import be.uantwerpen.idlab.cobra.blockgen.models.SourceFile;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
+import be.uantwerpen.idlab.cobra.common.models.CodeFile;
+import be.uantwerpen.idlab.cobra.common.models.Grammar;
+import be.uantwerpen.idlab.cobra.common.models.SourceFile;
+import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c.AntlrCLexer;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c.AntlrCListener;

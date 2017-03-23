@@ -1,8 +1,8 @@
 package be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules;
 
 import be.uantwerpen.idlab.cobra.blockgen.blockreduction.interfaces.ReductionRule;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.BasicBlock;
-import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
+import be.uantwerpen.idlab.cobra.common.models.blocks.BasicBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 
 import java.util.Iterator;
 import java.util.Vector;
