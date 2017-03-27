@@ -1,9 +1,9 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.importing.versions;
+package be.uantwerpen.idlab.cobra.common.tools.importing.project.versions;
 
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;
-import be.uantwerpen.idlab.cobra.blockgen.tools.importing.ProjectFileParser;
+import be.uantwerpen.idlab.cobra.common.tools.importing.project.ProjectFileParser;
 
 import java.io.BufferedReader;
 import java.io.File;

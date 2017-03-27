@@ -8,10 +8,10 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.SourceBlock;
 import be.uantwerpen.idlab.cobra.blockgen.services.BlockGenerationService;
 import be.uantwerpen.idlab.cobra.blockgen.services.TerminalService;
 import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.ProjectExport;
-import be.uantwerpen.idlab.cobra.blockgen.tools.importing.ProjectFileManager;
+import be.uantwerpen.idlab.cobra.common.tools.importing.project.ProjectFileManager;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
 import be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx.JGraphX;
-import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
+import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 
 import javax.swing.*;
 import java.io.File;

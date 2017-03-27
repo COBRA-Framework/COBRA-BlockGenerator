@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.terminal;
+package be.uantwerpen.idlab.cobra.common.tools.terminal;
 
 import com.diogonunes.jcdp.color.ColoredPrinter;
 import com.diogonunes.jcdp.color.api.Ansi;

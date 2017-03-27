@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.importing;
+package be.uantwerpen.idlab.cobra.common.tools.importing.project;
 
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 

@@ -2,7 +2,7 @@ package be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx;
 
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
-import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
+import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import com.mxgraph.layout.mxCompactTreeLayout;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;

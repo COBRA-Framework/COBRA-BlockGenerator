@@ -29,6 +29,14 @@ public class CodeFile extends SourceFile
         this.grammar = grammar;
     }
 
+    public CodeFile(String codeStream, String grammar, SourceFile sourceFile)
+    {
+        super(sourceFile.getId(), sourceFile.getSourceLocation());
+
+        this.codeStream = codeStream;
+        this.grammar = grammar;
+    }
+
     public String getCodeStream()
     {
         return this.codeStream;

@@ -10,9 +10,8 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.SourceBlock;
 import be.uantwerpen.idlab.cobra.common.models.blocks.SelectionBlock;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.Antlr;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
-import be.uantwerpen.idlab.cobra.blockgen.tools.terminal.Terminal;
+import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 
-import java.io.File;
 import java.util.Vector;
 
 /**

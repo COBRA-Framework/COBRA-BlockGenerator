@@ -25,6 +25,7 @@ public interface Block
     int getNumOfDescendants();
     String toStringRecursive();
     CodeSegment getCodeSegment();
+    void setCodeSegment(CodeSegment codeSegment);
     int getStartRowNumber();
     int getEndRowNumber();
 }

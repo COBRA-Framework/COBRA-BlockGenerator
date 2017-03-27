@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.terminal;
+package be.uantwerpen.idlab.cobra.common.tools.terminal;
 
 /**
  * Created by Thomas on 17/11/2016.
