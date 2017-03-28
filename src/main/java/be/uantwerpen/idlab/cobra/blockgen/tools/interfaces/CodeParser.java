@@ -11,5 +11,5 @@ import java.util.Vector;
  */
 public interface CodeParser
 {
-    Vector<Block> parseCodeFile(SourceFile fileName, Grammar grammar) throws Exception;
+    Vector<Block> parseCodeFile(SourceFile file, Grammar grammar) throws Exception;
 }
