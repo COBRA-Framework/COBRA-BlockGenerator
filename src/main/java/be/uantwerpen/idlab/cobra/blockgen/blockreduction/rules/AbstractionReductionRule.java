@@ -11,9 +11,10 @@ import be.uantwerpen.idlab.cobra.blockgen.models.blocks.Block;
  */
 public class AbstractionReductionRule extends BasicReductionRule implements ReductionRule
 {
-    @Override
-    public Block applyRule(Block model)
-    {
+    //@Override
+    @SuppressWarnings("null")
+	public Block applyRule(Block model)
+    {	
         Block abstractedBlock;
         CodeSegment replacementCodeSegment;
         CodeFile codeFile;
@@ -24,7 +25,8 @@ public class AbstractionReductionRule extends BasicReductionRule implements Redu
             //Nothing to abstract
             return model;
         }
-
+        
+       // if(model.getChildBlocks().firstElement().getCodeSegment()!=null){
         codeFile = model.getChildBlocks().firstElement().getCodeSegment().getCodeFile();
 
         startIndex = model.getChildBlocks().firstElement().getCodeSegment().getStartIndex();
@@ -34,6 +36,9 @@ public class AbstractionReductionRule extends BasicReductionRule implements Redu
 
         abstractedBlock = new BasicBlock(replacementCodeSegment);
 
-        return abstractedBlock;
+        return abstractedBlock;        
+      //  }
+        
+       // return model;
     }
 }

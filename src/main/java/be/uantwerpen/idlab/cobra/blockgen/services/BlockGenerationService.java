@@ -18,82 +18,68 @@ import java.util.Vector;
 /**
  * Created by Thomas on 6/12/2016.
  */
-public class BlockGenerationService
-{
-    public static SourceBlock parseProgramFile(SourceFile file, String exportLocation, Grammar grammar) throws Exception
-    {
-        CodeParser codeParser = new Antlr();
+public class BlockGenerationService {
+	public static SourceBlock parseProgramFile(SourceFile file, String exportLocation, Grammar grammar)
+			throws Exception {
+		CodeParser codeParser = new Antlr();
 
-        Vector<Block> blocks = null;
+		Vector<Block> blocks = null;
 
-        File exportFolder = new File(exportLocation);
-        exportFolder.mkdirs();
+		File exportFolder = new File(exportLocation);
+		exportFolder.mkdirs();
 
-        //Parse file and generate block model
-        blocks = codeParser.parseCodeFile(file, grammar);
+		// Parse file and generate block model
+		blocks = codeParser.parseCodeFile(file, grammar);
 
-        //Apply basic block reduction
-        for(Block methodBlock : blocks)
-        {
-            applyReductionRuleRecursive(methodBlock);
-        }
+		for (Block methodBlock : blocks) {
+		// Apply basic block reduction
+			applyReductionRuleRecursive(methodBlock);
 
-        Terminal.printTerminal("*****Block view*****");
-        for(Block block : blocks)
-        {
-            System.out.println(block.toStringRecursive() + "\n");
-        }
+		}
 
-        Terminal.printTerminal("*****Code view*****");
-        for(Block block : blocks)
-        {
-            System.out.println(block.getCodeString() + "\n");
-        }
+		Terminal.printTerminal("*****Block view*****");
+		for (Block block : blocks) {
+			System.out.println(block.toStringRecursive() + "\n");
+		}
 
-        SourceBlock programBlock = new SourceBlock(file.toString());
+		Terminal.printTerminal("*****Code view*****");
+		for (Block block : blocks) {
+			System.out.println(block.getCodeString() + "\n");
+		}
 
-        for(Block methodBlock : blocks)
-        {
-            programBlock.addChildBlock(methodBlock);
-        }
+		SourceBlock programBlock = new SourceBlock(file.toString());
 
-        return programBlock;
-    }
+		for (Block methodBlock : blocks) {
+			programBlock.addChildBlock(methodBlock);
+		}
 
-    private static void applyReductionRuleRecursive(Block block)
-    {
-        ReductionRule blockReduction = new BasicBlockReductionRule();
+		return programBlock;
+	}
 
-        blockReduction.applyRule(block);
+	public static void applyReductionRuleRecursive(Block block) {
+		ReductionRule blockReduction = new BasicBlockReductionRule();
 
-        for(Block childBlock : block.getChildBlocks())
-        {
-            applyReductionRuleRecursive(childBlock);
-        }
-    }
+		blockReduction.applyRule(block);
 
-    private static void applyAbstractionRuleRecursive(Block block, int abstractionLevel)
-    {
-        ReductionRule abstractionRule = new AbstractionReductionRule();
+		for (Block childBlock : block.getChildBlocks()) {
+			applyReductionRuleRecursive(childBlock);
+		}
+	}
 
-        if(abstractionLevel <= 0)
-        {
-            abstractionRule.applyRule(block);
-        }
-        else
-        {
-            for(Block childBlock : block.getChildBlocks())
-            {
-                if(childBlock.getClass() == SelectionBlock.class)
-                {
-                    //Case statements are the same abstraction level
-                    applyAbstractionRuleRecursive(childBlock, abstractionLevel);
-                }
-                else
-                {
-                    applyAbstractionRuleRecursive(childBlock, abstractionLevel - 1);
-                }
-            }
-        }
-    }
+	public static void applyAbstractionRuleRecursive(Block block, int abstractionLevel) {
+		ReductionRule abstractionRule = new AbstractionReductionRule();
+
+		if (abstractionLevel <= 0) {
+			abstractionRule.applyRule(block);
+		} else {
+			for (Block childBlock : block.getChildBlocks()) {
+				if (childBlock.getClass() == SelectionBlock.class) {
+					// Case statements are the same abstraction level
+					applyAbstractionRuleRecursive(childBlock, abstractionLevel);
+				} else {
+					applyAbstractionRuleRecursive(childBlock, abstractionLevel - 1);
+				}
+			}
+		}
+	}
 }

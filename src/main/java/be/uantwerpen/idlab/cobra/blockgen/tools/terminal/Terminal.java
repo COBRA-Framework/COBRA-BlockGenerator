@@ -25,7 +25,7 @@ public abstract class Terminal
 
         terminalReader.getObserver().addObserver(new Observer()
         {
-            @Override
+            //@Override
             public void update(Observable source, Object object)
             {
                 if(object != null)
@@ -100,7 +100,7 @@ public abstract class Terminal
             return this.observer;
         }
 
-        @Override
+       // @Override
         public void run()
         {
             BufferedReader input = new BufferedReader(new InputStreamReader(System.in));

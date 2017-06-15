@@ -85,7 +85,10 @@ public class CSourceGenerator extends BasicSourceGenerator implements SourceGene
             }
             else
             {
-                buffWriter.write(codeBlock.getCodeString() + eol);
+            	if(codeBlock.getCodeSegment().toString() != null)
+                {
+            		buffWriter.write(codeBlock.getCodeSegment().toString() + eol);
+            	}
             }
 
             //Create benchmark function footer
