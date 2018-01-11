@@ -13,14 +13,6 @@ public class CodeFile extends SourceFile
         super();
     }
 
-    public CodeFile(String codeStream, String grammar, String sourceLocation)
-    {
-        super();
-
-        this.codeStream = codeStream;
-        this.grammar = grammar;
-    }
-
     public CodeFile(String codeStream, String grammar, String sourceLocation, long id)
     {
         super(id, sourceLocation);

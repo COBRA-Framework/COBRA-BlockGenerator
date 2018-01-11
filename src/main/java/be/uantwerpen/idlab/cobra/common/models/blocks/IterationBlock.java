@@ -19,6 +19,11 @@ public abstract class IterationBlock extends BasicBlock implements Block
         super();
     }
 
+    protected IterationBlock(Long id)
+    {
+        super(id);
+    }
+
     public IterationBlock(CodeSegment codeSegment, String iterationCondition)
     {
         super(codeSegment);

@@ -21,6 +21,11 @@ public class ForBlock extends IterationBlock
         super();
     }
 
+    protected ForBlock(Long id)
+    {
+        super(id);
+    }
+
     public ForBlock(String initStatement, String iterationCondition, String postStatement, CodeSegment codeSegment)
     {
         super(codeSegment, iterationCondition);

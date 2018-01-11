@@ -20,6 +20,11 @@ public class ValueCaseBlock extends CaseBlock
         super();
     }
 
+    protected ValueCaseBlock(Long id)
+    {
+        super(id);
+    }
+
     public ValueCaseBlock(String value, CodeSegment codeSegment)
     {
         super(codeSegment);

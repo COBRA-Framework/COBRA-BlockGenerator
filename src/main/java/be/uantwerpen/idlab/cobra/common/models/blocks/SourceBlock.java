@@ -18,6 +18,11 @@ public class SourceBlock extends BasicBlock implements Block
         super();
     }
 
+    protected SourceBlock(Long id)
+    {
+        super(id);
+    }
+
     public SourceBlock(String sourceName)
     {
         super();

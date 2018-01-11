@@ -21,8 +21,9 @@ public abstract class XMLBlock implements XMLObject, Block
     {
         String xml = new String();
         String typeName = this.getClass().getCanonicalName().split(BLOCK_NAMESPACE_ROOT)[1].substring(1);
+        long id = this.getId();
 
-        xml = "<block type=\"" + typeName + "\">";
+        xml = "<block id=\"" + id + "\" type=\"" + typeName + "\">";
 
         //Add block specific field elements
         for(XMLObject element : this.getXMLElements())

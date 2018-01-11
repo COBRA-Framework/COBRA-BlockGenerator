@@ -20,6 +20,11 @@ public class GotoBlock extends JumpBlock
         super();
     }
 
+    protected GotoBlock(Long id)
+    {
+        super(id);
+    }
+
     public GotoBlock(String jumpLabel, CodeSegment codeSegment)
     {
         super(codeSegment);

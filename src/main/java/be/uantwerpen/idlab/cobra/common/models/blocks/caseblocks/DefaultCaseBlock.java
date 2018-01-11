@@ -13,6 +13,11 @@ public class DefaultCaseBlock extends CaseBlock
         super();
     }
 
+    protected DefaultCaseBlock(Long id)
+    {
+        super(id);
+    }
+
     public DefaultCaseBlock(CodeSegment codeSegment)
     {
         super(codeSegment);

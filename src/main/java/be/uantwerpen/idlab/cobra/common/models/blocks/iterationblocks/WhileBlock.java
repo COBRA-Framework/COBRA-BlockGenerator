@@ -14,6 +14,11 @@ public class WhileBlock extends IterationBlock
         super();
     }
 
+    protected WhileBlock(Long id)
+    {
+        super(id);
+    }
+
     public WhileBlock(String iterationCondition, CodeSegment codeSegment)
     {
         super(codeSegment, iterationCondition);

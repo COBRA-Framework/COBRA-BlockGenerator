@@ -14,6 +14,11 @@ public class DoWhileBlock extends IterationBlock
         super();
     }
 
+    protected DoWhileBlock(Long id)
+    {
+        super(id);
+    }
+
     public DoWhileBlock(String iterationCondition, CodeSegment codeSegment)
     {
         super(codeSegment, iterationCondition);

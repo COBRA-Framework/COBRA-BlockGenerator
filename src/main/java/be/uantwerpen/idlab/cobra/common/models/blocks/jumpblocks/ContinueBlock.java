@@ -13,6 +13,11 @@ public class ContinueBlock extends JumpBlock
         super();
     }
 
+    protected ContinueBlock(Long id)
+    {
+        super(id);
+    }
+
     public ContinueBlock(CodeSegment codeSegment)
     {
         super(codeSegment);

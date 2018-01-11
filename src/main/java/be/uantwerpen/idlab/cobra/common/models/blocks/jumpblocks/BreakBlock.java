@@ -13,6 +13,11 @@ public class BreakBlock extends JumpBlock
         super();
     }
 
+    protected BreakBlock(Long id)
+    {
+        super(id);
+    }
+
     public BreakBlock(CodeSegment codeSegment)
     {
         super(codeSegment);

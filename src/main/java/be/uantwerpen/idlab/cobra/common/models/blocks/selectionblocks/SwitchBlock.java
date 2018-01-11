@@ -13,6 +13,11 @@ public class SwitchBlock extends SelectionBlock
         super();
     }
 
+    protected SwitchBlock(Long id)
+    {
+        super(id);
+    }
+
     public SwitchBlock(String selectionStatement, CodeSegment codeSegment)
     {
         super(codeSegment, selectionStatement);

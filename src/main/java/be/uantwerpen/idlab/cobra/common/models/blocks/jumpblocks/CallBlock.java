@@ -21,6 +21,11 @@ public class CallBlock extends JumpBlock
         super();
     }
 
+    protected CallBlock(Long id)
+    {
+        super(id);
+    }
+
     public CallBlock(String calledSection, CodeSegment codeSegment)
     {
         super(codeSegment);

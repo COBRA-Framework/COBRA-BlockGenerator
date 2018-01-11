@@ -20,6 +20,11 @@ public abstract class SelectionBlock extends BasicBlock implements Block
         super();
     }
 
+    protected SelectionBlock(Long id)
+    {
+        super(id);
+    }
+
     public SelectionBlock(CodeSegment codeSegment, String selectionStatement)
     {
         super(codeSegment);

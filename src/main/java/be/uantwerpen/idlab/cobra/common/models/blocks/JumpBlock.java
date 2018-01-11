@@ -16,6 +16,11 @@ public abstract class JumpBlock extends BasicBlock implements Block
         super();
     }
 
+    protected JumpBlock(Long id)
+    {
+        super(id);
+    }
+
     public JumpBlock(CodeSegment codeSegment)
     {
         super(codeSegment);

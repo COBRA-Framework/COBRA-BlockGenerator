@@ -45,7 +45,7 @@ public class Main
                 projectConfig = projectFileManager.parseProjectConfig(file);
 
                 Terminal.printTerminalInfo("Performing block generation with the following configuration:");
-                Terminal.printTerminal(projectConfig.toString());
+                Terminal.printTerminal(projectConfig.toString() + "\n");
 
                 //Generate models for each source file
                 for(SourceFile sourceFile : projectConfig.getSourceFiles())

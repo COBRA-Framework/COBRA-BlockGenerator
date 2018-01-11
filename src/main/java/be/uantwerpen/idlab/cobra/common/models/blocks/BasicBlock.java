@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.models.blocks;
 
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLBlock;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLObject;
@@ -16,6 +17,7 @@ public class BasicBlock extends XMLBlock implements Block
     protected CodeSegment codeSegment;
     protected Block parentBlock;
     protected Vector<Block> childBlocks;
+    protected long id = 0;
 
     protected BasicBlock()
     {
@@ -24,6 +26,17 @@ public class BasicBlock extends XMLBlock implements Block
         this.codeSegment = null;
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
+        this.id = BlockFactory.getNextBlockId();
+    }
+
+    protected BasicBlock(Long id)
+    {
+        super();
+
+        this.codeSegment = null;
+        this.parentBlock = null;
+        this.childBlocks = new Vector<Block>();
+        this.id = id;
     }
 
     public BasicBlock(CodeSegment codeSegment)
@@ -33,6 +46,22 @@ public class BasicBlock extends XMLBlock implements Block
         this.codeSegment = codeSegment;
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
+        this.id = BlockFactory.getNextBlockId();
+    }
+
+    public BasicBlock(long id, CodeSegment codeSegment)
+    {
+        super();
+
+        this.codeSegment = codeSegment;
+        this.parentBlock = null;
+        this.childBlocks = new Vector<Block>();
+        this.id = id;
+    }
+
+    public long getId()
+    {
+        return this.id;
     }
 
     public CodeSegment getCodeSegment()

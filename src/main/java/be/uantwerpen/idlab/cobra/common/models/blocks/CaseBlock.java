@@ -16,6 +16,11 @@ public abstract class CaseBlock extends BasicBlock implements Block
         super();
     }
 
+    protected CaseBlock(Long id)
+    {
+        super(id);
+    }
+
     public CaseBlock(CodeSegment codeSegment)
     {
         super(codeSegment);

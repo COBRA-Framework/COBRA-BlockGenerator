@@ -96,6 +96,6 @@ public class ProjectConfig
             string = string.concat("\t" + sourceFile + "\n");
         }
 
-        return string;
+        return string.trim();
     }
 }

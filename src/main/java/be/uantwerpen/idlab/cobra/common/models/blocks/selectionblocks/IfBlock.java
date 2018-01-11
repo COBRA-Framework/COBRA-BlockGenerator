@@ -13,6 +13,11 @@ public class IfBlock extends SelectionBlock
         super();
     }
 
+    protected IfBlock(Long id)
+    {
+        super(id);
+    }
+
     public IfBlock(String selectionStatement, CodeSegment codeSegment)
     {
         super(codeSegment, selectionStatement);

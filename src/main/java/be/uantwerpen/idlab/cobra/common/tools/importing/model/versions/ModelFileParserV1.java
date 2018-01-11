@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ModelFileParserV1 implements ModelFileParser
 {
-    private final static String VERSION = "1.0";
+    private final static String VERSION = "1.1";
     private final static String BLOCK_NAMESPACE_ROOT = "be.uantwerpen.idlab.cobra.common.models.blocks";
 
     public ModelFileParserV1()
@@ -142,13 +142,23 @@ public class ModelFileParserV1 implements ModelFileParser
     {
         Block block = null;
         Object newInstance = null;
+        long id = 0;
         String type = BLOCK_NAMESPACE_ROOT.concat("." + blockElement.getAttribute("type"));
 
         try
         {
+            id = Long.parseLong(blockElement.getAttribute("id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse id attribute from block! " + e.getMessage(), e);
+        }
+
+        try
+        {
             Class<?> classType = Class.forName(type);
-            Constructor<?> constructor = classType.getConstructor();
-            newInstance = constructor.newInstance();
+            Constructor<?> constructor = classType.getConstructor(Long.class);
+            newInstance = constructor.newInstance(id);
         }
         catch(ClassNotFoundException e)
         {

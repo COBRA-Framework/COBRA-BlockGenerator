@@ -20,6 +20,11 @@ public class ReturnBlock extends JumpBlock
         super();
     }
 
+    protected ReturnBlock(Long id)
+    {
+        super(id);
+    }
+
     public ReturnBlock(String returnStatement, CodeSegment codeSegment)
     {
         super(codeSegment);

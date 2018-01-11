@@ -17,9 +17,11 @@ public abstract class BlockFactory
     protected CodeFile codeFile;
     protected Block currentBlockPointer;
     protected List<FactoryErrorListener> errorListeners;
+    private static long blockId;
 
     protected BlockFactory()
     {
+        this.blockId = 0;
         this.blocks = new Vector<Block>();
         this.errorListeners = new ArrayList<FactoryErrorListener>();
     }
@@ -28,6 +30,16 @@ public abstract class BlockFactory
     {
         this();
         this.codeFile = codeFile;
+    }
+
+    public static long getNextBlockId()
+    {
+        long id = blockId;
+
+        //Increment block id
+        blockId++;
+
+        return id;
     }
 
     public void setCodeFile(CodeFile codeFile)

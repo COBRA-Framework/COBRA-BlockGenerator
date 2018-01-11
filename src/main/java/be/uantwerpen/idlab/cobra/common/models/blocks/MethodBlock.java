@@ -23,6 +23,13 @@ public class MethodBlock extends BasicBlock implements Block
         this.entryPoint = false;
     }
 
+    protected MethodBlock(Long id)
+    {
+        super(id);
+
+        this.entryPoint = false;
+    }
+
     public MethodBlock(String methodName, boolean isEntryPoint, CodeSegment codeSegment)
     {
         super(codeSegment);

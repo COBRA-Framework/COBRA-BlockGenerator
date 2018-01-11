@@ -9,6 +9,8 @@ import java.util.Vector;
  */
 public interface Block
 {
+    long getId();
+
     String getCodeString();
 
     Block getParentBlock();
