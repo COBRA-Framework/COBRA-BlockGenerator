@@ -175,7 +175,7 @@ constantExpression
     ;
 
 declaration
-    :   declarationSpecifiers initDeclaratorList?
+    :   declarationSpecifiers initDeclaratorList
     |   staticAssertDeclaration
     ;
 
