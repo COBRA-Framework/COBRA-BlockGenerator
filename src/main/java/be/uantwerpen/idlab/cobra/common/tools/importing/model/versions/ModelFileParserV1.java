@@ -157,7 +157,7 @@ public class ModelFileParserV1 implements ModelFileParser
         try
         {
             Class<?> classType = Class.forName(type);
-            Constructor<?> constructor = classType.getConstructor(Long.class);
+            Constructor<?> constructor = classType.getConstructor(long.class);
             newInstance = constructor.newInstance(id);
         }
         catch(ClassNotFoundException e)
