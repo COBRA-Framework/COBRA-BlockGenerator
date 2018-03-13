@@ -21,7 +21,7 @@ public class ForBlock extends IterationBlock
         super();
     }
 
-    protected ForBlock(Long id)
+    protected ForBlock(long id)
     {
         super(id);
     }

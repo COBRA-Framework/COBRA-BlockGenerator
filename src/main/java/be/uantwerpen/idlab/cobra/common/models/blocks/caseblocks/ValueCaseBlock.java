@@ -20,7 +20,7 @@ public class ValueCaseBlock extends CaseBlock
         super();
     }
 
-    protected ValueCaseBlock(Long id)
+    protected ValueCaseBlock(long id)
     {
         super(id);
     }

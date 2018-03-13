@@ -21,7 +21,7 @@ public class CallBlock extends JumpBlock
         super();
     }
 
-    protected CallBlock(Long id)
+    protected CallBlock(long id)
     {
         super(id);
     }

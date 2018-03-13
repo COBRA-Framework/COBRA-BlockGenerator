@@ -13,7 +13,7 @@ public class ContinueBlock extends JumpBlock
         super();
     }
 
-    protected ContinueBlock(Long id)
+    protected ContinueBlock(long id)
     {
         super(id);
     }

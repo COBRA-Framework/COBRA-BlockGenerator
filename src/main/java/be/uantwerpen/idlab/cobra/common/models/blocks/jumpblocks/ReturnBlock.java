@@ -20,7 +20,7 @@ public class ReturnBlock extends JumpBlock
         super();
     }
 
-    protected ReturnBlock(Long id)
+    protected ReturnBlock(long id)
     {
         super(id);
     }

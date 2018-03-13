@@ -20,7 +20,7 @@ public class GotoBlock extends JumpBlock
         super();
     }
 
-    protected GotoBlock(Long id)
+    protected GotoBlock(long id)
     {
         super(id);
     }

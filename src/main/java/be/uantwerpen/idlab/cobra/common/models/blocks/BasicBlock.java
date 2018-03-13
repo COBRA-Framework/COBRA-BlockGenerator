@@ -29,7 +29,7 @@ public class BasicBlock extends XMLBlock implements Block
         this.id = BlockFactory.getNextBlockId();
     }
 
-    protected BasicBlock(Long id)
+    protected BasicBlock(long id)
     {
         super();
 

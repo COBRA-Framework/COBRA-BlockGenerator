@@ -18,7 +18,7 @@ public class SourceBlock extends BasicBlock implements Block
         super();
     }
 
-    protected SourceBlock(Long id)
+    protected SourceBlock(long id)
     {
         super(id);
     }

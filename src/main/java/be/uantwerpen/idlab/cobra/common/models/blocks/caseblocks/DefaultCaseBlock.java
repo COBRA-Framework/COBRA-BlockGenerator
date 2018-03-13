@@ -13,7 +13,7 @@ public class DefaultCaseBlock extends CaseBlock
         super();
     }
 
-    protected DefaultCaseBlock(Long id)
+    protected DefaultCaseBlock(long id)
     {
         super(id);
     }

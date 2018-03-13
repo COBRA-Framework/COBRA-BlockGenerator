@@ -20,7 +20,7 @@ public abstract class SelectionBlock extends BasicBlock implements Block
         super();
     }
 
-    protected SelectionBlock(Long id)
+    protected SelectionBlock(long id)
     {
         super(id);
     }

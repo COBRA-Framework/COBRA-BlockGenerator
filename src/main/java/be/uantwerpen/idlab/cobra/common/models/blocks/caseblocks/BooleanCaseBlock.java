@@ -20,7 +20,7 @@ public class BooleanCaseBlock extends CaseBlock
         super();
     }
 
-    protected BooleanCaseBlock(Long id)
+    protected BooleanCaseBlock(long id)
     {
         super(id);
     }

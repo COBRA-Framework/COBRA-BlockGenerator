@@ -23,7 +23,7 @@ public class MethodBlock extends BasicBlock implements Block
         this.entryPoint = false;
     }
 
-    protected MethodBlock(Long id)
+    protected MethodBlock(long id)
     {
         super(id);
 

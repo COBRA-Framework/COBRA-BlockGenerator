@@ -14,7 +14,7 @@ public class WhileBlock extends IterationBlock
         super();
     }
 
-    protected WhileBlock(Long id)
+    protected WhileBlock(long id)
     {
         super(id);
     }

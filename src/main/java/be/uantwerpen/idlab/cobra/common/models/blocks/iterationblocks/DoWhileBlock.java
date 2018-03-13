@@ -14,7 +14,7 @@ public class DoWhileBlock extends IterationBlock
         super();
     }
 
-    protected DoWhileBlock(Long id)
+    protected DoWhileBlock(long id)
     {
         super(id);
     }

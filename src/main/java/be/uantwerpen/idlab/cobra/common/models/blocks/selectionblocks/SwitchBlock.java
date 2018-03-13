@@ -13,7 +13,7 @@ public class SwitchBlock extends SelectionBlock
         super();
     }
 
-    protected SwitchBlock(Long id)
+    protected SwitchBlock(long id)
     {
         super(id);
     }

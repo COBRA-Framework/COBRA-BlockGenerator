@@ -13,7 +13,7 @@ public class IfBlock extends SelectionBlock
         super();
     }
 
-    protected IfBlock(Long id)
+    protected IfBlock(long id)
     {
         super(id);
     }
