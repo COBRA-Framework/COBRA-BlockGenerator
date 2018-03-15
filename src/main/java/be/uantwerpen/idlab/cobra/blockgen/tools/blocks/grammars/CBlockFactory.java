@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.blocks.grammars;
 
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.common.models.blocks.*;
@@ -32,18 +33,22 @@ public class CBlockFactory extends BlockFactory
         super(codeFile);
     }
 
-    public void createMethodBlock(String name, int start, int end)
+    public void createMethodBlock(String name, int start, int end, BlockReference ref)
     {
         Block methodBlock = new MethodBlock(name, false, generateCodeSegment(start, end));
 
         currentBlockPointer = methodBlock;
 
+        methodBlock.setRef(ref);
+
         blocks.add(methodBlock);
     }
 
-    public void createStatementBlock(int start, int end)
+    public void createStatementBlock(int start, int end, BlockReference ref)
     {
         Block statementBlock = new BasicBlock(generateCodeSegment(start, end));
+
+        statementBlock.setRef(ref);
 
         if(currentBlockPointer != null)
         {
@@ -55,7 +60,7 @@ public class CBlockFactory extends BlockFactory
         }
     }
 
-    public void createIterationBlock(int start, int end, boolean runAtLeastOnce)
+    public void createIterationBlock(int start, int end, boolean runAtLeastOnce, BlockReference ref)
     {
         Block iterationBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -133,12 +138,14 @@ public class CBlockFactory extends BlockFactory
             return;
         }
 
+        iterationBlock.setRef(ref);
+
         currentBlockPointer.addChildBlock(iterationBlock);
 
         currentBlockPointer = iterationBlock;
     }
 
-    public void createSelectionBlock(int start, int end)
+    public void createSelectionBlock(int start, int end, BlockReference ref)
     {
         Block selectionBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -181,12 +188,14 @@ public class CBlockFactory extends BlockFactory
             return;
         }
 
+        selectionBlock.setRef(ref);
+
         currentBlockPointer.addChildBlock(selectionBlock);
 
         currentBlockPointer = selectionBlock;
     }
 
-    public void createJumpBlock(int start, int end)
+    public void createJumpBlock(int start, int end, BlockReference ref)
     {
         Block jumpBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -238,19 +247,23 @@ public class CBlockFactory extends BlockFactory
             return;
         }
 
+        jumpBlock.setRef(ref);
+
         currentBlockPointer.addChildBlock(jumpBlock);
     }
 
-    public void addBooleanCaseStatement(boolean value)
+    public void addBooleanCaseStatement(boolean value, BlockReference ref)
     {
         Block caseBlock = new BooleanCaseBlock(value);
+
+        caseBlock.setRef(ref);
 
         currentBlockPointer.addChildBlock(caseBlock);
 
         currentBlockPointer = caseBlock;
     }
 
-    public void addCaseStatement(int start, int end)
+    public void addCaseStatement(int start, int end, BlockReference ref)
     {
         Block caseBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -282,6 +295,8 @@ public class CBlockFactory extends BlockFactory
             reportFactoryError("Case type can not be determined for the statement: (r." + codeSegment.getRowNumber(codeSegment.getStartIndex()) + "-" + codeSegment.getColumnNumber(codeSegment.getStartIndex()) + ") " + codeStream, new Throwable().getStackTrace().toString());
             return;
         }
+
+        caseBlock.setRef(ref);
 
         currentBlockPointer.addChildBlock(caseBlock);
 

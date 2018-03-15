@@ -2,8 +2,10 @@ package be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c;
 
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrListener;
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import org.antlr.v4.grammar.c.CBaseListener;
 import org.antlr.v4.grammar.c.CParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Iterator;
@@ -36,7 +38,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         int endIndex = ctx.declarator().getStop().getStopIndex() + 1;
         String methodName = ctx.declarator().getText().split("\\(")[0];
 
-        blockFactory.createMethodBlock(methodName, startIndex, endIndex);
+        blockFactory.createMethodBlock(methodName, startIndex, endIndex, getBlockReference(ctx));
     }
 
     @Override
@@ -63,7 +65,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         int startIndex = ctx.getStart().getStartIndex();
         int endIndex = ctx.getStop().getStopIndex() + 1;
 
-        blockFactory.createStatementBlock(startIndex, endIndex);
+        blockFactory.createStatementBlock(startIndex, endIndex, getBlockReference(ctx));
     }
 
     @Override
@@ -72,7 +74,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         int startIndex = ctx.getStart().getStartIndex();
         int endIndex = ctx.getStop().getStopIndex() + 1;
 
-        blockFactory.createStatementBlock(startIndex, endIndex);
+        blockFactory.createStatementBlock(startIndex, endIndex, getBlockReference(ctx));
     }
 
     @Override
@@ -97,7 +99,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
             isDoWhileIteration = false;
         }
 
-        blockFactory.createIterationBlock(startIndex, endIndex, isDoWhileIteration);
+        blockFactory.createIterationBlock(startIndex, endIndex, isDoWhileIteration, getBlockReference(ctx));
     }
 
     @Override
@@ -112,7 +114,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         int startIndex = ctx.getStart().getStartIndex();
         int endIndex = getStatementEndIndex(ctx.getTokens(CParser.LeftParen), ctx.getTokens(CParser.RightParen));
 
-        blockFactory.createSelectionBlock(startIndex, endIndex);
+        blockFactory.createSelectionBlock(startIndex, endIndex, getBlockReference(ctx));
 
         if(ctx.getText().trim().split("\n")[0].startsWith("switch"))
         {
@@ -135,7 +137,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
     @Override
     public void enterTrueStatement(CParser.TrueStatementContext ctx)
     {
-        blockFactory.addBooleanCaseStatement(true);
+        blockFactory.addBooleanCaseStatement(true, getBlockReference(ctx));
     }
 
     @Override
@@ -147,7 +149,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
     @Override
     public void enterFalseStatement(CParser.FalseStatementContext ctx)
     {
-        blockFactory.addBooleanCaseStatement(false);
+        blockFactory.addBooleanCaseStatement(false, getBlockReference(ctx));
     }
 
     @Override
@@ -174,7 +176,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
                 firstCase = false;
             }
 
-            blockFactory.addCaseStatement(startIndex, endIndex);
+            blockFactory.addCaseStatement(startIndex, endIndex, getBlockReference(ctx));
         }
     }
 
@@ -184,7 +186,7 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         int startIndex = ctx.getStart().getStartIndex();
         int endIndex = ctx.getStop().getStopIndex() + 1;
 
-        blockFactory.createJumpBlock(startIndex, endIndex);
+        blockFactory.createJumpBlock(startIndex, endIndex, getBlockReference(ctx));
     }
 
     private int getStatementEndIndex(List<TerminalNode> leftParenTokens, List<TerminalNode> rightParenTokens)
@@ -222,5 +224,13 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         } while(openParenTokens > 0);
 
         return nextRightParen.getSymbol().getStopIndex() + 1;
+    }
+
+    private BlockReference getBlockReference(ParserRuleContext ctx)
+    {
+        String refString = ctx.getRuleContext().getSourceInterval().a + "-" + ctx.getRuleContext().getSourceInterval().b;
+        BlockReference ref = new BlockReference(refString);
+
+        return ref;
     }
 }

@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
 
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.common.models.blocks.*;
@@ -47,19 +48,19 @@ public abstract class BlockFactory
         this.codeFile = codeFile;
     }
 
-    public abstract void createStatementBlock(int start, int end);
+    public abstract void createStatementBlock(int start, int end, BlockReference ref);
 
-    public abstract void createIterationBlock(int start, int end, boolean runAtLeastOnce);
+    public abstract void createIterationBlock(int start, int end, boolean runAtLeastOnce, BlockReference ref);
 
-    public abstract void createSelectionBlock(int start, int end);
+    public abstract void createSelectionBlock(int start, int end, BlockReference ref);
 
-    public abstract void createJumpBlock(int start, int end);
+    public abstract void createJumpBlock(int start, int end, BlockReference ref);
 
-    public abstract void addBooleanCaseStatement(boolean value);
+    public abstract void addBooleanCaseStatement(boolean value, BlockReference ref);
 
-    public abstract void addCaseStatement(int start, int end);
+    public abstract void addCaseStatement(int start, int end, BlockReference ref);
 
-    public abstract void createMethodBlock(String name, int start, int end);
+    public abstract void createMethodBlock(String name, int start, int end, BlockReference ref);
 
     public void exitCurrentBlock()
     {

@@ -13,7 +13,6 @@ import java.util.Vector;
 public class BasicBlockReductionRule extends BasicReductionRule implements ReductionRule
 {
     //TODO: Code segment layout fix!
-
     @Override
     public Block applyRule(Block model)
     {

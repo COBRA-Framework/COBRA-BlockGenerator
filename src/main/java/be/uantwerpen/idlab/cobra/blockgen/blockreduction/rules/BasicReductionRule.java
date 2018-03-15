@@ -1,11 +1,13 @@
 package be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules;
 
 import be.uantwerpen.idlab.cobra.blockgen.blockreduction.interfaces.ReductionRule;
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.common.models.blocks.BasicBlock;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -33,7 +35,24 @@ public abstract class BasicReductionRule implements ReductionRule
 
         replacementCodeSegment = new CodeSegment(codeFile, startIndex, endIndex);
 
+        //Parse new block reference index
+        Iterator<Block> it = blocks.iterator();
+        Block block = it.next();
+
+        String refString = block.getRef().toString();
+
+        while(it.hasNext())
+        {
+            block = it.next();
+
+            refString += "," + block.getRef().toString();
+        }
+
+        BlockReference ref = new BlockReference(refString);
+
         replacementBlock = new BasicBlock(replacementCodeSegment);
+
+        replacementBlock.setRef(ref);
 
         return replacementBlock;
     }

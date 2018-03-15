@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.models.blocks;
 
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
 
 import java.util.Vector;
@@ -10,6 +11,9 @@ import java.util.Vector;
 public interface Block
 {
     long getId();
+
+    void setRef(BlockReference ref);
+    BlockReference getRef();
 
     String getCodeString();
 

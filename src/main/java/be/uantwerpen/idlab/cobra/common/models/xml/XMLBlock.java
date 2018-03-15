@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.models.xml;
 
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 
 import java.util.List;
@@ -22,8 +23,9 @@ public abstract class XMLBlock implements XMLObject, Block
         String xml = new String();
         String typeName = this.getClass().getCanonicalName().split(BLOCK_NAMESPACE_ROOT)[1].substring(1);
         long id = this.getId();
+        BlockReference ref = this.getRef();
 
-        xml = "<block id=\"" + id + "\" type=\"" + typeName + "\">";
+        xml = "<block id=\"" + id + "\" ref=\"" + ref + "\" type=\"" + typeName + "\">";
 
         //Add block specific field elements
         for(XMLObject element : this.getXMLElements())

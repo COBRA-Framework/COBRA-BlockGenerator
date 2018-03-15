@@ -1,6 +1,7 @@
 package be.uantwerpen.idlab.cobra.common.models.blocks;
 
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
+import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLBlock;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLObject;
@@ -17,7 +18,8 @@ public class BasicBlock extends XMLBlock implements Block
     protected CodeSegment codeSegment;
     protected Block parentBlock;
     protected Vector<Block> childBlocks;
-    protected long id = 0;
+    protected long id = -1;
+    protected BlockReference blockRef;
 
     protected BasicBlock()
     {
@@ -27,6 +29,7 @@ public class BasicBlock extends XMLBlock implements Block
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
         this.id = BlockFactory.getNextBlockId();
+        this.blockRef = new BlockReference();
     }
 
     protected BasicBlock(long id)
@@ -37,6 +40,7 @@ public class BasicBlock extends XMLBlock implements Block
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
         this.id = id;
+        this.blockRef = new BlockReference();
     }
 
     public BasicBlock(CodeSegment codeSegment)
@@ -47,6 +51,7 @@ public class BasicBlock extends XMLBlock implements Block
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
         this.id = BlockFactory.getNextBlockId();
+        this.blockRef = new BlockReference();
     }
 
     public BasicBlock(long id, CodeSegment codeSegment)
@@ -57,11 +62,22 @@ public class BasicBlock extends XMLBlock implements Block
         this.parentBlock = null;
         this.childBlocks = new Vector<Block>();
         this.id = id;
+        this.blockRef = new BlockReference();
     }
 
     public long getId()
     {
         return this.id;
+    }
+
+    public void setRef(BlockReference ref)
+    {
+        this.blockRef = ref;
+    }
+
+    public BlockReference getRef()
+    {
+        return this.blockRef;
     }
 
     public CodeSegment getCodeSegment()

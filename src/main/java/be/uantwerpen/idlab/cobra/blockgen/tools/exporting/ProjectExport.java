@@ -15,7 +15,7 @@ import java.util.List;
 public class ProjectExport implements ExportTool
 {
     private static final int MAIN_VERSION = 1;
-    private static final int MINOR_VERSION = 1;
+    private static final int MINOR_VERSION = 2;
     private static final String eol = System.getProperty("line.separator");
 
     public int exportToXML(List<Block> models, String exportFile, String[] args) throws Exception

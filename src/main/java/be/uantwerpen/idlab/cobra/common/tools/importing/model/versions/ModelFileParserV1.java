@@ -1,9 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.tools.importing.model.versions;
 
-import be.uantwerpen.idlab.cobra.common.models.CodeFile;
-import be.uantwerpen.idlab.cobra.common.models.CodeSegment;
-import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
-import be.uantwerpen.idlab.cobra.common.models.SourceFile;
+import be.uantwerpen.idlab.cobra.common.models.*;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.common.tools.importing.model.ModelFileParser;
 import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
@@ -26,7 +23,7 @@ import java.util.List;
  */
 public class ModelFileParserV1 implements ModelFileParser
 {
-    private final static String VERSION = "1.1";
+    private final static String VERSION = "1.2";
     private final static String BLOCK_NAMESPACE_ROOT = "be.uantwerpen.idlab.cobra.common.models.blocks";
 
     public ModelFileParserV1()
@@ -144,6 +141,7 @@ public class ModelFileParserV1 implements ModelFileParser
         Object newInstance = null;
         long id = 0;
         String type = BLOCK_NAMESPACE_ROOT.concat("." + blockElement.getAttribute("type"));
+        BlockReference blockRef = new BlockReference(blockElement.getAttribute("ref"));
 
         try
         {
@@ -173,6 +171,9 @@ public class ModelFileParserV1 implements ModelFileParser
         {
             block = (Block)newInstance;
         }
+
+        //Set block reference
+        block.setRef(blockRef);
 
         //Set parameters with setter functions
         NodeList blockParameters = blockElement.getChildNodes();
