@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class BlockGenerationService
 {
-    public static SourceBlock parseProgramFile(SourceFile file, Grammar grammar) throws Exception
+    public static SourceBlock parseProgramFile(SourceFile file, int abstractionDepth, Grammar grammar) throws Exception
     {
         CodeParser codeParser = new Antlr();
 
@@ -27,6 +27,15 @@ public class BlockGenerationService
 
         //Parse file and generate block model
         blocks = codeParser.parseCodeFile(file, grammar);
+
+        //Apply abstraction depth reduction
+        if(abstractionDepth >= 0)
+        {
+            for(Block methodBlock : blocks)
+            {
+                applyAbstractionRuleRecursive(methodBlock, abstractionDepth);
+            }
+        }
 
         //Apply basic block reduction
         for(Block methodBlock : blocks)
@@ -68,11 +77,11 @@ public class BlockGenerationService
         }
     }
 
-    private static void applyAbstractionRuleRecursive(Block block, int abstractionLevel)
+    private static void applyAbstractionRuleRecursive(Block block, int abstractionDepth)
     {
         ReductionRule abstractionRule = new AbstractionReductionRule();
 
-        if(abstractionLevel <= 0)
+        if(abstractionDepth <= 0 && !SelectionBlock.class.isAssignableFrom(block.getClass()))
         {
             abstractionRule.applyRule(block);
         }
@@ -80,14 +89,14 @@ public class BlockGenerationService
         {
             for(Block childBlock : block.getChildBlocks())
             {
-                if(childBlock.getClass() == SelectionBlock.class)
+                if(SelectionBlock.class.isAssignableFrom(childBlock.getClass()))
                 {
                     //Case statements are the same abstraction level
-                    applyAbstractionRuleRecursive(childBlock, abstractionLevel);
+                    applyAbstractionRuleRecursive(childBlock, abstractionDepth);
                 }
                 else
                 {
-                    applyAbstractionRuleRecursive(childBlock, abstractionLevel - 1);
+                    applyAbstractionRuleRecursive(childBlock, abstractionDepth - 1);
                 }
             }
         }

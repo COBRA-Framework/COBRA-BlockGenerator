@@ -7,6 +7,7 @@ import be.uantwerpen.idlab.cobra.common.models.xml.XMLBlock;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -152,6 +153,20 @@ public class BasicBlock extends XMLBlock implements Block
         Block removedChild = this.childBlocks.remove(index);
 
         removedChild.setParentBlock(null);
+    }
+
+    public void removeChildBlocks()
+    {
+        Iterator<Block> it = this.childBlocks.iterator();
+
+        while(it.hasNext())
+        {
+            Block childBlock = it.next();
+
+            it.remove();
+
+            childBlock.setParentBlock(null);
+        }
     }
 
     public Vector<Block> getChildBlocks()

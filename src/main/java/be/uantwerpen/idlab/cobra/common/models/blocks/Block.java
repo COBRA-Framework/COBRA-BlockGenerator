@@ -24,6 +24,7 @@ public interface Block
     void addChildBlock(int index, Block child);
     void addChildBlock(Block child);
     void removeChildBlock(int index);
+    void removeChildBlocks();
     Vector<Block> getChildBlocks();
     Vector<Block> getDescendantBlocks();
     Vector<Block> getLeafs();

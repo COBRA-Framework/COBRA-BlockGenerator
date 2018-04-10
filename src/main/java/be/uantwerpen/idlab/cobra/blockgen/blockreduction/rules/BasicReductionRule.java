@@ -18,7 +18,7 @@ public abstract class BasicReductionRule implements ReductionRule
     protected Block concatBlocks(Vector<Block> blocks)
     {
         BasicBlock replacementBlock;
-        CodeSegment replacementCodeSegment;
+        CodeSegment replacementCodeSegment = null;
         CodeFile codeFile;
         int startIndex, endIndex;
 
@@ -28,15 +28,44 @@ public abstract class BasicReductionRule implements ReductionRule
             return null;
         }
 
-        codeFile = blocks.firstElement().getCodeSegment().getCodeFile();
+        CodeSegment firstChildCodeSegment = null;
+        CodeSegment lastChildCodeSegment = null;
+        Iterator<Block> it = blocks.iterator();
 
-        startIndex = blocks.firstElement().getCodeSegment().getStartIndex();
-        endIndex = blocks.lastElement().getCodeSegment().getEndIndex();
+        while(it.hasNext() && firstChildCodeSegment == null)
+        {
+            Block childBlock = it.next();
 
-        replacementCodeSegment = new CodeSegment(codeFile, startIndex, endIndex);
+            firstChildCodeSegment = childBlock.getCodeSegment();
+        }
+
+        if(firstChildCodeSegment != null)
+        {
+            codeFile = firstChildCodeSegment.getCodeFile();
+
+            while(it.hasNext())
+            {
+                Block childBlock = it.next();
+
+                if(childBlock.getCodeSegment() != null)
+                {
+                    lastChildCodeSegment = childBlock.getCodeSegment();
+                }
+            }
+
+            if(lastChildCodeSegment == null)
+            {
+                lastChildCodeSegment = firstChildCodeSegment;
+            }
+
+            startIndex = firstChildCodeSegment.getStartIndex();
+            endIndex = lastChildCodeSegment.getEndIndex();
+
+            replacementCodeSegment = new CodeSegment(codeFile, startIndex, endIndex);
+        }
 
         //Parse new block reference index
-        Iterator<Block> it = blocks.iterator();
+        it = blocks.iterator();
         Block block = it.next();
 
         String refString = block.getRef().toString();

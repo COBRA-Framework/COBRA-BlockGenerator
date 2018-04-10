@@ -12,6 +12,7 @@ public class ProjectConfig
     private String version;
     private List<SourceFile> sourceFiles;
     private Grammar grammar;
+    private int abstractionDepth;
 
     protected ProjectConfig()
     {
@@ -20,11 +21,17 @@ public class ProjectConfig
 
     public ProjectConfig(String name, String version, Grammar grammar)
     {
+        this(name, version, grammar, -1);
+    }
+
+    public ProjectConfig(String name, String version, Grammar grammar, int abstractionDepth)
+    {
         this();
 
         this.name = name;
         this.version = version;
         this.grammar = grammar;
+        this.abstractionDepth = abstractionDepth;
     }
 
     public ProjectConfig(String name, String version, Grammar grammar, SourceFile sourceFile)
@@ -34,9 +41,23 @@ public class ProjectConfig
         this.sourceFiles.add(sourceFile);
     }
 
+    public ProjectConfig(String name, String version, Grammar grammar, int abstractionDepth, SourceFile sourceFile)
+    {
+        this(name, version, grammar, abstractionDepth);
+
+        this.sourceFiles.add(sourceFile);
+    }
+
     public ProjectConfig(String name, String version, Grammar grammar, List<SourceFile> sourceFiles)
     {
         this(name, version, grammar);
+
+        this.sourceFiles = sourceFiles;
+    }
+
+    public ProjectConfig(String name, String version, Grammar grammar, int abstractionDepth, List<SourceFile> sourceFiles)
+    {
+        this(name, version, grammar, abstractionDepth);
 
         this.sourceFiles = sourceFiles;
     }
@@ -86,10 +107,20 @@ public class ProjectConfig
         this.sourceFiles.add(sourceFile);
     }
 
+    public int getAbstractionDepth()
+    {
+        return this.abstractionDepth;
+    }
+
+    public void setAbstractionDepth(int abstractionDepth)
+    {
+        this.abstractionDepth = abstractionDepth;
+    }
+
     @Override
     public String toString()
     {
-        String string = "Project: " + this.getName() + "\nVersion: " + this.getVersion() + "\nGrammar: " + this.getGrammar().name() + "\nSources:\n";
+        String string = "Project: " + this.getName() + "\nVersion: " + this.getVersion() + "\nGrammar: " + this.getGrammar().name() + (this.abstractionDepth >= 0 ? ("\nAbstraction depth: " + this.abstractionDepth) : "") + "\nSources:\n";
 
         for(SourceFile sourceFile : this.getSourceFiles())
         {

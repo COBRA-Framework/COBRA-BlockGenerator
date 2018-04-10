@@ -50,7 +50,7 @@ public class Main
                 //Generate models for each source file
                 for(SourceFile sourceFile : projectConfig.getSourceFiles())
                 {
-                    sourceBlocks.add((runBlockGenerator(sourceFile, projectConfig.getGrammar())));
+                    sourceBlocks.add((runBlockGenerator(sourceFile, projectConfig.getAbstractionDepth(), projectConfig.getGrammar())));
                 }
 
                 Terminal.printTerminalInfo("Exporting block model to project file...");
@@ -227,13 +227,13 @@ public class Main
         }
     }
 
-    private static SourceBlock runBlockGenerator(SourceFile file, Grammar grammar) throws Exception
+    private static SourceBlock runBlockGenerator(SourceFile file, int abstractionDepth, Grammar grammar) throws Exception
     {
         SourceBlock sourceBlock;
 
         Terminal.printTerminalInfo("Generating block model from file: " + file);
 
-        sourceBlock = BlockGenerationService.parseProgramFile(file, grammar);
+        sourceBlock = BlockGenerationService.parseProgramFile(file, abstractionDepth, grammar);
 
         Terminal.printTerminalInfo("Block generation complete!");
 

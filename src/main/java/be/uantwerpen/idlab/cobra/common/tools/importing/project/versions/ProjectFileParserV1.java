@@ -86,6 +86,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
         String version = null;
         List<SourceFile> sourceFiles = new ArrayList<SourceFile>();
         Grammar grammar = Grammar.UNKNOWN;
+        int abstractionDepth = -1;
 
         BufferedReader buffReader = null;
 
@@ -183,6 +184,29 @@ public class ProjectFileParserV1 implements ProjectFileParser
 
                     sourceFiles = parseSourceFiles(buffReader, projectFileLocation + System.getProperty("file.separator"));
                 }
+                else if(line.trim().startsWith("<abstraction>"))
+                {
+                    String abstractionDepthString;
+
+                    try
+                    {
+                        abstractionDepthString = line.split("<abstraction>", 2)[1];
+                        abstractionDepthString = abstractionDepthString.split("</abstraction>", 2)[0];
+                    }
+                    catch(Exception e)
+                    {
+                        throw new Exception("Could not parse abstraction field!", e);
+                    }
+
+                    try
+                    {
+                        abstractionDepth = Integer.parseInt(abstractionDepthString);
+                    }
+                    catch(NumberFormatException e)
+                    {
+                        throw new Exception("Abstraction tag contains a non-valid integer value: " + abstractionDepth, e);
+                    }
+                }
 
                 line = buffReader.readLine();
             }
@@ -199,7 +223,7 @@ public class ProjectFileParserV1 implements ProjectFileParser
             throw new Exception("Configuration file is corrupted! Missing or invalid configuration fields detected...");
         }
 
-        config = new ProjectConfig(name, version, grammar, sourceFiles);
+        config = new ProjectConfig(name, version, grammar, abstractionDepth, sourceFiles);
 
         return config;
     }
