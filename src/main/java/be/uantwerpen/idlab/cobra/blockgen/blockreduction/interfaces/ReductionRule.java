@@ -7,5 +7,5 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
  */
 public interface ReductionRule
 {
-    Block applyRule(Block model);
+    Block applyRule(Block model) throws Exception;
 }

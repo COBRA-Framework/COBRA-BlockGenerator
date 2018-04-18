@@ -14,7 +14,7 @@ public class BasicBlockReductionRule extends BasicReductionRule implements Reduc
 {
     //TODO: Code segment layout fix!
     @Override
-    public Block applyRule(Block model)
+    public Block applyRule(Block model) throws Exception
     {
         Vector<Block> newChildBlocks = new Vector<Block>();
         Vector<Block> replaceBlocks = new Vector<Block>();

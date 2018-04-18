@@ -9,7 +9,7 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 public class AbstractionReductionRule extends BasicReductionRule implements ReductionRule
 {
     @Override
-    public Block applyRule(Block model)
+    public Block applyRule(Block model) throws Exception
     {
         if(model.getNumOfChildren() == 0)
         {

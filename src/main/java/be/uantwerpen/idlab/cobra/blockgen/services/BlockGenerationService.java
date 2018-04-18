@@ -65,7 +65,7 @@ public class BlockGenerationService
         return programBlock;
     }
 
-    private static void applyReductionRuleRecursive(Block block)
+    private static void applyReductionRuleRecursive(Block block) throws Exception
     {
         ReductionRule blockReduction = new BasicBlockReductionRule();
 
@@ -77,7 +77,7 @@ public class BlockGenerationService
         }
     }
 
-    private static void applyAbstractionRuleRecursive(Block block, int abstractionDepth)
+    private static void applyAbstractionRuleRecursive(Block block, int abstractionDepth) throws Exception
     {
         ReductionRule abstractionRule = new AbstractionReductionRule();
 

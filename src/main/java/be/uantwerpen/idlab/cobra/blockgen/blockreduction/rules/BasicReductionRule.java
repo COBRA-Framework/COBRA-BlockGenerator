@@ -8,6 +8,7 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.BasicBlock;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 
 import java.util.Iterator;
+import java.util.Stack;
 import java.util.Vector;
 
 /**
@@ -15,7 +16,7 @@ import java.util.Vector;
  */
 public abstract class BasicReductionRule implements ReductionRule
 {
-    protected Block concatBlocks(Vector<Block> blocks)
+    protected Block concatBlocks(Vector<Block> blocks) throws Exception
     {
         BasicBlock replacementBlock;
         CodeSegment replacementCodeSegment = null;
@@ -61,6 +62,24 @@ public abstract class BasicReductionRule implements ReductionRule
             startIndex = firstChildCodeSegment.getStartIndex();
             endIndex = lastChildCodeSegment.getEndIndex();
 
+            int missingBrackets = detectOpenBrackets(codeFile.getCodeStream(), startIndex, endIndex);
+
+            while(missingBrackets > 0)
+            {
+                endIndex++;
+
+                if(endIndex >= codeFile.getCodeStream().length())
+                {
+                    throw new Exception("Failed to concatenate blocks. " + missingBrackets + " missing closing bracket(s) detected!");
+                }
+
+                char charIt = codeFile.getCodeStream().charAt(endIndex);
+                if(charIt == '}')
+                {
+                    missingBrackets--;
+                }
+            }
+
             replacementCodeSegment = new CodeSegment(codeFile, startIndex, endIndex);
         }
 
@@ -84,5 +103,25 @@ public abstract class BasicReductionRule implements ReductionRule
         replacementBlock.setRef(ref);
 
         return replacementBlock;
+    }
+
+    private int detectOpenBrackets(String codeString, int startIndex, int endIndex)
+    {
+        String substring = codeString.substring(startIndex, endIndex);
+        Stack<Character> bracketsStack = new Stack<Character>();
+
+        for(int i = 0; i < substring.length(); i++)
+        {
+            if(substring.charAt(i) == '{')
+            {
+                bracketsStack.push(substring.charAt(i));
+            }
+            else if(substring.charAt(i) == '}')
+            {
+                bracketsStack.pop();
+            }
+        }
+
+        return bracketsStack.size();
     }
 }
