@@ -1,6 +1,7 @@
 package be.uantwerpen.idlab.cobra.common.tools.importing.model.versions;
 
 import be.uantwerpen.idlab.cobra.common.models.*;
+import be.uantwerpen.idlab.cobra.common.models.blocks.AbstractionBlock;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.common.tools.importing.model.ModelFileParser;
 import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
@@ -23,7 +24,7 @@ import java.util.List;
  */
 public class ModelFileParserV1 implements ModelFileParser
 {
-    private final static String VERSION = "1.2";
+    private final static String VERSION = "1.3";
     private final static String BLOCK_NAMESPACE_ROOT = "be.uantwerpen.idlab.cobra.common.models.blocks";
 
     public ModelFileParserV1()
@@ -209,6 +210,23 @@ public class ModelFileParserV1 implements ModelFileParser
                 {
                     //Add code segment to current block
                     block.setCodeSegment(parseCodeSegment(parameterElement, config));
+                }
+                else if(parameterName.equals("abstracted_blocks"))
+                {
+                    //Add abstracted blocks to current block
+                    NodeList abstractedBlocks = parameterElement.getChildNodes();
+
+                    for(int j = 0; j < abstractedBlocks.getLength(); j++)
+                    {
+                        Node abstractedBlock = abstractedBlocks.item(j);
+
+                        if(abstractedBlock.getNodeType() == Node.ELEMENT_NODE)
+                        {
+                            Element abstractedElement = (Element)abstractedBlock;
+
+                            ((AbstractionBlock)block).addAbstractedBlock(parseBlock(abstractedElement, config));
+                        }
+                    }
                 }
                 else
                 {

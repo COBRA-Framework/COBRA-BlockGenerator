@@ -1,7 +1,11 @@
 package be.uantwerpen.idlab.cobra.blockgen.blockreduction.rules;
 
 import be.uantwerpen.idlab.cobra.blockgen.blockreduction.interfaces.ReductionRule;
+import be.uantwerpen.idlab.cobra.common.models.blocks.AbstractionBlock;
+import be.uantwerpen.idlab.cobra.common.models.blocks.BasicBlock;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
+
+import java.util.Vector;
 
 /**
  * Created by Thomas on 09/05/2016.
@@ -25,8 +29,19 @@ public class AbstractionReductionRule extends BasicReductionRule implements Redu
             return model;
         }
 
+        AbstractionBlock abstractedBlock = new AbstractionBlock((BasicBlock)reducedChildBlock);
+
+        //Make copy of vector
+        Vector<Block> abstractedBlocks = new Vector<Block>();
+        for(Block abstractedBlockIt : model.getChildBlocks())
+        {
+            abstractedBlocks.add(abstractedBlockIt);
+        }
+
+        abstractedBlock.setAbstractedBlocks(abstractedBlocks);
+
         model.removeChildBlocks();
-        model.addChildBlock(reducedChildBlock);
+        model.addChildBlock(abstractedBlock);
 
         return model;
     }
