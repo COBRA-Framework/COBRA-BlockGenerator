@@ -140,6 +140,9 @@ public class CBlockFactory extends BlockFactory
 
         iterationBlock.setRef(ref);
 
+        //To do detect loopbound
+        ((IterationBlock)iterationBlock).setLoopbound(1);
+
         currentBlockPointer.addChildBlock(iterationBlock);
 
         currentBlockPointer = iterationBlock;

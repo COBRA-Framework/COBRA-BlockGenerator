@@ -264,7 +264,13 @@ public class ModelFileParserV1 implements ModelFileParser
                             {
                                 method.invoke(block, parameterElement.getTextContent());
                             }
-                            else if(Number.class.isAssignableFrom(parameterType))
+                            else if(int.class.isAssignableFrom(parameterType) || Integer.class.isAssignableFrom(parameterType))
+                            {
+                                Integer value = Integer.parseInt(parameterElement.getTextContent());
+
+                                method.invoke(block, value);
+                            }
+                            else if(double.class.isAssignableFrom(parameterType) || Double.class.isAssignableFrom(parameterType))
                             {
                                 Double value = Double.parseDouble(parameterElement.getTextContent());
 

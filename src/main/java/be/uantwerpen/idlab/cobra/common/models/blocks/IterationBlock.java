@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class IterationBlock extends BasicBlock implements Block
 {
     protected String iterationCondition;
-    protected long loopbound;
+    protected int loopbound;
 
     protected IterationBlock()
     {
@@ -42,12 +42,12 @@ public abstract class IterationBlock extends BasicBlock implements Block
         this.iterationCondition = iterationCondition;
     }
 
-    public long getLoopbound()
+    public int getLoopbound()
     {
         return this.loopbound;
     }
 
-    public void setLoopbound(long loopbound)
+    public void setLoopbound(int loopbound)
     {
         this.loopbound = loopbound;
     }
