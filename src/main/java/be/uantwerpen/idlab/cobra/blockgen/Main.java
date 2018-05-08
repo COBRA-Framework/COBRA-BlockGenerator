@@ -1,5 +1,8 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.Scope;
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.VariableSymbol;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;
@@ -60,6 +63,23 @@ public class Main
                 projectExport.exportToXML((List<Block>)(Object)sourceBlocks, outputFolder + "model.xml", null);
 
                 Terminal.printTerminalInfo("Block model exported to: " + outputFolder + "model.xml");
+
+                /*
+                try
+                {
+                    SymbolTable table = new SymbolTable();
+                    table.insertScope("global", new Scope("global"));
+                    table.get("global").insertSymbol("counter", new VariableSymbol("int", "cnt"));
+                    table.insertScope("local", new Scope("local"));
+                    table.get("local").insertSymbol("iterator", new VariableSymbol("unsigned long", "i"));
+                    System.out.println(table.toString());
+                }
+                catch (Exception e)
+                {
+                    System.err.println(e.getMessage());
+                    e.printStackTrace();
+                }
+                */
 
                 if(showGraph)
                 {

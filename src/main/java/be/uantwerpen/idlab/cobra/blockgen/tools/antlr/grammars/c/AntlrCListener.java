@@ -2,6 +2,8 @@ package be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c;
 
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrListener;
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.CSymbolFactory;
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolFactory;
 import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import org.antlr.v4.grammar.c.CBaseListener;
 import org.antlr.v4.grammar.c.CParser;
@@ -17,6 +19,7 @@ import java.util.List;
 public class AntlrCListener extends CBaseListener implements AntlrListener
 {
     private BlockFactory blockFactory;
+    private SymbolFactory symbolFactory;
     private boolean firstCase = false;
 
     protected AntlrCListener()
@@ -24,11 +27,12 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         super();
     }
 
-    public AntlrCListener(BlockFactory blockFactory)
+    public AntlrCListener(BlockFactory blockFactory, SymbolFactory symbolFactory)
     {
         super();
 
         this.blockFactory = blockFactory;
+        this.symbolFactory = symbolFactory;
     }
 
     @Override
@@ -39,12 +43,14 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         String methodName = ctx.declarator().getText().split("\\(")[0];
 
         blockFactory.createMethodBlock(methodName, startIndex, endIndex, getBlockReference(ctx));
+        this.symbolFactory.pushToken(SymbolFactory.TokenType.FUNCTION_DEFINITION, ctx.getText());
     }
 
     @Override
     public void exitFunctionDefinition(CParser.FunctionDefinitionContext ctx)
     {
         blockFactory.exitCurrentBlock();
+        this.symbolFactory.exitScope();
     }
 
     @Override
@@ -75,6 +81,30 @@ public class AntlrCListener extends CBaseListener implements AntlrListener
         int endIndex = ctx.getStop().getStopIndex() + 1;
 
         blockFactory.createStatementBlock(startIndex, endIndex, getBlockReference(ctx));
+
+
+        this.symbolFactory.pushToken(SymbolFactory.TokenType.DECLARATION, ctx.getText());
+    }
+
+    @Override
+    public void enterTypeSpecifier(CParser.TypeSpecifierContext ctx)
+    {
+       this.symbolFactory.pushToken(SymbolFactory.TokenType.TYPE, ctx.getText());
+    }
+
+    @Override public void enterParameterList(CParser.ParameterListContext ctx)
+    {
+        this.symbolFactory.pushToken(SymbolFactory.TokenType.PARAMETER_LIST, ctx.getText());
+    }
+
+    @Override public void enterParameterDeclaration(CParser.ParameterDeclarationContext ctx)
+    {
+        this.symbolFactory.pushToken(SymbolFactory.TokenType.PARAMETER_DECLARATION, ctx.getText());
+    }
+
+    @Override public void enterDirectDeclarator(CParser.DirectDeclaratorContext ctx)
+    {
+        this.symbolFactory.pushToken(SymbolFactory.TokenType.DIRECT_DECLARATOR, ctx.getText());
     }
 
     @Override

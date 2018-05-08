@@ -1,5 +1,7 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.CSymbolFactory;
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolFactory;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;
@@ -17,11 +19,22 @@ import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrParser;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.FactoryErrorListener;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.grammars.CBlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
+import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +54,7 @@ public class Antlr implements CodeParser
         FactoryErrorListener factoryErrorListener;
         CharStream fileStream;
         BlockFactory blockParser;
+        SymbolFactory symbolFactory;
         CodeFile codeFile;
 
         Vector<Block> blocks = new Vector<Block>();
@@ -63,6 +77,9 @@ public class Antlr implements CodeParser
         factoryErrorListener = new FactoryErrorListener();
         blockParser.addErrorListener(factoryErrorListener);
 
+        //Create Symbol Factory
+	    symbolFactory = getSymbolFactory(grammar);
+
         //Get lexer
         lexer = getLexer(grammar, fileStream);
 
@@ -72,7 +89,7 @@ public class Antlr implements CodeParser
         parser.addErrorListener(parserErrorListener);
 
         //Get listener
-        listener = getListener(grammar, blockParser);
+        listener = getListener(grammar, blockParser, symbolFactory);
 
         //Walk tree and attach listener
         ParseTree tree = parser.getRootNode();
@@ -89,10 +106,48 @@ public class Antlr implements CodeParser
             throw new Exception("Errors are detected in the block builder. Block generation will be terminated!\n" + factoryErrorListener.toString());
         }
 
+	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+	    DocumentBuilder db = dbf.newDocumentBuilder();
+	    Document doc = db.newDocument();
+
+        doc.appendChild(symbolFactory.flush().toXMLNode(doc, null));
+
+	    TransformerFactory tf = TransformerFactory.newInstance();
+	    Transformer transformer = tf.newTransformer();
+
+	    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+
+	    DOMSource source = new DOMSource(doc);
+
+	    StreamResult stream = new StreamResult(new File("SymbolTable.xml"));
+	    transformer.transform(source, stream);
+
         return blockParser.getGeneratedBlocks();
     }
 
-    protected AntlrLexer getLexer(Grammar grammar, CharStream stream) throws Exception
+	protected SymbolFactory getSymbolFactory(Grammar grammar) throws Exception
+	{
+		SymbolFactory factory = null;
+
+		switch(grammar)
+		{
+			case C:
+			{
+				factory = new CSymbolFactory();
+				break;
+			}
+			default:
+			{
+				throw new Exception("Could not initialize symbol factory for grammar (" + grammar + "). Grammar unknown!");
+			}
+		}
+
+		return factory;
+	}
+
+	protected AntlrLexer getLexer(Grammar grammar, CharStream stream) throws Exception
     {
         AntlrLexer lexer = null;
 
@@ -145,7 +200,7 @@ public class Antlr implements CodeParser
         return parser;
     }
 
-    protected AntlrListener getListener(Grammar grammar, BlockFactory blockParser) throws Exception
+    protected AntlrListener getListener(Grammar grammar, BlockFactory blockParser, SymbolFactory symbolFactory) throws Exception
     {
         AntlrListener listener = null;
 
@@ -153,7 +208,7 @@ public class Antlr implements CodeParser
         {
             case C:
             {
-                listener = new AntlrCListener(blockParser);
+                listener = new AntlrCListener(blockParser, symbolFactory);
                 break;
             }
             case CPP:

@@ -4,6 +4,7 @@ import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;
 import be.uantwerpen.idlab.cobra.common.tools.importing.project.ProjectFileParser;
+import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 
 import java.io.BufferedReader;
 import java.io.File;
