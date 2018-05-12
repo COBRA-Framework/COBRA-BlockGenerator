@@ -6,6 +6,7 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.IterationBlock;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLElement;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -84,7 +85,7 @@ public class ForBlock extends IterationBlock
 
     public List<XMLObject> getXMLElements()
     {
-        List<XMLObject> elements = super.getXMLElements();
+        List<XMLObject> elements = new ArrayList<XMLObject>();
 
         //Element: init statement
         elements.add(new XMLElement("init_statement", this.initStatement));
