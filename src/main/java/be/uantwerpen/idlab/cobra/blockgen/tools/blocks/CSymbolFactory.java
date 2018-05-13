@@ -112,6 +112,7 @@ public class CSymbolFactory implements SymbolFactory
 				String name = this.strings.get(3);
 				String fullDecl = this.strings.get(2);
 				String sizeStr = fullDecl.substring(name.length() + 1, fullDecl.length() - 1);
+				//TODO: will throw an exception when a prototype function declaration had no parameters between the brackets (missing 'void')
 				int size = Integer.parseInt(sizeStr);
 
 				this.symbolTable.insert(this.currentScope, new ArraySymbol(type, name, size));
