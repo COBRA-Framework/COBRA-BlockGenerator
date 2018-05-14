@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
+import be.uantwerpen.idlab.cobra.blockgen.tools.loopboundanalysis.LoopboundAnalyser;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.Scope;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.VariableSymbol;
@@ -54,6 +55,14 @@ public class Main
                 for(SourceFile sourceFile : projectConfig.getSourceFiles())
                 {
                     sourceBlocks.add((runBlockGenerator(sourceFile, projectConfig.getAbstractionDepth(), projectConfig.getGrammar())));
+                }
+
+                Terminal.printTerminalInfo("Analyse iteration loop bounds...");
+
+                //Analyse iteration loop bounds
+                for(Block block : sourceBlocks)
+                {
+                    LoopboundAnalyser.analyseBlock(block, projectConfig.getGrammar());
                 }
 
                 Terminal.printTerminalInfo("Exporting block model to project file...");
