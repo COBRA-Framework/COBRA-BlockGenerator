@@ -1,5 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.models.blocks;
 
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLElement;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLObject;
 
@@ -12,6 +13,7 @@ import java.util.List;
 public class SourceBlock extends BasicBlock implements Block
 {
     private String sourceName;
+    private SymbolTable symbolTable;
 
     protected SourceBlock()
     {
@@ -33,6 +35,16 @@ public class SourceBlock extends BasicBlock implements Block
     public String getName()
     {
         return this.sourceName;
+    }
+
+    public SymbolTable getSymbolTable()
+    {
+        return this.symbolTable;
+    }
+
+    public void setSymbolTable(SymbolTable symbolTable)
+    {
+        this.symbolTable = symbolTable;
     }
 
     @Override

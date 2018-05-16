@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by Thomas on 30/11/2016.
  */
-public class ProjectExport implements ExportTool
+public class ModelExport
 {
     private static final int MAIN_VERSION = 1;
     private static final int MINOR_VERSION = 3;
@@ -38,10 +38,10 @@ public class ProjectExport implements ExportTool
             throw new IOException("Could not open file: " + exportFile + "\nMessage: " + e.getMessage(), e);
         }
 
-        return writeProjectFile(models, file);
+        return writeModelFile(models, file);
     }
 
-    private int writeProjectFile(List<Block> models, File file) throws Exception
+    private int writeModelFile(List<Block> models, File file) throws Exception
     {
         FileWriter writer;
         BufferedWriter buffWriter;
@@ -51,7 +51,7 @@ public class ProjectExport implements ExportTool
             writer = new FileWriter(file.getAbsoluteFile());
             buffWriter = new BufferedWriter(writer);
 
-            //Write project file introduction
+            //Write model file introduction
             String xmlProlog = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + eol;
             buffWriter.write(xmlProlog);
 
@@ -59,11 +59,11 @@ public class ProjectExport implements ExportTool
             xmlIntroductionComments = xmlIntroductionComments.concat("<!-- Copyright (c) 2016-2018 Thomas Huybrechts, IDLab, University of Antwerp, Belgium. All rights reserved. -->" + eol);
             buffWriter.write(xmlIntroductionComments);
 
-            //Write project file metadata
-            String projectMetaData = "<blockmodel>" + eol + "\t<version>" + MAIN_VERSION + "." + MINOR_VERSION + "</version>" + eol + "\t<models>" + eol;
-            buffWriter.write(projectMetaData);
+            //Write model file metadata
+            String modelMetaData = "<blockmodel>" + eol + "\t<version>" + MAIN_VERSION + "." + MINOR_VERSION + "</version>" + eol + "\t<models>" + eol;
+            buffWriter.write(modelMetaData);
 
-            //Write project file body
+            //Write model file body
             for(Block model : models)
             {
                 buffWriter.write("\t\t<model>" + eol);

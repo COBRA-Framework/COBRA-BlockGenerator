@@ -1,12 +1,10 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.CSymbolFactory;
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolFactory;
+import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.*;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;
 import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c.AntlrCLexer;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c.AntlrCListener;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c.AntlrCParser;
@@ -16,25 +14,13 @@ import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.cpp.AntlrCPPParse
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrLexer;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrListener;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrParser;
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.FactoryErrorListener;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.grammars.CBlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.CodeParser;
-import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +31,9 @@ import java.util.Vector;
  */
 public class Antlr implements CodeParser
 {
+    private BlockFactory blockFactory;
+    private SymbolFactory symbolFactory;
+
     public Vector<Block> parseCodeFile(SourceFile file, Grammar grammar) throws Exception
     {
         AntlrLexer lexer;
@@ -53,8 +42,6 @@ public class Antlr implements CodeParser
         ParserErrorListener parserErrorListener;
         FactoryErrorListener factoryErrorListener;
         CharStream fileStream;
-        BlockFactory blockParser;
-        SymbolFactory symbolFactory;
         CodeFile codeFile;
 
         Vector<Block> blocks = new Vector<Block>();
@@ -72,12 +59,12 @@ public class Antlr implements CodeParser
         //Create code file
         codeFile = new CodeFile(fileStream.getText(Interval.of(0, fileStream.size())), grammar.name(), fileStream.getSourceName(), file.getId());
 
-        //Create block parser
-        blockParser = getBlockFactory(grammar, codeFile);
+        //Create block factory
+        blockFactory = getBlockFactory(grammar, codeFile);
         factoryErrorListener = new FactoryErrorListener();
-        blockParser.addErrorListener(factoryErrorListener);
+        blockFactory.addErrorListener(factoryErrorListener);
 
-        //Create Symbol Factory
+        //Create symbol factory
 	    symbolFactory = getSymbolFactory(grammar);
 
         //Get lexer
@@ -89,7 +76,7 @@ public class Antlr implements CodeParser
         parser.addErrorListener(parserErrorListener);
 
         //Get listener
-        listener = getListener(grammar, blockParser, symbolFactory);
+        listener = getListener(grammar, blockFactory, symbolFactory);
 
         //Walk tree and attach listener
         ParseTree tree = parser.getRootNode();
@@ -106,46 +93,28 @@ public class Antlr implements CodeParser
             throw new Exception("Errors are detected in the block builder. Block generation will be terminated!\n" + factoryErrorListener.toString());
         }
 
-	    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    Document doc = db.newDocument();
-
-        doc.appendChild(symbolFactory.flush().toXMLNode(doc, null));
-
-	    TransformerFactory tf = TransformerFactory.newInstance();
-	    Transformer transformer = tf.newTransformer();
-
-	    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-	    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-	    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-
-	    DOMSource source = new DOMSource(doc);
-
-	    StreamResult stream = new StreamResult(new File("SymbolTable.xml"));
-	    transformer.transform(source, stream);
-
-        return blockParser.getGeneratedBlocks();
+        return blockFactory.getGeneratedBlocks();
     }
 
-	protected SymbolFactory getSymbolFactory(Grammar grammar) throws Exception
-	{
-		SymbolFactory factory = null;
+    public List<Block> getBlockModel() throws Exception
+    {
+        if(blockFactory == null)
+        {
+            throw new Exception("No block model present. Parse a code file first!");
+        }
 
-		switch(grammar)
-		{
-			case C:
-			{
-				factory = new CSymbolFactory();
-				break;
-			}
-			default:
-			{
-				throw new Exception("Could not initialize symbol factory for grammar (" + grammar + "). Grammar unknown!");
-			}
-		}
+        return blockFactory.getGeneratedBlocks();
+    }
 
-		return factory;
-	}
+    public SymbolTable getSymbolTable() throws Exception
+    {
+        if(symbolFactory == null)
+        {
+            throw new Exception("No block model present. Parse a code file first!");
+        }
+
+        return symbolFactory.flush();
+    }
 
 	protected AntlrLexer getLexer(Grammar grammar, CharStream stream) throws Exception
     {
@@ -239,6 +208,26 @@ public class Antlr implements CodeParser
             default:
             {
                 throw new Exception("Could not initialize block factory for grammar (" + grammar + "). Grammar unknown!");
+            }
+        }
+
+        return factory;
+    }
+
+    protected SymbolFactory getSymbolFactory(Grammar grammar) throws Exception
+    {
+        SymbolFactory factory = null;
+
+        switch(grammar)
+        {
+            case C:
+            {
+                factory = new CSymbolFactory();
+                break;
+            }
+            default:
+            {
+                throw new Exception("Could not initialize symbol factory for grammar (" + grammar + "). Grammar unknown!");
             }
         }
 

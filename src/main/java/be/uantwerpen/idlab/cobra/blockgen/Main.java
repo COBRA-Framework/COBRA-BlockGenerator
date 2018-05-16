@@ -1,9 +1,8 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.loopboundanalysis.LoopboundAnalyser;
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.Scope;
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.VariableSymbol;
+import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.SymbolExport;
+import be.uantwerpen.idlab.cobra.blockgen.tools.loopboundanalysis.LoopboundAnalyser;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;
@@ -11,7 +10,7 @@ import be.uantwerpen.idlab.cobra.common.models.blocks.Block;
 import be.uantwerpen.idlab.cobra.common.models.blocks.SourceBlock;
 import be.uantwerpen.idlab.cobra.blockgen.services.BlockGenerationService;
 import be.uantwerpen.idlab.cobra.blockgen.services.TerminalService;
-import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.ProjectExport;
+import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.ModelExport;
 import be.uantwerpen.idlab.cobra.common.tools.importing.project.ProjectFileManager;
 import be.uantwerpen.idlab.cobra.blockgen.tools.interfaces.GraphDisplay;
 import be.uantwerpen.idlab.cobra.blockgen.tools.jgraphx.JGraphX;
@@ -19,9 +18,7 @@ import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 
 import javax.swing.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * Created by Thomas on 18/03/2016.
@@ -65,30 +62,27 @@ public class Main
                     LoopboundAnalyser.analyseBlock(block, projectConfig.getGrammar());
                 }
 
-                Terminal.printTerminalInfo("Exporting block model to project file...");
+                Terminal.printTerminalInfo("Exporting block model to file...");
 
-                ProjectExport projectExport = new ProjectExport();
+                ModelExport modelExport = new ModelExport();
 
-                projectExport.exportToXML((List<Block>)(Object)sourceBlocks, outputFolder + "model.xml", null);
+                modelExport.exportToXML((List<Block>)(Object)sourceBlocks, outputFolder + "model.xml", null);
 
                 Terminal.printTerminalInfo("Block model exported to: " + outputFolder + "model.xml");
 
-                /*
-                try
+                Terminal.printTerminalInfo("Exporting symbol table to file...");
+
+                SymbolExport symbolExport = new SymbolExport();
+                List<SymbolTable> symbolTables = new ArrayList<SymbolTable>();
+
+                for(SourceBlock sourceBlock : sourceBlocks)
                 {
-                    SymbolTable table = new SymbolTable();
-                    table.insertScope("global", new Scope("global"));
-                    table.get("global").insertSymbol("counter", new VariableSymbol("int", "cnt"));
-                    table.insertScope("local", new Scope("local"));
-                    table.get("local").insertSymbol("iterator", new VariableSymbol("unsigned long", "i"));
-                    System.out.println(table.toString());
+                    symbolTables.add(sourceBlock.getSymbolTable());
                 }
-                catch (Exception e)
-                {
-                    System.err.println(e.getMessage());
-                    e.printStackTrace();
-                }
-                */
+
+                symbolExport.exportToXML(symbolTables, outputFolder + "symbols.xml");
+
+                Terminal.printTerminalInfo("Symbol table exported to: " + outputFolder + "symbols.xml");
 
                 if(showGraph)
                 {

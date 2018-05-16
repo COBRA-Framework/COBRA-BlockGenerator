@@ -62,6 +62,8 @@ public class BlockGenerationService
             programBlock.addChildBlock(methodBlock);
         }
 
+        programBlock.setSymbolTable(codeParser.getSymbolTable());
+
         return programBlock;
     }
 
