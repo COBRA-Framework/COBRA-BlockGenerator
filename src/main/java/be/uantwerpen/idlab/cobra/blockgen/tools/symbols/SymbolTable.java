@@ -1,6 +1,5 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
 
-import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -11,7 +10,7 @@ public class SymbolTable
 {
 	private LinkedList<Scope> scopes;
 
-	public SymbolTable ()
+	public SymbolTable()
 	{
 		this.scopes = new LinkedList<Scope>();
 	}
@@ -32,7 +31,7 @@ public class SymbolTable
 		return this.scopes.iterator();
 	}
 
-	public void insert (Scope scope, Symbol symbol)
+	public void insert(Scope scope, Symbol symbol)
 	{
 		if (this.scopes.indexOf(scope) == -1)
 		{
@@ -44,9 +43,9 @@ public class SymbolTable
 
 	public boolean contains(Scope scope)
 	{
-		for (Scope ownScope : this.scopes)
+		for(Scope ownScope : this.scopes)
 		{
-			if (ownScope.equals(scope))
+			if(ownScope.equals(scope))
 			{
 				return true;
 			}
@@ -55,11 +54,11 @@ public class SymbolTable
 		return false;
 	}
 
-	public String toString ()
+	public String toString()
 	{
 		StringBuilder resultBuilder = new StringBuilder();
 
-		for (Scope scope : this.scopes)
+		for(Scope scope : this.scopes)
 		{
 			resultBuilder.append(scope.toString());
 		}
@@ -67,18 +66,18 @@ public class SymbolTable
 		return resultBuilder.toString();
 	}
 
-	public Element toXMLNode (Document doc, Element parent)
+	public Element toXMLNode(Document doc, Element parent)
 	{
-		Element symbolTableElement = doc.createElement("SymbolTable");
+		Element symbolTableElement = doc.createElement("symbol_table");
 
-		for (Scope scope : this.scopes)
+		for(Scope scope : this.scopes)
 		{
 			symbolTableElement.appendChild(scope.toXMLNode(doc, symbolTableElement));
 		}
 
 		NodeList nodes = symbolTableElement.getChildNodes();
 
-		if (parent != null)
+		if(parent != null)
 		{
 			parent.appendChild(symbolTableElement);
 		}

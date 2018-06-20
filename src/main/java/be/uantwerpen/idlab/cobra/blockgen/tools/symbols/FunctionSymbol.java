@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -12,7 +12,7 @@ public class FunctionSymbol implements Symbol
 	private String name;
 	private ArrayList<ParameterSymbol> parameters;
 
-	public FunctionSymbol (String returnType, String name, List<ParameterSymbol> parameters)
+	public FunctionSymbol(String returnType, String name, List<ParameterSymbol> parameters)
 	{
 		this.returnType = returnType;
 		this.name = name;
@@ -22,19 +22,19 @@ public class FunctionSymbol implements Symbol
 	@Override
 	public Element toXMLNode(Document doc, Element parent)
 	{
-		Element symbolNode = doc.createElement("Function");
-		symbolNode.setAttribute("returnType", this.returnType);
+		Element symbolNode = doc.createElement("function");
+		symbolNode.setAttribute("return_type", this.returnType);
 		symbolNode.setAttribute("name", this.name);
 
 		/*
 		 *  If you uncomment this, parameters will be listed under functions and under the functions' scopes
-		for (ParameterSymbol parameter : this.parameters)
+		for(ParameterSymbol parameter : this.parameters)
 		{
 			parameter.toXMLNode(doc, symbolNode);
 		}
 		*/
 
-		if (parent != null)
+		if(parent != null)
 		{
 			parent.appendChild(symbolNode);
 		}
@@ -51,11 +51,11 @@ public class FunctionSymbol implements Symbol
 		stringBuilder.append(this.name);
 		stringBuilder.append('(');
 
-		for (int i = 0; i < this.parameters.size(); i++)
+		for(int i = 0; i < this.parameters.size(); i++)
 		{
 			stringBuilder.append(this.parameters.get(i).toString());
 
-			if ((i + 1) != this.parameters.size())
+			if((i + 1) != this.parameters.size())
 			{
 				stringBuilder.append(", ");
 			}

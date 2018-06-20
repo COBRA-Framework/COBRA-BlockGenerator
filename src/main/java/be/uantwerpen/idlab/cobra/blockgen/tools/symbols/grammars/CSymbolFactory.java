@@ -1,5 +1,6 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols.grammars;
 
+import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.*;
 import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import javafx.util.Pair;
 
@@ -32,38 +33,39 @@ public class CSymbolFactory implements SymbolFactory
 	 */
 	private void leaveScope()
 	{
-		if (this.currentScope.getParent() != null)
+		if(this.currentScope.getParent() != null)
 		{
 			this.currentScope = this.currentScope.getParent();
 		}
+
 		this.scopeExitQueued = false;
 	}
 
-	private boolean isParameter (int startIndex)
+	private boolean isParameter(int startIndex)
 	{
 		return (this.tokens.match(FUNCTION_PARAMETER, startIndex) != Sequence.END);
 	}
 
-	private void addFunctionDefinition (int numParams)
+	private void addFunctionDefinition(int numParams)
 	{
 		String returnType = this.strings.get(1);
 		String name = this.strings.get(3);
 
 		LinkedList<ParameterSymbol> parameters = new LinkedList<>();
 
-		for (int j = 0; j < numParams; j++)
+		for(int j = 0; j < numParams; j++)
 		{
 			int paramStartIndex = 7 + (j * 3);
 
 			parameters.add(new ParameterSymbol(this.strings.get(paramStartIndex + 1), this.strings.get(paramStartIndex + 2)));
 		}
 
-		Symbol functionSymbol  = new FunctionSymbol(returnType, name, parameters);
+		Symbol functionSymbol = new FunctionSymbol(returnType, name, parameters);
 
 		this.symbolTable.insert(this.currentScope, functionSymbol);
 		this.currentScope = new Scope(name, this.currentScope);
 
-		for (ParameterSymbol parameter : parameters)
+		for(ParameterSymbol parameter : parameters)
 		{
 			this.symbolTable.insert(this.currentScope, parameter);
 		}
@@ -79,13 +81,13 @@ public class CSymbolFactory implements SymbolFactory
 	 */
 	private boolean checkSingleVariable()
 	{
-		if (this.tokens.size() == 4)
+		if(this.tokens.size() == 4)
 		{
 			boolean variablePossible = (this.tokens.match(SINGLE_VARIABLE_DECLARATION) != -1) || (this.tokens.match(SINGLE_VARIABLE_INITIALIZATION) != -1);
 
 			variablePossible &= !(this.tokens.get(3) == TokenType.DIRECT_DECLARATOR);
 
-			if (variablePossible)
+			if(variablePossible)
 			{
 				this.symbolTable.insert(this.currentScope, new VariableSymbol(this.strings.get(1), this.strings.get(2)));
 				this.strings.clear();
@@ -100,13 +102,13 @@ public class CSymbolFactory implements SymbolFactory
 
 	private boolean checkArrayVariable()
 	{
-		if (this.tokens.size() == 5)
+		if(this.tokens.size() == 5)
 		{
 			boolean arrayPossible = (this.tokens.match(ARRAY_VARIABLE_DECLARATION) != -1);
 
 			arrayPossible &= !(this.tokens.get(4) == TokenType.PARAMETER_LIST);
 
-			if (arrayPossible)
+			if(arrayPossible)
 			{
 				String type = this.strings.get(1);
 				String name = this.strings.get(3);
@@ -144,9 +146,9 @@ public class CSymbolFactory implements SymbolFactory
 	 * 14. Type Token                   int
 	 * 15. Direct Declarator Token      dir
 	 */
-	private boolean checkFunctionDeclaration (Pair<TokenType, String> pair)
+	private boolean checkFunctionDeclaration(Pair<TokenType, String> pair)
 	{
-		if (this.tokens.size() >= NO_ARGUMENT_FUNCTION_SIZE)
+		if(this.tokens.size() >= NO_ARGUMENT_FUNCTION_SIZE)
 		{
 			boolean functionPossible = this.tokens.match(FUNCTION_DECLARATION) != -1;
 
@@ -154,24 +156,24 @@ public class CSymbolFactory implements SymbolFactory
 			int numParams = 0;
 			int i = 4;
 
-			while ((i < this.tokens.size()) && (this.tokens.get(i) == TokenType.PARAMETER_LIST))    // Count function parameters, functions with a single 'void' parameter are counted as having a single parameter right now
+			while((i < this.tokens.size()) && (this.tokens.get(i) == TokenType.PARAMETER_LIST))    // Count function parameters, functions with a single 'void' parameter are counted as having a single parameter right now
 			{
 				numParams++;
 				i++;
 			}
 
-			if ((this.tokens.size() == (NO_ARGUMENT_FUNCTION_SIZE + 1)) && (numParams == 1))
+			if((this.tokens.size() == (NO_ARGUMENT_FUNCTION_SIZE + 1)) && (numParams == 1))
 			{
-				if (this.tokens.get(NO_ARGUMENT_FUNCTION_SIZE) != TokenType.DIRECT_DECLARATOR)  // Function with a single void parameter = Function with no arguments
+				if(this.tokens.get(NO_ARGUMENT_FUNCTION_SIZE) != TokenType.DIRECT_DECLARATOR)  // Function with a single void parameter = Function with no arguments
 				{
 					numParams = 0;
 
-					if (functionPossible)   // There currently is a function worth of tokenPairs in the list
+					if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 					{
 						this.strings.clear();
 						this.tokens.clear();
 
-						if ((pair.getKey() != null) && (pair.getValue() != null))
+						if((pair.getKey() != null) && (pair.getValue() != null))
 						{
 							this.strings.add(pair.getValue());
 							this.tokens.insert(pair.getKey());
@@ -182,16 +184,16 @@ public class CSymbolFactory implements SymbolFactory
 				}
 			}
 
-			if (this.tokens.size() == (4 + numParams + (3 * numParams)))
+			if(this.tokens.size() == (4 + numParams + (3 * numParams)))
 			{
-				for (int j = 0; j < numParams; j++)
+				for(int j = 0; j < numParams; j++)
 				{
 					int listIndex = 4 + numParams + (j * 3);
 
 					functionPossible &= this.isParameter(listIndex);
 				}
 
-				if (functionPossible)   // There currently is a function worth of tokenPairs in the list
+				if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 				{
 					this.strings.clear();
 					this.tokens.clear();
@@ -221,32 +223,32 @@ public class CSymbolFactory implements SymbolFactory
 	 * 14. Type Token                   int
 	 * 15. Direct Declarator Token      dir
 	 */
-	private boolean checkFunctionDefinition (Pair<TokenType, String> pair)
+	private boolean checkFunctionDefinition(Pair<TokenType, String> pair)
 	{
-		if (this.tokens.size() >= NO_ARGUMENT_FUNCTION_SIZE)
+		if(this.tokens.size() >= NO_ARGUMENT_FUNCTION_SIZE)
 		{
 			boolean functionPossible = this.tokens.match(FUNCTION_DEFINITION) != -1;
 
 			int numParams = 0;
 			int i = 4;
 
-			while ((i < this.tokens.size() && (this.tokens.get(i) == TokenType.PARAMETER_LIST)))    // Count function parameters, functions with a single 'void' parameter are counted as having a single parameter right now
+			while((i < this.tokens.size() && (this.tokens.get(i) == TokenType.PARAMETER_LIST)))    // Count function parameters, functions with a single 'void' parameter are counted as having a single parameter right now
 			{
 				numParams++;
 				i++;
 			}
 
-			if ((this.tokens.size() == (NO_ARGUMENT_FUNCTION_SIZE + 1)) && (numParams == 1))
+			if((this.tokens.size() == (NO_ARGUMENT_FUNCTION_SIZE + 1)) && (numParams == 1))
 			{
-				if (this.tokens.get(NO_ARGUMENT_FUNCTION_SIZE) != TokenType.DIRECT_DECLARATOR)  // Function with a single void parameter = Function with no arguments
+				if(this.tokens.get(NO_ARGUMENT_FUNCTION_SIZE) != TokenType.DIRECT_DECLARATOR)  // Function with a single void parameter = Function with no arguments
 				{
 					numParams = 0;
 
-					if (functionPossible)   // There currently is a function worth of tokenPairs in the list
+					if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 					{
 						this.addFunctionDefinition(numParams);
 
-						if ((pair.getKey() != null) && (pair.getValue() != null))
+						if((pair.getKey() != null) && (pair.getValue() != null))
 						{
 							this.strings.add(pair.getValue());
 							this.tokens.insert(pair.getKey());
@@ -256,12 +258,12 @@ public class CSymbolFactory implements SymbolFactory
 					}
 				}
 			}
-			else if ((this.tokens.size() == (NO_ARGUMENT_FUNCTION_SIZE)) && (numParams == 1) && (pair.getKey() == null) && (pair.getValue() == null))
+			else if((this.tokens.size() == (NO_ARGUMENT_FUNCTION_SIZE)) && (numParams == 1) && (pair.getKey() == null) && (pair.getValue() == null))
 			{
 				//todo: Check for end of compilation unit
 				// This method was called from the flush method, we don't need to check if the next parameter is a direct declarator, because there won't be one
 
-				if (functionPossible)   // There currently is a function worth of tokenPairs in the list
+				if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 				{
 					this.addFunctionDefinition(0);
 
@@ -269,16 +271,16 @@ public class CSymbolFactory implements SymbolFactory
 				}
 			}
 
-			if (this.tokens.size() == (4 + numParams + (3 * numParams)))
+			if(this.tokens.size() == (4 + numParams + (3 * numParams)))
 			{
-				for (int j = 0; j < numParams; j++)
+				for(int j = 0; j < numParams; j++)
 				{
 					int listIndex = 4 + numParams + (j * 3);
 
 					functionPossible &= this.isParameter(listIndex);
 				}
 
-				if (functionPossible)   // There currently is a function worth of tokenPairs in the list
+				if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 				{
 					this.addFunctionDefinition(numParams);
 
@@ -302,7 +304,7 @@ public class CSymbolFactory implements SymbolFactory
 	}
 
 	@Override
-	public SymbolTable flush ()
+	public SymbolTable flush()
 	{
 		//todo: Note to people optimizing this software:
 		//      This method can return after each of these checks, based on the result (true = return early)
@@ -312,12 +314,12 @@ public class CSymbolFactory implements SymbolFactory
 		this.checkArrayVariable();
 		this.checkSingleVariable();
 
-		if (!this.symbolTable.contains(this.currentScope))
+		if(!this.symbolTable.contains(this.currentScope))
 		{
 			this.symbolTable.insertScope(this.currentScope);
 		}
 
-		if (this.tokens.size() > 0)
+		if(this.tokens.size() > 0)
 		{
 			Terminal.printTerminalWarning("There were still " + this.tokens.size() + " tokens left in the stream when flush() was called.");
 		}
@@ -326,14 +328,20 @@ public class CSymbolFactory implements SymbolFactory
 	}
 
 	@Override
-	public void pushToken (TokenType type, String value)
+	public SymbolTable getGeneratedSymbolTable()
+	{
+		return this.symbolTable;
+	}
+
+	@Override
+	public void pushToken(TokenType type, String value)
 	{
 		this.tokens.insert(type);
 		this.strings.add(value);
 
-		if (this.checkFunctionDeclaration(new Pair<TokenType, String>(type, value)))
+		if(this.checkFunctionDeclaration(new Pair<TokenType, String>(type, value)))
 		{
-			if (this.scopeExitQueued)
+			if(this.scopeExitQueued)
 			{
 				this.leaveScope();
 			}
@@ -342,9 +350,9 @@ public class CSymbolFactory implements SymbolFactory
 		}
 
 
-		if (this.checkFunctionDefinition(new Pair<TokenType, String>(type, value)))
+		if(this.checkFunctionDefinition(new Pair<TokenType, String>(type, value)))
 		{
-			if (this.scopeExitQueued)
+			if(this.scopeExitQueued)
 			{
 				this.leaveScope();
 			}
@@ -352,13 +360,13 @@ public class CSymbolFactory implements SymbolFactory
 			return;
 		}
 
-		if (this.checkArrayVariable())
+		if(this.checkArrayVariable())
 		{
 			// Re-add the final token because we waited 1 token 'too long' to be sure this isn't a function
 			this.strings.add(value);
 			this.tokens.insert(type);
 
-			if (this.scopeExitQueued)
+			if(this.scopeExitQueued)
 			{
 				this.leaveScope();
 			}
@@ -366,13 +374,13 @@ public class CSymbolFactory implements SymbolFactory
 			return;
 		}
 
-		if (this.checkSingleVariable())
+		if(this.checkSingleVariable())
 		{
 			// Re-add the final token because we waited 1 token 'too long' to be sure this isn't a function
 			this.strings.add(value);
 			this.tokens.insert(type);
 
-			if (this.scopeExitQueued)
+			if(this.scopeExitQueued)
 			{
 				this.leaveScope();
 			}
@@ -384,7 +392,7 @@ public class CSymbolFactory implements SymbolFactory
 	 * This creates a 'token' delay, to prevent problems with certain sequences needing a look-ahead
 	 */
 	@Override
-	public void exitScope ()
+	public void exitScope()
 	{
 		this.scopeExitQueued = true;
 	}

@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
 
 /**
  *  This interface represents a language-agnostic Factory class, that creates a symbol table from a stream of ANTLR rule-matches
@@ -15,14 +15,16 @@ public interface SymbolFactory
 		PARAMETER_DECLARATION,
 		PARAMETER_LIST,
 		TYPE,
-		FUNCTION_DEFINITION,
+		FUNCTION_DEFINITION
 	}
 
 	/**
 	 * This method should be called after the entire file has been parsed, it will flush the last tokens from the queue
 	 * @return
 	 */
-	SymbolTable flush ();
+	SymbolTable flush();
+
+	SymbolTable getGeneratedSymbolTable();
 
 	/**
 	 * This method should be called any time one of the tokens in TokenType is encountered.
@@ -30,7 +32,7 @@ public interface SymbolFactory
 	 * @param type      The type of token to be added to the sequence
 	 * @param value     The string value of the token
 	 */
-	void pushToken (TokenType type, String value);
+	void pushToken(TokenType type, String value);
 
-	void exitScope ();
+	void exitScope();
 }

@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.exporting;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
+import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolTable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -50,7 +50,7 @@ public class SymbolExport
         Document doc = db.newDocument();
 
         //Create root element
-        Element rootElement = doc.createElement("SymbolTables");
+        Element rootElement = doc.createElement("symbol_tables");
         doc.appendChild(rootElement);
 
         for(SymbolTable table : tables)

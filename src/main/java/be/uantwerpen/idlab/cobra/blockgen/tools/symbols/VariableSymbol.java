@@ -1,32 +1,31 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ParameterSymbol implements Symbol
+public class VariableSymbol implements Symbol
 {
 	private String type;
 	private String identifier;
 
-	public ParameterSymbol(String type, String identifier)
+	public VariableSymbol(String type, String identifier)
 	{
 		this.type = type;
 		this.identifier = identifier;
 	}
 
-	public String toString ()
+	public String toString()
 	{
 		return this.type + " " + this.identifier;
 	}
 
-	@Override
-	public Element toXMLNode (Document doc, Element parent)
+	public Element toXMLNode(Document doc, Element parent)
 	{
-		Element symbolNode = doc.createElement("Parameter");
+		Element symbolNode = doc.createElement("variable");
 		symbolNode.setAttribute("type", this.type);
 		symbolNode.setAttribute("id", this.identifier);
 
-		if (parent != null)
+		if(parent != null)
 		{
 			parent.appendChild(symbolNode);
 		}

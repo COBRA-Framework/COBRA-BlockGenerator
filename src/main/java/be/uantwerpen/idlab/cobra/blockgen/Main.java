@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
+import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolTable;
 import be.uantwerpen.idlab.cobra.blockgen.tools.exporting.SymbolExport;
 import be.uantwerpen.idlab.cobra.blockgen.tools.loopboundanalysis.LoopboundAnalyser;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;

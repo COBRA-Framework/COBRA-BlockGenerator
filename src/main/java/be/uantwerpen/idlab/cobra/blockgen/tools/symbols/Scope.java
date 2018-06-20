@@ -1,11 +1,8 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
 
-import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
-import com.sun.corba.se.impl.io.TypeMismatchException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,14 +13,14 @@ public class Scope
 	private String name;
 	private LinkedList<Symbol> symbols;
 
-	public Scope (String name, Scope parent)
+	public Scope(String name, Scope parent)
 	{
 		this.parent = parent;
 		this.name = name;
 		this.symbols = new LinkedList<Symbol>();
 	}
 
-	public Scope (String name, Scope parent, LinkedList<Symbol> symbols)
+	public Scope(String name, Scope parent, LinkedList<Symbol> symbols)
 	{
 		this.parent = parent;
 		this.name = name;
@@ -33,6 +30,7 @@ public class Scope
 	public Scope insertSymbol(Symbol symbol)
 	{
 		this.symbols.add(symbol);
+
 		return this;
 	}
 
@@ -41,7 +39,7 @@ public class Scope
 		return this.parent;
 	}
 
-	public List<Symbol> getList ()
+	public List<Symbol> getList()
 	{
 		return this.symbols;
 	}
@@ -51,11 +49,11 @@ public class Scope
 		return this.symbols.iterator();
 	}
 
-	public String toString (int level)
+	public String toString(int level)
 	{
 		StringBuilder resultBuilder = new StringBuilder();
 
-		for (int i = 0; i < level; i++)
+		for(int i = 0; i < level; i++)
 		{
 			resultBuilder.append('\t');
 		}
@@ -63,16 +61,16 @@ public class Scope
 		resultBuilder.append(this.name);
 		resultBuilder.append('\n');
 
-		for (int i = 0; i < level; i++)
+		for(int i = 0; i < level; i++)
 		{
 			resultBuilder.append('\t');
 		}
 
 		resultBuilder.append("{\n");
 
-		for (Symbol symbol : this.symbols)
+		for(Symbol symbol : this.symbols)
 		{
-			for (int i = 0; i < (level + 1); i++)
+			for(int i = 0; i < (level + 1); i++)
 			{
 				resultBuilder.append('\t');
 			}
@@ -84,7 +82,7 @@ public class Scope
 		// Recurisve Symbol Table:
 		// You can recursively call toString() here, don't forget to call it with 'level + 1' as the argument!
 
-		for (int i = 0; i < (level + 1); i++)
+		for(int i = 0; i < (level + 1); i++)
 		{
 			resultBuilder.append('\t');
 		}
@@ -101,13 +99,13 @@ public class Scope
 		resultBuilder.append(this.name);
 		resultBuilder.append("\n{\n");
 
-		for (Symbol symbol : this.symbols)
+		for(Symbol symbol : this.symbols)
 		{
 			resultBuilder.append(symbol.toString());
 			resultBuilder.append('\n');
 		}
 
-		// Recurisve Symbol Table:
+		// Recursive Symbol Table:
 		// You can recursively call toString() here, don't forget to call it with '1' as the argument!
 
 		resultBuilder.append("}\n");
@@ -115,12 +113,12 @@ public class Scope
 		return resultBuilder.toString();
 	}
 
-	public Element toXMLNode (Document doc, Element parent)
+	public Element toXMLNode(Document doc, Element parent)
 	{
-		Element scopeElement = doc.createElement("Scope");
+		Element scopeElement = doc.createElement("scope");
 		scopeElement.setAttribute("name", this.name);
 
-		for (Symbol symbol : this.symbols)
+		for(Symbol symbol : this.symbols)
 		{
 			scopeElement.appendChild(symbol.toXMLNode(doc, scopeElement));
 		}
@@ -128,7 +126,7 @@ public class Scope
 		// Recurisve Symbol Table:
 		// You can recursively add children here, don't forget to pass 'scopeElement' as parent!
 
-		if (parent != null)
+		if(parent != null)
 		{
 			parent.appendChild(scopeElement);
 		}
@@ -139,11 +137,11 @@ public class Scope
 	@Override
 	public boolean equals (Object other)
 	{
-		if (other instanceof Scope)
+		if(other instanceof Scope)
 		{
 			Scope otherScope = (Scope) other;
 
-			if ((this.parent != null) && (otherScope.parent != null))
+			if((this.parent != null) && (otherScope.parent != null))
 			{
 				return (this.name.equals(otherScope.name)) && (this.parent.equals(otherScope.parent));
 			}

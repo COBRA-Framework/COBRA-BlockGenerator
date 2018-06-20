@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.blocks;
+package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,19 +16,19 @@ public class ArraySymbol implements Symbol
 		this.size = size;
 	}
 
-	public String toString ()
+	public String toString()
 	{
 		return this.type + " " + this.identifier + "[" + this.size + "]";
 	}
 
-	public Element toXMLNode (Document doc, Element parent)
+	public Element toXMLNode(Document doc, Element parent)
 	{
-		Element symbolNode = doc.createElement("Array");
+		Element symbolNode = doc.createElement("array");
 		symbolNode.setAttribute("type", this.type);
 		symbolNode.setAttribute("id", this.identifier);
 		symbolNode.setAttribute("size", Integer.toString(this.size));
 
-		if (parent != null)
+		if(parent != null)
 		{
 			parent.appendChild(symbolNode);
 		}

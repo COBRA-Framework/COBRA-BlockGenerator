@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.models.blocks;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.SymbolTable;
+import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolTable;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLElement;
 import be.uantwerpen.idlab.cobra.common.models.xml.XMLObject;
 
