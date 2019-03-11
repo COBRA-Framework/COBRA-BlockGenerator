@@ -2,7 +2,7 @@ package be.uantwerpen.idlab.cobra.blockgen.tools.antlr.grammars.c;
 
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.BlockFactory;
 import be.uantwerpen.idlab.cobra.blockgen.tools.antlr.interfaces.AntlrListener;
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolFactory;
+import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolFactory;
 import be.uantwerpen.idlab.cobra.common.models.BlockReference;
 import org.antlr.v4.grammar.c.CBaseListener;
 import org.antlr.v4.grammar.c.CParser;

@@ -1,6 +1,6 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.symbols.grammars;
+package be.uantwerpen.idlab.cobra.common.models.symbols.grammars;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.*;
+import be.uantwerpen.idlab.cobra.common.models.symbols.*;
 import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import javafx.util.Pair;
 

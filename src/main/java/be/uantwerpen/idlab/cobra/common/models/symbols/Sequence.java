@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
+package be.uantwerpen.idlab.cobra.common.models.symbols;
 
 import java.util.LinkedList;
 import java.util.List;

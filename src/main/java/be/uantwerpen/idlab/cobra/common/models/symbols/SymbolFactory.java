@@ -1,4 +1,4 @@
-package be.uantwerpen.idlab.cobra.blockgen.tools.symbols;
+package be.uantwerpen.idlab.cobra.common.models.symbols;
 
 /**
  *  This interface represents a language-agnostic Factory class, that creates a symbol table from a stream of ANTLR rule-matches

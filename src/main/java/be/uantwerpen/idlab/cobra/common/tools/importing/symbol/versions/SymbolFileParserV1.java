@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.common.tools.importing.symbol.versions;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.*;
+import be.uantwerpen.idlab.cobra.common.models.symbols.*;
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.common.tools.importing.symbol.SymbolFileParser;
 import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;

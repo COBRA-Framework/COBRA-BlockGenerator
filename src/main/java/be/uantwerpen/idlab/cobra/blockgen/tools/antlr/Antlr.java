@@ -1,9 +1,9 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.*;
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.grammars.CSymbolFactory;
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolFactory;
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolTable;
+import be.uantwerpen.idlab.cobra.common.models.symbols.grammars.CSymbolFactory;
+import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolFactory;
+import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolTable;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
 import be.uantwerpen.idlab.cobra.common.models.SourceFile;

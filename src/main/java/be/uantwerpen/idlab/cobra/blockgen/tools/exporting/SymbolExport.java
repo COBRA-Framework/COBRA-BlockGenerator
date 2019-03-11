@@ -1,6 +1,6 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.exporting;
 
-import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolTable;
+import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolTable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
