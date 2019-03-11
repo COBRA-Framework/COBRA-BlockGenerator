@@ -8,7 +8,7 @@ import java.util.*;
 
 public class SymbolTable
 {
-	private LinkedList<Scope> scopes;
+	private List<Scope> scopes;
 
 	public SymbolTable()
 	{
@@ -33,7 +33,7 @@ public class SymbolTable
 
 	public void insert(Scope scope, Symbol symbol)
 	{
-		if (this.scopes.indexOf(scope) == -1)
+		if(this.scopes.indexOf(scope) == -1)
 		{
 			this.scopes.add(scope);
 		}
@@ -43,15 +43,7 @@ public class SymbolTable
 
 	public boolean contains(Scope scope)
 	{
-		for(Scope ownScope : this.scopes)
-		{
-			if(ownScope.equals(scope))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return this.scopes.contains(scope);
 	}
 
 	public String toString()
@@ -68,7 +60,7 @@ public class SymbolTable
 
 	public Element toXMLNode(Document doc, Element parent)
 	{
-		Element symbolTableElement = doc.createElement("symbol_table");
+		Element symbolTableElement = doc.createElement("table");
 
 		for(Scope scope : this.scopes)
 		{

@@ -23,7 +23,7 @@ public class CSymbolFactory implements SymbolFactory
 	private boolean scopeExitQueued;
 
 	private Sequence<TokenType> tokens;
-	private LinkedList<String> strings;
+	private LinkedList<String> stringTokens;
 
 	private Scope currentScope;
 	private SymbolTable symbolTable;
@@ -48,8 +48,8 @@ public class CSymbolFactory implements SymbolFactory
 
 	private void addFunctionDefinition(int numParams)
 	{
-		String returnType = this.strings.get(1);
-		String name = this.strings.get(3);
+		String returnType = this.stringTokens.get(1);
+		String name = this.stringTokens.get(3);
 
 		LinkedList<ParameterSymbol> parameters = new LinkedList<>();
 
@@ -57,7 +57,7 @@ public class CSymbolFactory implements SymbolFactory
 		{
 			int paramStartIndex = 7 + (j * 3);
 
-			parameters.add(new ParameterSymbol(this.strings.get(paramStartIndex + 1), this.strings.get(paramStartIndex + 2)));
+			parameters.add(new ParameterSymbol(this.stringTokens.get(paramStartIndex + 1), this.stringTokens.get(paramStartIndex + 2)));
 		}
 
 		Symbol functionSymbol = new FunctionSymbol(returnType, name, parameters);
@@ -70,7 +70,7 @@ public class CSymbolFactory implements SymbolFactory
 			this.symbolTable.insert(this.currentScope, parameter);
 		}
 
-		this.strings.clear();   // Clear the list
+		this.stringTokens.clear();   // Clear the list
 		this.tokens.clear();
 	}
 
@@ -89,8 +89,8 @@ public class CSymbolFactory implements SymbolFactory
 
 			if(variablePossible)
 			{
-				this.symbolTable.insert(this.currentScope, new VariableSymbol(this.strings.get(1), this.strings.get(2)));
-				this.strings.clear();
+				this.symbolTable.insert(this.currentScope, new VariableSymbol(this.stringTokens.get(1), this.stringTokens.get(2)));
+				this.stringTokens.clear();
 				this.tokens.clear();
 
 				return true;
@@ -110,15 +110,24 @@ public class CSymbolFactory implements SymbolFactory
 
 			if(arrayPossible)
 			{
-				String type = this.strings.get(1);
-				String name = this.strings.get(3);
-				String fullDecl = this.strings.get(2);
+				String type = this.stringTokens.get(1);
+				String name = this.stringTokens.get(3);
+				String fullDecl = this.stringTokens.get(2);
 				String sizeStr = fullDecl.substring(name.length() + 1, fullDecl.length() - 1);
-				//TODO: will throw an exception when a prototype function declaration had no parameters between the brackets (missing 'void')
-				int size = Integer.parseInt(sizeStr);
+				int size;
+
+				try
+				{
+					size = Integer.parseInt(sizeStr);
+				}
+				catch(NumberFormatException e)
+				{
+					//Array size not defined (prototype declaration)
+					size = -1;
+				}
 
 				this.symbolTable.insert(this.currentScope, new ArraySymbol(type, name, size));
-				this.strings.clear();
+				this.stringTokens.clear();
 				this.tokens.clear();
 
 				return true;
@@ -133,10 +142,10 @@ public class CSymbolFactory implements SymbolFactory
 	 * 1. Type Token                    void                                                    void
 	 * 2. Direct Declarator Token       bitonic_compare(int i, int j, int dir)                  bitonic_init(void)
 	 * 3. Direct Declarator Token       bitconic_compare                                        bitonic_init
-	 * 4. ParameterSymbol List Token          int i, int j, int dir                                   void
+	 * 4. ParameterSymbol List Token          int i, int j, int dir                             void
 	 * 5. ParameterSymbol List Token          int i, int j
 	 * 6. ParameterSymbol List Token          int i
-	 * 7. ParameterSymbol Declaration Token   int i                                                   void
+	 * 7. ParameterSymbol Declaration Token   int i                                             void
 	 * 8. Type Token                    int                                                     void
 	 * 9. Direct Declarator Token       i
 	 * 10. ParameterSymbol Declaration Token  int j
@@ -170,12 +179,12 @@ public class CSymbolFactory implements SymbolFactory
 
 					if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 					{
-						this.strings.clear();
+						this.stringTokens.clear();
 						this.tokens.clear();
 
 						if((pair.getKey() != null) && (pair.getValue() != null))
 						{
-							this.strings.add(pair.getValue());
+							this.stringTokens.add(pair.getValue());
 							this.tokens.insert(pair.getKey());
 						}
 
@@ -195,7 +204,7 @@ public class CSymbolFactory implements SymbolFactory
 
 				if(functionPossible)   // There currently is a function worth of tokenPairs in the list
 				{
-					this.strings.clear();
+					this.stringTokens.clear();
 					this.tokens.clear();
 					return true;
 				}
@@ -210,10 +219,10 @@ public class CSymbolFactory implements SymbolFactory
 	 * 1. Type Token                    void                                                    void
 	 * 2. Direct Declarator Token       bitonic_compare(int i, int j, int dir)                  bitonic_init(void)
 	 * 3. Direct Declarator Token       bitconic_compare                                        bitonic_init
-	 * 4. ParameterSymbol List Token          int i, int j, int dir                                   void
+	 * 4. ParameterSymbol List Token          int i, int j, int dir                             void
 	 * 5. ParameterSymbol List Token          int i, int j
 	 * 6. ParameterSymbol List Token          int i
-	 * 7. ParameterSymbol Declaration Token   int i                                                   void
+	 * 7. ParameterSymbol Declaration Token   int i                                             void
 	 * 8. Type Token                    int                                                     void
 	 * 9. Direct Declarator Token       i
 	 * 10. ParameterSymbol Declaration Token  int j
@@ -250,7 +259,7 @@ public class CSymbolFactory implements SymbolFactory
 
 						if((pair.getKey() != null) && (pair.getValue() != null))
 						{
-							this.strings.add(pair.getValue());
+							this.stringTokens.add(pair.getValue());
 							this.tokens.insert(pair.getKey());
 						}
 
@@ -298,7 +307,7 @@ public class CSymbolFactory implements SymbolFactory
 	public CSymbolFactory()
 	{
 		this.tokens = new Sequence<TokenType>();
-		this.strings = new LinkedList<String>();
+		this.stringTokens = new LinkedList<String>();
 		this.currentScope = new Scope("global", null);
 		this.symbolTable = new SymbolTable();
 	}
@@ -337,7 +346,7 @@ public class CSymbolFactory implements SymbolFactory
 	public void pushToken(TokenType type, String value)
 	{
 		this.tokens.insert(type);
-		this.strings.add(value);
+		this.stringTokens.add(value);
 
 		if(this.checkFunctionDeclaration(new Pair<TokenType, String>(type, value)))
 		{
@@ -363,7 +372,7 @@ public class CSymbolFactory implements SymbolFactory
 		if(this.checkArrayVariable())
 		{
 			// Re-add the final token because we waited 1 token 'too long' to be sure this isn't a function
-			this.strings.add(value);
+			this.stringTokens.add(value);
 			this.tokens.insert(type);
 
 			if(this.scopeExitQueued)
@@ -377,7 +386,7 @@ public class CSymbolFactory implements SymbolFactory
 		if(this.checkSingleVariable())
 		{
 			// Re-add the final token because we waited 1 token 'too long' to be sure this isn't a function
-			this.strings.add(value);
+			this.stringTokens.add(value);
 			this.tokens.insert(type);
 
 			if(this.scopeExitQueued)

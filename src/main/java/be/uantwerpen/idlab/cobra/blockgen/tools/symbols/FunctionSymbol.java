@@ -26,13 +26,10 @@ public class FunctionSymbol implements Symbol
 		symbolNode.setAttribute("return_type", this.returnType);
 		symbolNode.setAttribute("name", this.name);
 
-		/*
-		 *  If you uncomment this, parameters will be listed under functions and under the functions' scopes
 		for(ParameterSymbol parameter : this.parameters)
 		{
 			parameter.toXMLNode(doc, symbolNode);
 		}
-		*/
 
 		if(parent != null)
 		{
@@ -55,7 +52,7 @@ public class FunctionSymbol implements Symbol
 		{
 			stringBuilder.append(this.parameters.get(i).toString());
 
-			if((i + 1) != this.parameters.size())
+			if(this.parameters.size() != (i + 1))
 			{
 				stringBuilder.append(", ");
 			}

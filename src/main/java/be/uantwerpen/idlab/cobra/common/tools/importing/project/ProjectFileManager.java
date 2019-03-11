@@ -25,7 +25,6 @@ public class ProjectFileManager
 
     public ProjectConfig parseProjectConfig(String fileLocation) throws Exception
     {
-        ProjectConfig projectConfig = null;
         ProjectFileParser parser = null;
 
         File projectFile = new File(fileLocation);

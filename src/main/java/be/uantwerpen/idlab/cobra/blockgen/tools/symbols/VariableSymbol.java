@@ -23,7 +23,7 @@ public class VariableSymbol implements Symbol
 	{
 		Element symbolNode = doc.createElement("variable");
 		symbolNode.setAttribute("type", this.type);
-		symbolNode.setAttribute("id", this.identifier);
+		symbolNode.setAttribute("name", this.identifier);
 
 		if(parent != null)
 		{

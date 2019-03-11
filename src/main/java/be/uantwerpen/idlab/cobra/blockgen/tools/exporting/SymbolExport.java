@@ -50,8 +50,13 @@ public class SymbolExport
         Document doc = db.newDocument();
 
         //Create root element
-        Element rootElement = doc.createElement("symbol_tables");
+        Element rootElement = doc.createElement("symboltable");
         doc.appendChild(rootElement);
+
+        //Add version element
+        Element versionElement = doc.createElement("version");
+        versionElement.setTextContent(MAIN_VERSION + "." + MINOR_VERSION);
+        rootElement.appendChild(versionElement);
 
         for(SymbolTable table : tables)
         {

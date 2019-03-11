@@ -11,7 +11,7 @@ public class Scope
 {
 	private Scope parent;
 	private String name;
-	private LinkedList<Symbol> symbols;
+	private List<Symbol> symbols;
 
 	public Scope(String name, Scope parent)
 	{
@@ -20,7 +20,7 @@ public class Scope
 		this.symbols = new LinkedList<Symbol>();
 	}
 
-	public Scope(String name, Scope parent, LinkedList<Symbol> symbols)
+	public Scope(String name, Scope parent, List<Symbol> symbols)
 	{
 		this.parent = parent;
 		this.name = name;
@@ -79,7 +79,7 @@ public class Scope
 			resultBuilder.append('\n');
 		}
 
-		// Recurisve Symbol Table:
+		// Recursive Symbol Table:
 		// You can recursively call toString() here, don't forget to call it with 'level + 1' as the argument!
 
 		for(int i = 0; i < (level + 1); i++)
@@ -123,7 +123,7 @@ public class Scope
 			scopeElement.appendChild(symbol.toXMLNode(doc, scopeElement));
 		}
 
-		// Recurisve Symbol Table:
+		// Recursive Symbol Table:
 		// You can recursively add children here, don't forget to pass 'scopeElement' as parent!
 
 		if(parent != null)
@@ -135,11 +135,11 @@ public class Scope
 	}
 
 	@Override
-	public boolean equals (Object other)
+	public boolean equals(Object other)
 	{
 		if(other instanceof Scope)
 		{
-			Scope otherScope = (Scope) other;
+			Scope otherScope = (Scope)other;
 
 			if((this.parent != null) && (otherScope.parent != null))
 			{

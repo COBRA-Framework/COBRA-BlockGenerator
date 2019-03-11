@@ -38,10 +38,6 @@ public class Sequence<T>
 
 	public int match(List<T> subSequence, int startIndex)
 	{
-		//Terminal.printTerminalWarning("Subsequence size: " + subSequence.size());
-		//Terminal.printTerminalWarning("Start index: " + startIndex);
-		//Terminal.printTerminalWarning("Full sequence size: " + this.size());
-
 		for(int i = startIndex; (i + subSequence.size() - 1) < this.size(); i++)
 		{
 			boolean match = true;
@@ -52,8 +48,6 @@ public class Sequence<T>
 					match = false;
 				}
 			}
-
-			//Terminal.printTerminalInfo("Match starting at " + i);
 
 			if(match)
 			{

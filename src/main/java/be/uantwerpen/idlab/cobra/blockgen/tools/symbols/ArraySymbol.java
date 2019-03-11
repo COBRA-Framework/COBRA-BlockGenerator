@@ -25,8 +25,12 @@ public class ArraySymbol implements Symbol
 	{
 		Element symbolNode = doc.createElement("array");
 		symbolNode.setAttribute("type", this.type);
-		symbolNode.setAttribute("id", this.identifier);
-		symbolNode.setAttribute("size", Integer.toString(this.size));
+		symbolNode.setAttribute("name", this.identifier);
+
+		if(this.size > 0)
+		{
+			symbolNode.setAttribute("size", Integer.toString(this.size));
+		}
 
 		if(parent != null)
 		{

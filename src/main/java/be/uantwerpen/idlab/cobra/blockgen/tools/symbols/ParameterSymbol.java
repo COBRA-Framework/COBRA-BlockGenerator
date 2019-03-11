@@ -24,7 +24,7 @@ public class ParameterSymbol implements Symbol
 	{
 		Element symbolNode = doc.createElement("parameter");
 		symbolNode.setAttribute("type", this.type);
-		symbolNode.setAttribute("id", this.identifier);
+		symbolNode.setAttribute("name", this.identifier);
 
 		if(parent != null)
 		{
