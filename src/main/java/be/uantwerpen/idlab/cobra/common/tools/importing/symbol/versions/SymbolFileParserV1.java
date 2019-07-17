@@ -123,21 +123,18 @@ public class SymbolFileParserV1 implements SymbolFileParser
         //Get first node
         Node scopeNode = tableElement.getFirstChild();
 
-        if(scopeNode != null)
+        //Get global scope
+        while(scopeNode != null && symbolTable == null)
         {
-            //Get global scope
-            do
+            if(scopeNode.getNodeType() == Node.ELEMENT_NODE)
             {
-                if(scopeNode.getNodeType() == Node.ELEMENT_NODE)
-                {
-                    Element scopeElement = (Element)scopeNode;
+                Element scopeElement = (Element)scopeNode;
 
-                    Scope globalScope = parseScope(scopeElement, config);
-                    symbolTable = new SymbolTable(globalScope);
-                }
+                Scope globalScope = parseScope(scopeElement, config);
+                symbolTable = new SymbolTable(globalScope);
+            }
 
-                scopeNode = scopeNode.getNextSibling();
-            } while(scopeNode != null && symbolTable == null);
+            scopeNode = scopeNode.getNextSibling();
         }
 
         if(symbolTable == null)
@@ -193,7 +190,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
         Node childScopeNode = scopeElement.getFirstChild();
 
         //Get child scopes
-        do
+        while(childScopeNode != null)
         {
             if(childScopeNode.getNodeType() == Node.ELEMENT_NODE)
             {
@@ -203,7 +200,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
             }
 
             childScopeNode = childScopeNode.getNextSibling();
-        } while(childScopeNode != null);
+        }
     }
 
     private GlobalScope parseGlobalScope(Element scopeElement, ProjectConfig config) throws Exception
@@ -258,7 +255,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
             {
                 NodeList parametersList = propertyNode.getChildNodes();
 
-                for(int j = 0; i < parametersList.getLength(); j++)
+                for(int j = 0; j < parametersList.getLength(); j++)
                 {
                     Node parameterNode = parametersList.item(j);
 
