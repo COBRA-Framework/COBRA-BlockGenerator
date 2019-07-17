@@ -3,14 +3,14 @@ package be.uantwerpen.idlab.cobra.common.models.symbols;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class ArraySymbol implements Symbol
+public class ArraySymbol extends VariableSymbol implements Symbol
 {
-	private String type;
-	private String identifier;
-	private int size;
+	protected int size;
 
 	public ArraySymbol(String type, String identifier, int size)
 	{
+		super(type, identifier);
+
 		this.type = type;
 		this.identifier = identifier;
 		this.size = size;

@@ -1,8 +1,8 @@
 package be.uantwerpen.idlab.cobra.blockgen.tools.antlr;
 
 import be.uantwerpen.idlab.cobra.blockgen.tools.blocks.*;
-import be.uantwerpen.idlab.cobra.common.models.symbols.grammars.CSymbolFactory;
-import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolFactory;
+import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.SymbolFactory;
+import be.uantwerpen.idlab.cobra.blockgen.tools.symbols.grammars.CSymbolFactory;
 import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolTable;
 import be.uantwerpen.idlab.cobra.common.models.CodeFile;
 import be.uantwerpen.idlab.cobra.common.models.Grammar;
@@ -116,7 +116,7 @@ public class Antlr implements CodeParser
             throw new Exception("No block model present. Parse a code file first!");
         }
 
-        return symbolFactory.flush();
+        return symbolFactory.build();
     }
 
 	protected AntlrLexer getLexer(Grammar grammar, CharStream stream) throws Exception

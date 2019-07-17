@@ -5,8 +5,8 @@ import org.w3c.dom.Element;
 
 public class VariableSymbol implements Symbol
 {
-	private String type;
-	private String identifier;
+	protected String type;
+	protected String identifier;
 
 	public VariableSymbol(String type, String identifier)
 	{

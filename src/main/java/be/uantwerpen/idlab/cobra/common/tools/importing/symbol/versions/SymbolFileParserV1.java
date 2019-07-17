@@ -3,7 +3,6 @@ package be.uantwerpen.idlab.cobra.common.tools.importing.symbol.versions;
 import be.uantwerpen.idlab.cobra.common.models.symbols.*;
 import be.uantwerpen.idlab.cobra.common.models.ProjectConfig;
 import be.uantwerpen.idlab.cobra.common.tools.importing.symbol.SymbolFileParser;
-import be.uantwerpen.idlab.cobra.common.tools.terminal.Terminal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -20,7 +19,7 @@ import java.util.List;
 
 public class SymbolFileParserV1 implements SymbolFileParser
 {
-    private final static String VERSION = "1.3";
+    private final static String VERSION = "1.5";
 
     public SymbolFileParserV1()
     {
@@ -99,34 +98,14 @@ public class SymbolFileParserV1 implements SymbolFileParser
             for(int i = 0; i < tablesList.getLength(); i++)
             {
                 Node table = tablesList.item(i);
-                SymbolTable symbolTable = new SymbolTable();
 
                 if(table.getNodeType() == Node.ELEMENT_NODE)
                 {
-                    //Get first node
-                    Node scopeNode = table.getFirstChild();
+                    Element tableElement = (Element)table;
+                    SymbolTable symbolTable = parseTable(tableElement, config);
 
-                    if(scopeNode != null)
-                    {
-                        do
-                        {
-                            if(scopeNode.getNodeType() == Node.ELEMENT_NODE)
-                            {
-                                Element scopeElement = (Element)scopeNode;
-
-                                symbolTable.insertScope(parseScope(scopeElement, config));
-                            }
-
-                            scopeNode = scopeNode.getNextSibling();
-                        } while(scopeNode != null);
-                    }
-                    else
-                    {
-                        Terminal.printTerminalWarning("Table contains no scopes. Table will be skipped!");
-                    }
+                    symbolTables.add(symbolTable);
                 }
-
-                symbolTables.add(symbolTable);
             }
         }
         catch(Exception e)
@@ -137,6 +116,38 @@ public class SymbolFileParserV1 implements SymbolFileParser
         return symbolTables;
     }
 
+    private SymbolTable parseTable(Element tableElement, ProjectConfig config) throws Exception
+    {
+        SymbolTable symbolTable = null;
+
+        //Get first node
+        Node scopeNode = tableElement.getFirstChild();
+
+        if(scopeNode != null)
+        {
+            //Get global scope
+            do
+            {
+                if(scopeNode.getNodeType() == Node.ELEMENT_NODE)
+                {
+                    Element scopeElement = (Element)scopeNode;
+
+                    Scope globalScope = parseScope(scopeElement, config);
+                    symbolTable = new SymbolTable(globalScope);
+                }
+
+                scopeNode = scopeNode.getNextSibling();
+            } while(scopeNode != null && symbolTable == null);
+        }
+
+        if(symbolTable == null)
+        {
+            throw new Exception("Table does not contain a global context!");
+        }
+
+        return symbolTable;
+    }
+
     private Scope parseScope(Element scopeElement, ProjectConfig config) throws Exception
     {
         return parseScope(null, scopeElement, config);
@@ -145,7 +156,145 @@ public class SymbolFileParserV1 implements SymbolFileParser
     private Scope parseScope(Scope parentScope, Element scopeElement, ProjectConfig config) throws Exception
     {
         Scope scope = null;
-        String name = null;
+        String scopeType = scopeElement.getTagName().toLowerCase();
+
+        switch(scopeType)
+        {
+            case "globalscope":
+                scope = parseGlobalScope(scopeElement, config);
+                break;
+            case "functionscope":
+                scope = parseFunctionScope(parentScope, scopeElement, config);
+                break;
+            case "statementscope":
+                scope = parseStatementScope(parentScope, scopeElement, config);
+                break;
+            case "blockscope":
+                scope = parseBlockScope(parentScope, scopeElement, config);
+                break;
+            case "parameters":
+                //Skip function scope specific tag
+                return parentScope;
+            default:
+                //Check for symbol tag
+                Symbol symbol = parseSymbol(scopeElement, config);
+                parentScope.insertSymbol(symbol);
+                return parentScope;
+        }
+
+        parseChildScopes(scope, scopeElement, config);
+
+        return scope;
+    }
+
+    private void parseChildScopes(Scope parentScope, Element scopeElement, ProjectConfig config) throws Exception
+    {
+        //Get first node
+        Node childScopeNode = scopeElement.getFirstChild();
+
+        //Get child scopes
+        do
+        {
+            if(childScopeNode.getNodeType() == Node.ELEMENT_NODE)
+            {
+                Element childScopeElement = (Element)childScopeNode;
+
+                parseScope(parentScope, childScopeElement, config);
+            }
+
+            childScopeNode = childScopeNode.getNextSibling();
+        } while(childScopeNode != null);
+    }
+
+    private GlobalScope parseGlobalScope(Element scopeElement, ProjectConfig config) throws Exception
+    {
+        GlobalScope scope = new GlobalScope();
+
+        return scope;
+    }
+
+    private FunctionScope parseFunctionScope(Scope parentScope, Element symbolElement, ProjectConfig config) throws Exception
+    {
+        FunctionScope scope;
+        String name;
+        String returnType;
+        Long blockId;
+
+        try
+        {
+            name = symbolElement.getAttribute("name");
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse name attribute from function scope! " + e.getMessage(), e);
+        }
+
+        try
+        {
+            returnType = symbolElement.getAttribute("return_type");
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse return type attribute from function scope! " + e.getMessage(), e);
+        }
+
+        try
+        {
+            blockId = Long.parseLong(symbolElement.getAttribute("block_id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse block id attribute from function scope! " + e.getMessage(), e);
+        }
+
+        List<VariableSymbol> parameters = new ArrayList<VariableSymbol>();
+        NodeList propertiesList = symbolElement.getChildNodes();
+
+        for(int i = 0; i < propertiesList.getLength(); i++)
+        {
+            Node propertyNode = propertiesList.item(i);
+
+            if(propertyNode.getNodeType() == Node.ELEMENT_NODE && propertyNode.getNodeName().toLowerCase().equals("parameters"))
+            {
+                NodeList parametersList = propertyNode.getChildNodes();
+
+                for(int j = 0; i < parametersList.getLength(); j++)
+                {
+                    Node parameterNode = parametersList.item(j);
+
+                    if(parameterNode.getNodeType() == Node.ELEMENT_NODE)
+                    {
+                        Element parameterElement = (Element)parameterNode;
+
+                        Symbol parsedSymbol = parseSymbol(parameterElement, config);
+                        VariableSymbol parameterSymbol;
+
+                        if(parsedSymbol instanceof VariableSymbol)
+                        {
+                            parameterSymbol = (VariableSymbol)parsedSymbol;
+                        }
+                        else
+                        {
+                            throw new RuntimeException("Incompatible symbol '" + parsedSymbol.getClass().getSimpleName() + "' detected in parameters tag!");
+                        }
+
+                        parameters.add(parameterSymbol);
+                    }
+                }
+            }
+        }
+
+        scope = new FunctionScope(blockId, name, returnType, parentScope);
+        scope.addParameters(parameters);
+
+        return scope;
+    }
+
+    private StatementScope parseStatementScope(Scope parentScope, Element scopeElement, ProjectConfig config) throws Exception
+    {
+        StatementScope scope;
+        String name;
+        Long blockId;
 
         try
         {
@@ -153,25 +302,47 @@ public class SymbolFileParserV1 implements SymbolFileParser
         }
         catch(Exception e)
         {
-            throw new Exception("Could not find or parse name attribute from table! " + e.getMessage(), e);
+            throw new Exception("Could not find or parse name attribute from statement scope! " + e.getMessage(), e);
         }
 
-        List<Symbol> symbols = new ArrayList<Symbol>();
-        NodeList symbolList = scopeElement.getChildNodes();
-
-        for(int i = 0; i < symbolList.getLength(); i++)
+        try
         {
-            Node symbolNode = symbolList.item(i);
-
-            if(symbolNode.getNodeType() == Node.ELEMENT_NODE)
-            {
-                Element symbolElement = (Element)symbolNode;
-
-                symbols.add(parseSymbol(symbolElement, config));
-            }
+            blockId = Long.parseLong(scopeElement.getAttribute("block_id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse block id attribute from statement scope! " + e.getMessage(), e);
         }
 
-        scope = new Scope(name, null, symbols);
+        scope = new StatementScope(blockId, name, parentScope);
+
+        return scope;
+    }
+
+    private BlockScope parseBlockScope(Scope parentScope, Element scopeElement, ProjectConfig config) throws Exception
+    {
+        Integer startIndex;
+        Integer endIndex;
+
+        try
+        {
+            startIndex = Integer.parseInt(scopeElement.getAttribute("start_index"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse start index attribute from block scope! " + e.getMessage(), e);
+        }
+
+        try
+        {
+            endIndex = Integer.parseInt(scopeElement.getAttribute("end_index"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse end index attribute from block scope! " + e.getMessage(), e);
+        }
+
+        BlockScope scope = new BlockScope(startIndex, endIndex, parentScope);
 
         return scope;
     }
@@ -189,12 +360,6 @@ public class SymbolFileParserV1 implements SymbolFileParser
             case "array":
                 symbol = parseArraySymbol(symbolElement, config);
                 break;
-            case "function":
-                symbol = parseFunctionSymbol(symbolElement, config);
-                break;
-            case "parameter":
-                symbol = parseParameterSymbol(symbolElement, config);
-                break;
             default:
                 throw new Exception("Unknown symbol. Could not find symbol with type: " + symbolType);
         }
@@ -204,9 +369,9 @@ public class SymbolFileParserV1 implements SymbolFileParser
 
     private VariableSymbol parseVariableSymbol(Element symbolElement, ProjectConfig config) throws Exception
     {
-        VariableSymbol symbol = null;
-        String name = null;
-        String type = null;
+        VariableSymbol symbol;
+        String name;
+        String type;
 
         try
         {
@@ -233,9 +398,9 @@ public class SymbolFileParserV1 implements SymbolFileParser
 
     private ArraySymbol parseArraySymbol(Element symbolElement, ProjectConfig config) throws Exception
     {
-        ArraySymbol symbol = null;
-        String name = null;
-        String type = null;
+        ArraySymbol symbol;
+        String name;
+        String type;
         int size = -1;
 
         try
@@ -256,89 +421,19 @@ public class SymbolFileParserV1 implements SymbolFileParser
             throw new Exception("Could not find or parse type attribute from array symbol! " + e.getMessage(), e);
         }
 
-        try
+        if(symbolElement.hasAttribute("size"))
         {
-            size = Integer.parseInt(symbolElement.getAttribute("size"));
-        }
-        catch(Exception e)
-        {
-            throw new Exception("Could not find or parse size attribute from array symbol! " + e.getMessage(), e);
-        }
-
-        symbol = new ArraySymbol(type, name, size);
-
-        return symbol;
-    }
-
-    private FunctionSymbol parseFunctionSymbol(Element symbolElement, ProjectConfig config) throws Exception
-    {
-        FunctionSymbol symbol = null;
-        String name = null;
-        String returnType = null;
-
-        try
-        {
-            name = symbolElement.getAttribute("name");
-        }
-        catch(Exception e)
-        {
-            throw new Exception("Could not find or parse name attribute from function symbol! " + e.getMessage(), e);
-        }
-
-        try
-        {
-            returnType = symbolElement.getAttribute("return_type");
-        }
-        catch(Exception e)
-        {
-            throw new Exception("Could not find or parse return type attribute from function symbol! " + e.getMessage(), e);
-        }
-
-        List<ParameterSymbol> parameters = new ArrayList<ParameterSymbol>();
-        NodeList parameterList = symbolElement.getChildNodes();
-
-        for(int i = 0; i < parameterList.getLength(); i++)
-        {
-            Node parameterNode = parameterList.item(i);
-
-            if(parameterNode.getNodeType() == Node.ELEMENT_NODE)
+            try
             {
-                Element parameterElement = (Element)parameterNode;
-
-                parameters.add(parseParameterSymbol(parameterElement, config));
+                size = Integer.parseInt(symbolElement.getAttribute("size"));
+            }
+            catch(Exception e)
+            {
+                throw new Exception("Could not find or parse size attribute from array symbol! " + e.getMessage(), e);
             }
         }
 
-        symbol = new FunctionSymbol(returnType, name, parameters);
-
-        return symbol;
-    }
-
-    private ParameterSymbol parseParameterSymbol(Element symbolElement, ProjectConfig config) throws Exception
-    {
-        ParameterSymbol symbol = null;
-        String name = null;
-        String type = null;
-
-        try
-        {
-            name = symbolElement.getAttribute("name");
-        }
-        catch(Exception e)
-        {
-            throw new Exception("Could not find or parse name attribute from parameter symbol! " + e.getMessage(), e);
-        }
-
-        try
-        {
-            type = symbolElement.getAttribute("type");
-        }
-        catch(Exception e)
-        {
-            throw new Exception("Could not find or parse type attribute from parameter symbol! " + e.getMessage(), e);
-        }
-
-        symbol = new ParameterSymbol(type, name);
+        symbol = new ArraySymbol(type, name, size);
 
         return symbol;
     }

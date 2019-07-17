@@ -33,7 +33,7 @@ public class CBlockFactory extends BlockFactory
         super(codeFile);
     }
 
-    public void createMethodBlock(String name, int start, int end, BlockReference ref)
+    public Block createMethodBlock(String name, int start, int end, BlockReference ref)
     {
         Block methodBlock = new MethodBlock(name, false, generateCodeSegment(start, end));
 
@@ -42,9 +42,11 @@ public class CBlockFactory extends BlockFactory
         methodBlock.setRef(ref);
 
         blocks.add(methodBlock);
+
+        return methodBlock;
     }
 
-    public void createStatementBlock(int start, int end, BlockReference ref)
+    public Block createStatementBlock(int start, int end, BlockReference ref)
     {
         Block statementBlock = new BasicBlock(generateCodeSegment(start, end));
 
@@ -58,9 +60,11 @@ public class CBlockFactory extends BlockFactory
         {
             //System.err.println("Statement declared outside method. Statement: char#." + start + "-" + end +" will be ignored!");
         }
+
+        return statementBlock;
     }
 
-    public void createIterationBlock(int start, int end, boolean runAtLeastOnce, BlockReference ref)
+    public Block createIterationBlock(int start, int end, boolean runAtLeastOnce, BlockReference ref)
     {
         Block iterationBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -135,7 +139,7 @@ public class CBlockFactory extends BlockFactory
         else
         {
             reportFactoryError("Iteration type can not be determined for the statement: (r." + codeSegment.getRowNumber(codeSegment.getStartIndex()) + "-" + codeSegment.getColumnNumber(codeSegment.getStartIndex()) + ") " + codeStream, new Throwable().getStackTrace().toString());
-            return;
+            return null;
         }
 
         iterationBlock.setRef(ref);
@@ -146,9 +150,11 @@ public class CBlockFactory extends BlockFactory
         currentBlockPointer.addChildBlock(iterationBlock);
 
         currentBlockPointer = iterationBlock;
+
+        return iterationBlock;
     }
 
-    public void createSelectionBlock(int start, int end, BlockReference ref)
+    public Block createSelectionBlock(int start, int end, BlockReference ref)
     {
         Block selectionBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -188,7 +194,7 @@ public class CBlockFactory extends BlockFactory
         else
         {
             reportFactoryError("Selection type can not be determined for the statement: (r." + codeSegment.getRowNumber(codeSegment.getStartIndex()) + "-" + codeSegment.getColumnNumber(codeSegment.getStartIndex()) + ") " + codeStream, new Throwable().getStackTrace().toString());
-            return;
+            return null;
         }
 
         selectionBlock.setRef(ref);
@@ -196,9 +202,11 @@ public class CBlockFactory extends BlockFactory
         currentBlockPointer.addChildBlock(selectionBlock);
 
         currentBlockPointer = selectionBlock;
+
+        return selectionBlock;
     }
 
-    public void createJumpBlock(int start, int end, BlockReference ref)
+    public Block createJumpBlock(int start, int end, BlockReference ref)
     {
         Block jumpBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -247,15 +255,17 @@ public class CBlockFactory extends BlockFactory
         else
         {
             reportFactoryError("Jump type can not be determined for the statement: (r." + codeSegment.getRowNumber(codeSegment.getStartIndex()) + "-" + codeSegment.getColumnNumber(codeSegment.getStartIndex()) + ") " + codeStream, new Throwable().getStackTrace().toString());
-            return;
+            return null;
         }
 
         jumpBlock.setRef(ref);
 
         currentBlockPointer.addChildBlock(jumpBlock);
+
+        return jumpBlock;
     }
 
-    public void addBooleanCaseStatement(boolean value, BlockReference ref)
+    public Block addBooleanCaseStatement(boolean value, BlockReference ref)
     {
         Block caseBlock = new BooleanCaseBlock(value);
 
@@ -264,9 +274,11 @@ public class CBlockFactory extends BlockFactory
         currentBlockPointer.addChildBlock(caseBlock);
 
         currentBlockPointer = caseBlock;
+
+        return caseBlock;
     }
 
-    public void addCaseStatement(int start, int end, BlockReference ref)
+    public Block addCaseStatement(int start, int end, BlockReference ref)
     {
         Block caseBlock = null;
         CodeSegment codeSegment = generateCodeSegment(start, end);
@@ -296,7 +308,7 @@ public class CBlockFactory extends BlockFactory
         else
         {
             reportFactoryError("Case type can not be determined for the statement: (r." + codeSegment.getRowNumber(codeSegment.getStartIndex()) + "-" + codeSegment.getColumnNumber(codeSegment.getStartIndex()) + ") " + codeStream, new Throwable().getStackTrace().toString());
-            return;
+            return null;
         }
 
         caseBlock.setRef(ref);
@@ -304,5 +316,7 @@ public class CBlockFactory extends BlockFactory
         currentBlockPointer.addChildBlock(caseBlock);
 
         currentBlockPointer = caseBlock;
+
+        return caseBlock;
     }
 }

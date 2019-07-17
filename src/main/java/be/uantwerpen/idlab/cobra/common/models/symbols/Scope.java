@@ -3,27 +3,31 @@ package be.uantwerpen.idlab.cobra.common.models.symbols;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Scope
+public abstract class Scope
 {
-	private Scope parent;
-	private String name;
-	private List<Symbol> symbols;
+	protected Scope parent;
+	protected List<Scope> children;
+	protected Long blockId;
+	protected List<Symbol> symbols;
 
-	public Scope(String name, Scope parent)
+	public Scope(Long blockId, Scope parent)
 	{
-		this.parent = parent;
-		this.name = name;
+		this.setParentScope(parent);
+		this.children = new ArrayList<Scope>();
+		this.blockId = blockId;
 		this.symbols = new LinkedList<Symbol>();
 	}
 
-	public Scope(String name, Scope parent, List<Symbol> symbols)
+	public Scope(Long blockId, Scope parent, List<Symbol> symbols)
 	{
-		this.parent = parent;
-		this.name = name;
+		this.setParentScope(parent);
+		this.children = new ArrayList<Scope>();
+		this.blockId = blockId;
 		this.symbols = symbols;
 	}
 
@@ -39,6 +43,11 @@ public class Scope
 		return this.parent;
 	}
 
+	public List<Scope> getChildren()
+	{
+		return this.children;
+	}
+
 	public List<Symbol> getList()
 	{
 		return this.symbols;
@@ -49,110 +58,32 @@ public class Scope
 		return this.symbols.iterator();
 	}
 
-	public String toString(int level)
+	public abstract String toString(int level);
+
+	public Long getBlockId()
 	{
-		StringBuilder resultBuilder = new StringBuilder();
-
-		for(int i = 0; i < level; i++)
-		{
-			resultBuilder.append('\t');
-		}
-
-		resultBuilder.append(this.name);
-		resultBuilder.append('\n');
-
-		for(int i = 0; i < level; i++)
-		{
-			resultBuilder.append('\t');
-		}
-
-		resultBuilder.append("{\n");
-
-		for(Symbol symbol : this.symbols)
-		{
-			for(int i = 0; i < (level + 1); i++)
-			{
-				resultBuilder.append('\t');
-			}
-
-			resultBuilder.append(symbol.toString());
-			resultBuilder.append('\n');
-		}
-
-		// Recursive Symbol Table:
-		// You can recursively call toString() here, don't forget to call it with 'level + 1' as the argument!
-
-		for(int i = 0; i < (level + 1); i++)
-		{
-			resultBuilder.append('\t');
-		}
-
-		resultBuilder.append("}\n");
-
-		return resultBuilder.toString();
+		return this.blockId;
 	}
 
 	public String toString()
 	{
-		StringBuilder resultBuilder = new StringBuilder();
-
-		resultBuilder.append(this.name);
-		resultBuilder.append("\n{\n");
-
-		for(Symbol symbol : this.symbols)
-		{
-			resultBuilder.append(symbol.toString());
-			resultBuilder.append('\n');
-		}
-
-		// Recursive Symbol Table:
-		// You can recursively call toString() here, don't forget to call it with '1' as the argument!
-
-		resultBuilder.append("}\n");
-
-		return resultBuilder.toString();
+		return this.toString(0);
 	}
 
-	public Element toXMLNode(Document doc, Element parent)
+	public abstract Element toXMLNode(Document doc, Element parent);
+
+	protected void addChild(Scope scope)
 	{
-		Element scopeElement = doc.createElement("scope");
-		scopeElement.setAttribute("name", this.name);
-
-		for(Symbol symbol : this.symbols)
-		{
-			scopeElement.appendChild(symbol.toXMLNode(doc, scopeElement));
-		}
-
-		// Recursive Symbol Table:
-		// You can recursively add children here, don't forget to pass 'scopeElement' as parent!
-
-		if(parent != null)
-		{
-			parent.appendChild(scopeElement);
-		}
-
-		return scopeElement;
+		this.children.add(scope);
 	}
 
-	@Override
-	public boolean equals(Object other)
+	private void setParentScope(Scope parentScope)
 	{
-		if(other instanceof Scope)
-		{
-			Scope otherScope = (Scope)other;
+		this.parent = parentScope;
 
-			if((this.parent != null) && (otherScope.parent != null))
-			{
-				return (this.name.equals(otherScope.name)) && (this.parent.equals(otherScope.parent));
-			}
-			else
-			{
-				return (this.name.equals(otherScope.name));
-			}
-		}
-		else
+		if(parentScope != null)
 		{
-			return false;
+			parentScope.addChild(this);
 		}
 	}
 }

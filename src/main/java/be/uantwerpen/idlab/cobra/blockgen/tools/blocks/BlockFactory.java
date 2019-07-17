@@ -48,19 +48,19 @@ public abstract class BlockFactory
         this.codeFile = codeFile;
     }
 
-    public abstract void createStatementBlock(int start, int end, BlockReference ref);
+    public abstract Block createStatementBlock(int start, int end, BlockReference ref);
 
-    public abstract void createIterationBlock(int start, int end, boolean runAtLeastOnce, BlockReference ref);
+    public abstract Block createIterationBlock(int start, int end, boolean runAtLeastOnce, BlockReference ref);
 
-    public abstract void createSelectionBlock(int start, int end, BlockReference ref);
+    public abstract Block createSelectionBlock(int start, int end, BlockReference ref);
 
-    public abstract void createJumpBlock(int start, int end, BlockReference ref);
+    public abstract Block createJumpBlock(int start, int end, BlockReference ref);
 
-    public abstract void addBooleanCaseStatement(boolean value, BlockReference ref);
+    public abstract Block addBooleanCaseStatement(boolean value, BlockReference ref);
 
-    public abstract void addCaseStatement(int start, int end, BlockReference ref);
+    public abstract Block addCaseStatement(int start, int end, BlockReference ref);
 
-    public abstract void createMethodBlock(String name, int start, int end, BlockReference ref);
+    public abstract Block createMethodBlock(String name, int start, int end, BlockReference ref);
 
     public void exitCurrentBlock()
     {

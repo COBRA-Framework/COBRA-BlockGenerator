@@ -151,7 +151,7 @@ public class JGraphX implements GraphDisplay
     {
         JFrame frame = new JFrame();
 
-        frame.setTitle("Block Viewer (" + name + ") | COBRA - Block Generator [v." + this.getClass().getPackage().getImplementationVersion() + "]  -  Created by Thomas Huybrechts, IDLab, UAntwerp (c) 2016-2017");
+        frame.setTitle("Block Viewer (" + name + ") | COBRA - Block Generator [v." + this.getClass().getPackage().getImplementationVersion() + "]  -  Created by Thomas Huybrechts, IDLab, UAntwerp (c) 2016-2019");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         try
