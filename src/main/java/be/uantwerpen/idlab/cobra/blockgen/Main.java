@@ -275,7 +275,7 @@ public class Main
 
         Terminal.printTerminal("==================================");
         Terminal.printTerminal(":: COBRA framework - 0.1(alpha) ::");
-        Terminal.printTerminal("\nCOBRA - Block Generator [Version " + Main.class.getPackage().getImplementationVersion() + "]\nCopyright (c) 2016-2017 Thomas Huybrechts, IDLab,\nUniversity of Antwerp, Belgium. All rights reserved.");
+        Terminal.printTerminal("\nCOBRA - Block Generator [Version " + Main.class.getPackage().getImplementationVersion() + "]\nCopyright (c) 2016-2019 Thomas Huybrechts, IDLab,\nUniversity of Antwerp - imec, Belgium. All rights reserved.");
         Terminal.printTerminal("This program comes with ABSOLUTELY NO WARRANTY.");
     }
 }
