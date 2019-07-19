@@ -40,6 +40,11 @@ public class SymbolTable
 		return this.scopes.get(scopeId);
 	}
 
+	public Scope getGlobalScope()
+	{
+		return this.globalScope;
+	}
+
 	public void insert(Scope scope, Symbol symbol)
 	{
 		if(this.scopes.get(scope.getBlockId()) == null)
