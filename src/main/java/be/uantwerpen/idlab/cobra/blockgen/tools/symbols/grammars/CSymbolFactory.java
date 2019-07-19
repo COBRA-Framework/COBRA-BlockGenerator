@@ -17,7 +17,7 @@ public class CSymbolFactory implements SymbolFactory
     public CSymbolFactory()
     {
         this.currentScope = new GlobalScope();
-        this.enteredNewScope = true;
+        this.enteredNewScope = false;
         this.enteredBlockScopes = new Vector<Integer>();
     }
 
