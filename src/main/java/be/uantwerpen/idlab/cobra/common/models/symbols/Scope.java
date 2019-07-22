@@ -48,7 +48,7 @@ public abstract class Scope
 		return this.children;
 	}
 
-	public List<Symbol> getList()
+	public List<Symbol> getSymbols()
 	{
 		return this.symbols;
 	}
