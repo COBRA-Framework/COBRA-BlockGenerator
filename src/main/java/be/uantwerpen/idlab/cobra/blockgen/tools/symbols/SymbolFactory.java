@@ -5,27 +5,44 @@ import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolTable;
 /**
  *  This interface represents a language-agnostic Factory class, that creates a symbol table from a stream of ANTLR rule-matches
  */
-public interface SymbolFactory
+public abstract class SymbolFactory
 {
-	void enterFunctionScope(Long blockId, String name, String returnType);
+	private static long symbolId;
 
-	void enterStatementScope(Long blockId, String name);
+	protected SymbolFactory()
+	{
+		this.symbolId = 0;
+	}
 
-	void enterBlockScope(int startIndex, int endIndex);
+	protected static long getNextSymbolId()
+	{
+		long id = symbolId;
 
-    void addVariableSymbol(String type, String identifier);
+		//Increment symbol id
+		symbolId++;
 
-    void addArraySymbol(String type, String identifier, int size);
+		return id;
+	}
 
-	void addParameterVariableSymbol(String type, String identifier);
+	public abstract void enterFunctionScope(Long blockId, String name, String returnType);
 
-	void addParameterArraySymbol(String type, String identifier, int size);
+	public abstract void enterStatementScope(Long blockId, String name);
 
-	void exitFunctionScope();
+	public abstract void enterBlockScope(int startIndex, int endIndex);
 
-	void exitBlockScope(int startIndex, int endIndex);
+	public abstract void addVariableSymbol(String type, String identifier);
 
-	void exitScope();
+	public abstract void addArraySymbol(String type, String identifier, int size);
 
-	SymbolTable build();
+	public abstract void addParameterVariableSymbol(String type, String identifier);
+
+	public abstract void addParameterArraySymbol(String type, String identifier, int size);
+
+	public abstract void exitFunctionScope();
+
+	public abstract void exitBlockScope(int startIndex, int endIndex);
+
+	public abstract void exitScope();
+
+	public abstract SymbolTable build();
 }

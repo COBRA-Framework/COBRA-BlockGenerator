@@ -18,7 +18,7 @@ import java.util.List;
 public class SymbolExport
 {
     private static final int MAIN_VERSION = 1;
-    private static final int MINOR_VERSION = 5;
+    private static final int MINOR_VERSION = 6;
 
     public int exportToXML(List<SymbolTable> tables, String exportFile) throws Exception
     {

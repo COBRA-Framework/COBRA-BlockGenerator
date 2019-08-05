@@ -27,7 +27,7 @@ public abstract class BlockFactory
         this.errorListeners = new ArrayList<FactoryErrorListener>();
     }
 
-    public BlockFactory(CodeFile codeFile)
+    protected BlockFactory(CodeFile codeFile)
     {
         this();
         this.codeFile = codeFile;

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class CSymbolFactory implements SymbolFactory
+public class CSymbolFactory extends SymbolFactory
 {
 	private Scope currentScope;
 	private List<VariableSymbol> functionScopeParameters;
@@ -93,28 +93,28 @@ public class CSymbolFactory implements SymbolFactory
 
     public void addArraySymbol(String type, String identifier, int size)
     {
-        ArraySymbol array = new ArraySymbol(type, identifier, size);
+        ArraySymbol array = new ArraySymbol(getNextSymbolId(), type, identifier, size);
 
         this.currentScope.insertSymbol(array);
     }
 
     public void addVariableSymbol(String type, String identifier)
     {
-        VariableSymbol variable = new VariableSymbol(type, identifier);
+        VariableSymbol variable = new VariableSymbol(getNextSymbolId(), type, identifier);
 
         this.currentScope.insertSymbol(variable);
     }
 
     public void addParameterArraySymbol(String type, String identifier, int size)
     {
-        ArraySymbol array = new ArraySymbol(type, identifier, size);
+        ArraySymbol array = new ArraySymbol(getNextSymbolId(), type, identifier, size);
 
         addParameterSymbol(array);
     }
 
     public void addParameterVariableSymbol(String type, String identifier)
     {
-        VariableSymbol variable = new VariableSymbol(type, identifier);
+        VariableSymbol variable = new VariableSymbol(getNextSymbolId(), type, identifier);
 
         addParameterSymbol(variable);
     }

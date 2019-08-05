@@ -7,13 +7,16 @@ public class ArraySymbol extends VariableSymbol implements Symbol
 {
 	protected int size;
 
-	public ArraySymbol(String type, String identifier, int size)
+	public ArraySymbol(long id, String type, String identifier, int size)
 	{
-		super(type, identifier);
+		super(id, type, identifier);
 
-		this.type = type;
-		this.identifier = identifier;
 		this.size = size;
+	}
+
+	public int getSize()
+	{
+		return this.size;
 	}
 
 	public String toString()
@@ -24,6 +27,7 @@ public class ArraySymbol extends VariableSymbol implements Symbol
 	public Element toXMLNode(Document doc, Element parent)
 	{
 		Element symbolNode = doc.createElement("array");
+		symbolNode.setAttribute("id", Long.toString(this.id));
 		symbolNode.setAttribute("type", this.type);
 		symbolNode.setAttribute("name", this.identifier);
 

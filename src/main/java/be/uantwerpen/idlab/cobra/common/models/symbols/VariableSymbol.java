@@ -5,13 +5,30 @@ import org.w3c.dom.Element;
 
 public class VariableSymbol implements Symbol
 {
+	protected long id;
 	protected String type;
 	protected String identifier;
 
-	public VariableSymbol(String type, String identifier)
+	public VariableSymbol(long id, String type, String identifier)
 	{
+		this.id = id;
 		this.type = type;
 		this.identifier = identifier;
+	}
+
+	public long getId()
+	{
+		return this.id;
+	}
+
+	public String getType()
+	{
+		return this.type;
+	}
+
+	public String getIdentifier()
+	{
+		return this.identifier;
 	}
 
 	public String toString()
@@ -22,6 +39,7 @@ public class VariableSymbol implements Symbol
 	public Element toXMLNode(Document doc, Element parent)
 	{
 		Element symbolNode = doc.createElement("variable");
+		symbolNode.setAttribute("id", Long.toString(this.id));
 		symbolNode.setAttribute("type", this.type);
 		symbolNode.setAttribute("name", this.identifier);
 

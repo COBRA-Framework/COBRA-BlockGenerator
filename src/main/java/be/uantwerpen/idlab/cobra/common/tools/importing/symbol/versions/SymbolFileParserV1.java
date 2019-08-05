@@ -19,7 +19,7 @@ import java.util.List;
 
 public class SymbolFileParserV1 implements SymbolFileParser
 {
-    private final static String VERSION = "1.5";
+    private final static String VERSION = "1.6";
 
     public SymbolFileParserV1()
     {
@@ -367,8 +367,18 @@ public class SymbolFileParserV1 implements SymbolFileParser
     private VariableSymbol parseVariableSymbol(Element symbolElement, ProjectConfig config) throws Exception
     {
         VariableSymbol symbol;
+        long id;
         String name;
         String type;
+
+        try
+        {
+            id = Long.parseLong(symbolElement.getAttribute("id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse id attribute from variable symbol! " + e.getMessage(), e);
+        }
 
         try
         {
@@ -388,7 +398,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
             throw new Exception("Could not find or parse type attribute from variable symbol! " + e.getMessage(), e);
         }
 
-        symbol = new VariableSymbol(type, name);
+        symbol = new VariableSymbol(id, type, name);
 
         return symbol;
     }
@@ -396,9 +406,19 @@ public class SymbolFileParserV1 implements SymbolFileParser
     private ArraySymbol parseArraySymbol(Element symbolElement, ProjectConfig config) throws Exception
     {
         ArraySymbol symbol;
+        long id;
         String name;
         String type;
         int size = -1;
+
+        try
+        {
+            id = Long.parseLong(symbolElement.getAttribute("id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse id attribute from variable symbol! " + e.getMessage(), e);
+        }
 
         try
         {
@@ -430,7 +450,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
             }
         }
 
-        symbol = new ArraySymbol(type, name, size);
+        symbol = new ArraySymbol(id, type, name, size);
 
         return symbol;
     }

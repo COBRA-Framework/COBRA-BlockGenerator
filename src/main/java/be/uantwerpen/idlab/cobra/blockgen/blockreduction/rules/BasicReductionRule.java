@@ -105,6 +105,7 @@ public abstract class BasicReductionRule implements ReductionRule
         return replacementBlock;
     }
 
+    //TODO: take different scopes into account
     private int detectOpenBrackets(String codeString, int startIndex, int endIndex)
     {
         String substring = codeString.substring(startIndex, endIndex);
