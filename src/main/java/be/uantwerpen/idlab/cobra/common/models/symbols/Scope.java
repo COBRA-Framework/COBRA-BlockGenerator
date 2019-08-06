@@ -10,25 +10,33 @@ import java.util.List;
 
 public abstract class Scope
 {
+	protected long id;
 	protected Scope parent;
 	protected List<Scope> children;
 	protected Long blockId;
 	protected List<Symbol> symbols;
 
-	public Scope(Long blockId, Scope parent)
+	public Scope(Long id, Long blockId, Scope parent)
 	{
+		this.id = id;
 		this.setParentScope(parent);
 		this.children = new ArrayList<Scope>();
 		this.blockId = blockId;
 		this.symbols = new LinkedList<Symbol>();
 	}
 
-	public Scope(Long blockId, Scope parent, List<Symbol> symbols)
+	public Scope(Long id, Long blockId, Scope parent, List<Symbol> symbols)
 	{
+		this.id = id;
 		this.setParentScope(parent);
 		this.children = new ArrayList<Scope>();
 		this.blockId = blockId;
 		this.symbols = symbols;
+	}
+
+	public long getId()
+	{
+		return this.id;
 	}
 
 	public Scope insertSymbol(Symbol symbol)

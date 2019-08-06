@@ -47,12 +47,12 @@ public class SymbolTable
 
 	public void insert(Scope scope, Symbol symbol)
 	{
-		if(this.scopes.get(scope.getBlockId()) == null)
+		if(this.scopes.get(scope.getId()) == null)
 		{
-			this.scopes.put(scope.getBlockId(), scope);
+			this.scopes.put(scope.getId(), scope);
 		}
 
-		this.scopes.get(scope.getBlockId()).insertSymbol(symbol);
+		this.scopes.get(scope.getId()).insertSymbol(symbol);
 	}
 
 	public boolean contains(Scope scope)
@@ -85,7 +85,7 @@ public class SymbolTable
 
 	private void insertScopesRecursively(Scope scope)
 	{
-		this.scopes.put(scope.getBlockId(), scope);
+		this.scopes.put(scope.getId(), scope);
 
 		for(Scope childScope : scope.getChildren())
 		{

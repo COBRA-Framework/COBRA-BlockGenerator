@@ -10,16 +10,16 @@ public class BlockScope extends Scope
     private Integer startIndex;
     private Integer endIndex;
 
-    public BlockScope(Integer startIndex, Integer endIndex, Scope parent)
+    public BlockScope(Long id, Integer startIndex, Integer endIndex, Scope parent)
     {
-        super(-1L, parent);
+        super(id, -1L, parent);
         this.startIndex = startIndex;
         this.endIndex = endIndex;
     }
 
-    public BlockScope(Integer startIndex, Integer endIndex, Scope parent, List<Symbol> symbols)
+    public BlockScope(Long id, Integer startIndex, Integer endIndex, Scope parent, List<Symbol> symbols)
     {
-        super(-1L, parent, symbols);
+        super(id, -1L, parent, symbols);
         this.startIndex = startIndex;
         this.endIndex = endIndex;
     }
@@ -83,6 +83,7 @@ public class BlockScope extends Scope
     public Element toXMLNode(Document doc, Element parent)
     {
         Element scopeElement = doc.createElement("blockscope");
+        scopeElement.setAttribute("id", Long.toString(this.id));
         scopeElement.setAttribute("start_index", this.startIndex.toString());
         scopeElement.setAttribute("end_index", this.endIndex.toString());
 

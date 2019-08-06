@@ -19,7 +19,7 @@ import java.util.List;
 
 public class SymbolFileParserV1 implements SymbolFileParser
 {
-    private final static String VERSION = "1.6";
+    private final static String VERSION = "1.7";
 
     public SymbolFileParserV1()
     {
@@ -213,9 +213,19 @@ public class SymbolFileParserV1 implements SymbolFileParser
     private FunctionScope parseFunctionScope(Scope parentScope, Element symbolElement, ProjectConfig config) throws Exception
     {
         FunctionScope scope;
+        Long id;
         String name;
         String returnType;
         Long blockId;
+
+        try
+        {
+            id = Long.parseLong(symbolElement.getAttribute("id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse id attribute from function scope! " + e.getMessage(), e);
+        }
 
         try
         {
@@ -281,7 +291,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
             }
         }
 
-        scope = new FunctionScope(blockId, name, returnType, parentScope);
+        scope = new FunctionScope(id, blockId, name, returnType, parentScope);
         scope.addParameters(parameters);
 
         return scope;
@@ -290,8 +300,18 @@ public class SymbolFileParserV1 implements SymbolFileParser
     private StatementScope parseStatementScope(Scope parentScope, Element scopeElement, ProjectConfig config) throws Exception
     {
         StatementScope scope;
+        Long id;
         String name;
         Long blockId;
+
+        try
+        {
+            id = Long.parseLong(scopeElement.getAttribute("id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse id attribute from statement scope! " + e.getMessage(), e);
+        }
 
         try
         {
@@ -311,15 +331,25 @@ public class SymbolFileParserV1 implements SymbolFileParser
             throw new Exception("Could not find or parse block id attribute from statement scope! " + e.getMessage(), e);
         }
 
-        scope = new StatementScope(blockId, name, parentScope);
+        scope = new StatementScope(id, blockId, name, parentScope);
 
         return scope;
     }
 
     private BlockScope parseBlockScope(Scope parentScope, Element scopeElement, ProjectConfig config) throws Exception
     {
+        Long id;
         Integer startIndex;
         Integer endIndex;
+
+        try
+        {
+            id = Long.parseLong(scopeElement.getAttribute("id"));
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Could not find or parse id attribute from block scope! " + e.getMessage(), e);
+        }
 
         try
         {
@@ -339,7 +369,7 @@ public class SymbolFileParserV1 implements SymbolFileParser
             throw new Exception("Could not find or parse end index attribute from block scope! " + e.getMessage(), e);
         }
 
-        BlockScope scope = new BlockScope(startIndex, endIndex, parentScope);
+        BlockScope scope = new BlockScope(id, startIndex, endIndex, parentScope);
 
         return scope;
     }

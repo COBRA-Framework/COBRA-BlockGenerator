@@ -8,10 +8,12 @@ import be.uantwerpen.idlab.cobra.common.models.symbols.SymbolTable;
 public abstract class SymbolFactory
 {
 	private static long symbolId;
+	private static long scopeId;
 
 	protected SymbolFactory()
 	{
 		this.symbolId = 0;
+		this.scopeId = 0;
 	}
 
 	protected static long getNextSymbolId()
@@ -20,6 +22,16 @@ public abstract class SymbolFactory
 
 		//Increment symbol id
 		symbolId++;
+
+		return id;
+	}
+
+	protected static long getNextScopeId()
+	{
+		long id = scopeId;
+
+		//Increment scope id
+		scopeId++;
 
 		return id;
 	}

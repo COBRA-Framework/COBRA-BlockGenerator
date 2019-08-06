@@ -12,17 +12,17 @@ public class FunctionScope extends Scope
     private String returnType;
     private List<VariableSymbol> parameters;
 
-    public FunctionScope(Long blockId, String name, String returnType, Scope parent)
+    public FunctionScope(Long id, Long blockId, String name, String returnType, Scope parent)
     {
-        super(blockId, parent);
+        super(id, blockId, parent);
         this.name = name;
         this.returnType = returnType;
         this.parameters = new ArrayList<VariableSymbol>();
     }
 
-    public FunctionScope(Long blockId, String name, String returnType, Scope parent, List<Symbol> symbols)
+    public FunctionScope(Long id, Long blockId, String name, String returnType, Scope parent, List<Symbol> symbols)
     {
-        super(blockId, parent, symbols);
+        super(id, blockId, parent, symbols);
         this.name = name;
         this.returnType = returnType;
         this.parameters = new ArrayList<VariableSymbol>();
@@ -120,6 +120,7 @@ public class FunctionScope extends Scope
     public Element toXMLNode(Document doc, Element parent)
     {
         Element scopeElement = doc.createElement("functionscope");
+        scopeElement.setAttribute("id", Long.toString(this.id));
         scopeElement.setAttribute("return_type", this.returnType);
         scopeElement.setAttribute("name", this.name);
         scopeElement.setAttribute("block_id", this.blockId.toString());

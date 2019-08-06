@@ -9,12 +9,12 @@ public class GlobalScope extends Scope
 {
     public GlobalScope()
     {
-        super(-1L, null);
+        super(-1L, -1L, null);
     }
 
     public GlobalScope(List<Symbol> symbols)
     {
-        super(-1L, null, symbols);
+        super(-1L, -1L, null, symbols);
     }
 
     public String toString(int level)

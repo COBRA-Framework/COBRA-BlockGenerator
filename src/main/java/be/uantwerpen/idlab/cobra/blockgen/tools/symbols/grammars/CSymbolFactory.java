@@ -25,13 +25,13 @@ public class CSymbolFactory extends SymbolFactory
     {
         this.functionScopeParameters = new ArrayList<>();
 
-        this.currentScope = new FunctionScope(blockId, name, returnType, this.currentScope);
+        this.currentScope = new FunctionScope(getNextScopeId(), blockId, name, returnType, this.currentScope);
         this.enteredNewScope = true;
     }
 
     public void enterStatementScope(Long blockId, String name)
     {
-        this.currentScope = new StatementScope(blockId, name, this.currentScope);
+        this.currentScope = new StatementScope(getNextScopeId(), blockId, name, this.currentScope);
         this.enteredNewScope = true;
     }
 
@@ -44,7 +44,7 @@ public class CSymbolFactory extends SymbolFactory
         }
         else
         {
-            this.currentScope = new BlockScope(startIndex, endIndex, this.currentScope);
+            this.currentScope = new BlockScope(getNextScopeId(), startIndex, endIndex, this.currentScope);
             this.enteredBlockScopes.add(startIndex);
         }
     }

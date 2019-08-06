@@ -9,15 +9,15 @@ public class StatementScope extends Scope
 {
     private String name;
 
-    public StatementScope(Long blockId, String name, Scope parent)
+    public StatementScope(Long id, Long blockId, String name, Scope parent)
     {
-        super(blockId, parent);
+        super(id, blockId, parent);
         this.name = name;
     }
 
-    public StatementScope(Long blockId, String name, Scope parent, List<Symbol> symbols)
+    public StatementScope(Long id, Long blockId, String name, Scope parent, List<Symbol> symbols)
     {
-        super(blockId, parent, symbols);
+        super(id, blockId, parent, symbols);
         this.name = name;
     }
 
@@ -76,6 +76,7 @@ public class StatementScope extends Scope
     public Element toXMLNode(Document doc, Element parent)
     {
         Element scopeElement = doc.createElement("statementscope");
+        scopeElement.setAttribute("id", Long.toString(this.id));
         scopeElement.setAttribute("name", this.name);
         scopeElement.setAttribute("block_id", this.blockId.toString());
 
