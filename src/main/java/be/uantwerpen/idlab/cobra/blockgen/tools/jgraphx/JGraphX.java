@@ -13,6 +13,7 @@ import com.mxgraph.view.mxGraph;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Calendar;
 import java.util.Map;
 
 /**
@@ -151,7 +152,7 @@ public class JGraphX implements GraphDisplay
     {
         JFrame frame = new JFrame();
 
-        frame.setTitle("Block Viewer (" + name + ") | COBRA - Block Generator [v." + this.getClass().getPackage().getImplementationVersion() + "]  -  Created by Thomas Huybrechts, IDLab, UAntwerp (c) 2016-2019");
+        frame.setTitle("Block Viewer (" + name + ") | COBRA - Block Generator [v." + this.getClass().getPackage().getImplementationVersion() + "]  -  Created by Thomas Huybrechts, IDLab, UAntwerp (c) 2016-" + Calendar.getInstance().get(Calendar.YEAR));
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         try
