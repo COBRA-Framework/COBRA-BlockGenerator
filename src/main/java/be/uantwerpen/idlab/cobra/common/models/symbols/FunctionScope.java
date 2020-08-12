@@ -20,14 +20,6 @@ public class FunctionScope extends Scope
         this.parameters = new ArrayList<VariableSymbol>();
     }
 
-    public FunctionScope(Long id, Long blockId, String name, String returnType, Scope parent, List<Symbol> symbols)
-    {
-        super(id, blockId, parent, symbols);
-        this.name = name;
-        this.returnType = returnType;
-        this.parameters = new ArrayList<VariableSymbol>();
-    }
-
     public FunctionScope addParameter(VariableSymbol parameter)
     {
         this.parameters.add(parameter);

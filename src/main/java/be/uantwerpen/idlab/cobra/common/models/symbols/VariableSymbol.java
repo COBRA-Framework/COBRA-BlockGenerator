@@ -3,6 +3,8 @@ package be.uantwerpen.idlab.cobra.common.models.symbols;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.util.Objects;
+
 public class VariableSymbol implements Symbol
 {
 	protected long id;
@@ -49,5 +51,28 @@ public class VariableSymbol implements Symbol
 		}
 
 		return symbolNode;
+	}
+
+	@Override
+	public boolean equals(Object object)
+	{
+		if(this == object)
+		{
+			return true;
+		}
+
+		if(object == null)
+		{
+			return false;
+		}
+
+		if(getClass() != object.getClass())
+		{
+			return false;
+		}
+
+		VariableSymbol variableSymbol = (VariableSymbol) object;
+
+		return Objects.equals(id, variableSymbol.getId());
 	}
 }
